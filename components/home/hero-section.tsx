@@ -1,12 +1,12 @@
 import {
-    ArrowRight,
-    CheckCircle,
-    Heart,
-    Home,
-    Search,
-    Sparkles,
-    Star,
-    Wrench
+  ArrowRight,
+  CheckCircle,
+  Heart,
+  Home,
+  Search,
+  Sparkles,
+  Star,
+  Wrench,
 } from "lucide-react";
 
 const HeroSection = () => {
@@ -47,7 +47,7 @@ const HeroSection = () => {
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               Connecting You to{" "}
-              <span className="bg-linear-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-purple-700 to-blue-700 bg-clip-text text-transparent">
                 What You Need
               </span>
               , When You Need It
@@ -59,7 +59,7 @@ const HeroSection = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <button className="cursor-pointer group bg-linear-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl transition transform hover:-translate-y-1 flex items-center justify-center">
+              <button className="cursor-pointer group bg-linear-to-r from-purple-700 to-blue-700 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl transition transform hover:-translate-y-1 flex items-center justify-center">
                 Find a Professional
                 <ArrowRight
                   className="ml-2 group-hover:translate-x-1 transition"

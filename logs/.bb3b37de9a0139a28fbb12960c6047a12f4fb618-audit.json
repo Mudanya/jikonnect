@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/home/bentola/Prog/Proj/jikonnect/logs/.bb3b37de9a0139a28fbb12960c6047a12f4fb618-audit.json",
+    "files": [
+        {
+            "date": 1762687305472,
+            "name": "/home/bentola/Prog/Proj/jikonnect/logs/2025-11-09.log",
+            "hash": "9f55309ee65c631b4ccd91e9555099102fe5aeb7e701ea332ba109c3cf8ec888"
+        },
+        {
+            "date": 1762723410662,
+            "name": "/home/bentola/Prog/Proj/jikonnect/logs/2025-11-10.log",
+            "hash": "825d4649d5c4d94bd48b239f82ee8ec19c8a04127a8bfefcfa6b50fb0c28e3a2"
+        }
+    ],
+    "hashType": "sha256"
+}

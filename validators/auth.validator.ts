@@ -10,11 +10,57 @@ export const registerSchema = z.object({
         .regex(/[0-9]/, 'Password must contain atleast one number')
         .regex(/[^A-Za-z0-9]/, 'Password must contain atleast one special character'),
     confirmPassword: z.string(),
-    firstName: z.string().min(2, 'First name must be atleast 2 characters'),
-    lastName: z.string().min(2, 'Last name must be atleast 2 characters'),
+    fullName: z.string().min(2, 'First name must be atleast 2 characters'),
+    // firstName: z.string().min(2, 'First name must be atleast 2 characters'),
+    // lastName: z.string().min(2, 'Last name must be atleast 2 characters'),
+    category: z.string().optional(),
+    experience: z.string().optional(),
+    hourlyRate: z.string().optional(),
+    location: z.string().optional(),
+    bio: z.string().optional(),
     role: z.enum(['CLIENT', 'PROFESSIONAL']).optional(),
 }).refine(data => data.password === data.confirmPassword,
     { message: "Passwords don't match", path: ['confirmPassword'] })
+    .superRefine((data, ctx) => {
+        if (data.role && data.role === 'PROFESSIONAL') {
+            debugger
+            if (!data.category) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["category"],
+                    message: 'Category is required'
+                })
+            }
+            if (!data.experience) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["experience"],
+                    message: 'Experience is required'
+                })
+            }
+            if (!data.hourlyRate) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["hourlyRate"],
+                    message: 'Hourly rate is required'
+                })
+            }
+            if (!data.location) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["location"],
+                    message: 'Location is required'
+                })
+            }
+            if (!data.bio) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["bio"],
+                    message: 'Bio is required'
+                })
+            }
+        }
+    })
 
 
 export const loginSchema = z.object({
@@ -42,3 +88,5 @@ export const resetPasswordSchema = z.object({
     path: ["confirmPassword"]
 
 });
+
+export type RegisterFormData = z.infer<typeof registerSchema>;

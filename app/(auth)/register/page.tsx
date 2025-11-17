@@ -1,48 +1,62 @@
 "use client";
+import { Input } from "@/components/ui/input";
 import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  EyeOff,
-  Eye,
-  Briefcase,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/AuthContext";
+import { RegisterFormData, registerSchema } from "@/validators/auth.validator";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
   Award,
+  Briefcase,
   DollarSign,
+  Eye,
+  EyeOff,
   Lock,
+  Mail,
+  MapPin,
+  Phone,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { AuthLayoutContext } from "../layout";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectGroup,
-  SelectLabel,
-  SelectItem,
-} from "@/components/ui/select";
 
 const Register = () => {
-  const [signUpData, setSignUpData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-    userType: "client",
-    // Professional specific
-    category: "",
-    experience: "",
-    hourlyRate: "",
-    location: "",
-    bio: "",
+  const {
+    register,
+    handleSubmit,
+    setValue,
+
+    formState: { errors, isValid, isSubmitting },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    mode: "onBlur",
+    shouldUnregister: true,
   });
 
+
+  
+  const { register: registerUser } = useAuth();
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      await registerUser(data);
+      
+    } catch (err) {
+      // if (err instanceof Error) logger.error(err.message);
+    }
+  };
+
   const [showPassword, setShowPassword] = useState(false);
+  const [isClient, setIsClient] = useState<boolean>(true);
   const categories = [
     "Cleaning",
     "Plumbing",
@@ -52,25 +66,35 @@ const Register = () => {
     "Home Care",
     "Gardening",
     "Other",
-  ];
+  ]; // todo: retrieve from db
   const { setHeaderDesc } = useContext(AuthLayoutContext);
+
+  
+
   useEffect(() => {
     setHeaderDesc({
       title: "Create your account and get started",
       classWidth: "max-w-5xl",
       classFlex: "py-12 px-4",
     });
+    setValue("role", "CLIENT");
   }, [setHeaderDesc]);
+
+  
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       {/* User Type Selection */}
       <div className="bg-white rounded-2xl shadow-xl  border border-gray-100 p-6 mb-6">
         <h3 className="font-bold text-lg mb-4 text-center">I want to:</h3>
         <div className="grid md:grid-cols-2 gap-4">
           <button
-            onClick={() => setSignUpData({ ...signUpData, userType: "client" })}
+            type="button"
+            onClick={() => {
+              setIsClient(true);
+              setValue("role", "CLIENT");
+            }}
             className={`p-6 rounded-xl border-2 transition cursor-pointer ${
-              signUpData.userType === "client"
+              isClient
                 ? "border-blue-500 bg-blue-50"
                 : "border-gray-300 hover:border-blue-300"
             }`}
@@ -82,11 +106,16 @@ const Register = () => {
             </p>
           </button>
           <button
-            onClick={() =>
-              setSignUpData({ ...signUpData, userType: "professional" })
-            }
+            onClick={() => {
+              setIsClient(false);
+              setValue("role", "PROFESSIONAL", {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true,
+              });
+            }}
             className={`p-6 rounded-xl border-2 transition cursor-pointer ${
-              signUpData.userType === "professional"
+              !isClient
                 ? "border-blue-500 bg-blue-50"
                 : "border-gray-300 hover:border-blue-300"
             }`}
@@ -114,14 +143,18 @@ const Register = () => {
               />
               <Input
                 type="text"
-                value={signUpData.fullName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSignUpData({ ...signUpData, fullName: e.target.value })
-                }
+                {...register("fullName")}
                 placeholder="John Doe"
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.fullName && "border-red-300"
+                }`}
               />
             </div>
+            {errors.fullName && (
+              <small className="text-xs text-red-300">
+                {errors.fullName.message}
+              </small>
+            )}
           </div>
 
           <div>
@@ -135,14 +168,18 @@ const Register = () => {
               />
               <Input
                 type="email"
-                value={signUpData.email}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSignUpData({ ...signUpData, email: e.target.value })
-                }
+                {...register("email")}
                 placeholder="your.email@example.com"
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.email && "border-red-300"
+                }`}
               />
             </div>
+            {errors.email && (
+              <small className="text-xs text-red-300">
+                {errors.email.message}
+              </small>
+            )}
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -155,17 +192,21 @@ const Register = () => {
               />
               <Input
                 type="tel"
-                value={signUpData.phone}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSignUpData({ ...signUpData, phone: e.target.value })
-                }
+                {...register("phone")}
                 placeholder="+254 700 000000"
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.phone && "border-red-300"
+                }`}
               />
             </div>
+            {errors.phone && (
+              <small className="text-xs text-red-300">
+                {errors.phone.message}
+              </small>
+            )}
           </div>
 
-          {signUpData.userType === "professional" && (
+          {!isClient && (
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Location
@@ -177,14 +218,18 @@ const Register = () => {
                 />
                 <Input
                   type="text"
-                  value={signUpData.location}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setSignUpData({ ...signUpData, location: e.target.value })
-                  }
+                  {...register("location")}
                   placeholder="Nairobi, Kenya"
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.location && "border-red-300"
+                  }`}
                 />
               </div>
+              {errors.location && (
+                <small className="text-xs text-red-300">
+                  {errors.location.message}
+                </small>
+              )}
             </div>
           )}
 
@@ -199,20 +244,25 @@ const Register = () => {
               />
               <Input
                 type={showPassword ? "text" : "password"}
-                value={signUpData.password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSignUpData({ ...signUpData, password: e.target.value })
-                }
+                {...register("password")}
                 placeholder="Create a password"
-                className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.password && "border-red-300"
+                }`}
               />
               <button
+                type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute cursor-pointer right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+            {errors.password && (
+              <small className="text-xs text-red-300">
+                {errors.password.message}
+              </small>
+            )}
           </div>
 
           <div>
@@ -225,23 +275,24 @@ const Register = () => {
                 size={20}
               />
               <Input
-                type={showPassword ? "text" : "password"}
-                value={signUpData.confirmPassword}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSignUpData({
-                    ...signUpData,
-                    confirmPassword: e.target.value,
-                  })
-                }
+                type={"password"}
+                {...register("confirmPassword")}
                 placeholder="Confirm your password"
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.confirmPassword && "border-red-300"
+                }`}
               />
             </div>
+            {errors.confirmPassword && (
+              <small className="text-xs text-red-300">
+                {errors.confirmPassword.message}
+              </small>
+            )}
           </div>
         </div>
 
         {/* Professional-specific fields */}
-        {signUpData.userType === "professional" && (
+        {!isClient && (
           <div className="mt-6 pt-6 border-t space-y-6">
             <h3 className="font-bold text-lg">Professional Details</h3>
 
@@ -256,13 +307,21 @@ const Register = () => {
                     size={20}
                   />
                   <Select
-                    value={signUpData.category}
-                    onValueChange={(value) => {
-                      setSignUpData({ ...signUpData, category: value });
-                    }}
+                    {...register("category")}
+                    onValueChange={(value) =>
+                      setValue("category", value, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      })
+                    }
                   >
-                    <SelectTrigger className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <SelectValue placeholder="Select a fruit" />
+                    <SelectTrigger
+                      className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        errors.category && "border-red-300"
+                      }`}
+                    >
+                      <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
@@ -276,6 +335,11 @@ const Register = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                {errors.category && (
+                  <small className="text-xs text-red-300">
+                    {errors.category.message}
+                  </small>
+                )}
               </div>
 
               <div>
@@ -289,17 +353,18 @@ const Register = () => {
                   />
                   <Input
                     type="number"
-                    value={signUpData.experience}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setSignUpData({
-                        ...signUpData,
-                        experience: e.target.value,
-                      })
-                    }
+                    {...register("experience")}
                     placeholder="5"
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      errors.experience && "border-red-300"
+                    }`}
                   />
                 </div>
+                {errors.experience && (
+                  <small className="text-xs text-red-300">
+                    {errors.experience.message}
+                  </small>
+                )}
               </div>
 
               <div>
@@ -313,17 +378,18 @@ const Register = () => {
                   />
                   <Input
                     type="number"
-                    value={signUpData.hourlyRate}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setSignUpData({
-                        ...signUpData,
-                        hourlyRate: e.target.value,
-                      })
-                    }
+                    {...register("hourlyRate")}
                     placeholder="800"
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      errors.hourlyRate && "border-red-300"
+                    }`}
                   />
                 </div>
+                {errors.hourlyRate && (
+                  <small className="text-xs text-red-300">
+                    {errors.hourlyRate.message}
+                  </small>
+                )}
               </div>
             </div>
 
@@ -332,18 +398,19 @@ const Register = () => {
                 Bio / Description
               </label>
               <Textarea
-                value={signUpData.bio}
-                onChange={(value) =>
-                  setSignUpData({
-                    ...signUpData,
-                    bio: value as unknown as string,
-                  })
-                }
+                {...register("bio")}
                 placeholder="Tell clients about your experience and expertise..."
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.bio && "border-red-300"
+                }`}
               />
             </div>
+            {errors.bio && (
+              <small className="text-xs text-red-300">
+                {errors.bio.message}
+              </small>
+            )}
           </div>
         )}
 
@@ -355,19 +422,29 @@ const Register = () => {
             />
             <span className="ml-2 text-sm text-gray-600">
               I agree to the{" "}
-              <button className="text-blue-600 hover:underline">
+              <button
+                type="button"
+                className="text-blue-600 cursor-pointer hover:underline"
+              >
                 Terms of Service
               </button>{" "}
               and{" "}
-              <button className="text-blue-600 hover:underline">
+              <button
+                type="button"
+                className="text-blue-600 cursor-pointer hover:underline"
+              >
                 Privacy Policy
               </button>
             </span>
           </label>
         </div>
 
-        <button className="w-full cursor-pointer mt-6 bg-linear-to-r from-purple-700 to-blue-700 text-white py-3 rounded-xl font-bold hover:shadow-lg transition transform hover:-translate-y-0.5">
-          Create Account
+        <button
+          type="submit"
+          disabled={!isValid || isSubmitting}
+          className="disabled:opacity-30 disabled:cursor-not-allowed w-full cursor-pointer mt-6 bg-linear-to-r from-purple-700 to-blue-700 text-white py-3 rounded-xl font-bold hover:shadow-lg transition transform hover:-translate-y-0.5"
+        >
+          {isSubmitting ? "Submitting ..." : "Create Account"}
         </button>
 
         <div className="mt-6 text-center">
@@ -375,14 +452,14 @@ const Register = () => {
             Already have an account?{" "}
             <Link
               href="/login"
-              className="text-blue-600 font-semibold hover:underline"
+              className="text-blue-600 cursor-pointer font-semibold hover:underline"
             >
               Sign In
             </Link>
           </p>
         </div>
       </div>
-    </>
+    </form>
   );
 };
 

@@ -11,10 +11,10 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-linear-to-br from-purple-700 to-blue-700 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">Ji</span>
             </div>
-            <span className="text-2xl font-bold bg-linear-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-linear-to-r from-purple-700 to-blue-700 bg-clip-text text-transparent">
               JiKonnect
             </span>
           </div>
@@ -47,10 +47,16 @@ const Header = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
-            <Link href={'/login'} className="cursor-pointer text-gray-700 hover:text-blue-600 transition font-medium">
+            <Link
+              href={"/login"}
+              className="cursor-pointer text-gray-700 hover:text-blue-600 transition font-medium"
+            >
               Login
             </Link>
-            <Link href={'/signup'} className="cursor-pointer bg-linear-to-r from-blue-600 to-cyan-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transition transform hover:-translate-y-0.5">
+            <Link
+              href={"/register"}
+              className="cursor-pointer bg-linear-to-r from-purple-700 to-blue-700 text-white px-6 py-2 rounded-lg hover:shadow-lg transition transform hover:-translate-y-0.5"
+            >
               Sign Up
             </Link>
           </div>
@@ -91,7 +97,7 @@ const Header = () => {
             <button className="w-full text-left text-gray-700 hover:text-blue-600 font-medium">
               Login
             </button>
-            <button className="w-full bg-linear-to-r from-blue-600 to-cyan-500 text-white px-6 py-2 rounded-lg">
+            <button className="w-full bg-linear-to-r from-purple-700 to-blue-700 text-white px-6 py-2 rounded-lg">
               Sign Up
             </button>
           </div>
