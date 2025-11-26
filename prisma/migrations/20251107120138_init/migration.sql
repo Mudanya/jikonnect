@@ -28,7 +28,7 @@ CREATE TABLE "User" (
     "status" "UserStatus" NOT NULL DEFAULT 'PENDING',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "avatarUrl" TEXT,
+    "avatar" TEXT,
     "phoneVerified" BOOLEAN NOT NULL DEFAULT false,
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "lastLogin" TIMESTAMP(3),

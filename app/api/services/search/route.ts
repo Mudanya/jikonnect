@@ -1,0 +1,25 @@
+import logger from "@/lib/logger";
+import { getUserProfiles } from "@/services/queries/provider.query";
+import { NextRequest, NextResponse } from "next/server";
+import { success } from "zod";
+
+export const GET = async (req: NextRequest) => {
+    try {
+        const { searchParams } = new URL(req.url)
+        const category = searchParams.get('category')
+        const location = searchParams.get('locatiion')
+        const minRate = searchParams.get('minRate');
+        const maxRate = searchParams.get('maxRate');
+        const minRating = searchParams.get('minRating');
+
+        const profiles = await getUserProfiles({ category, location, minRate, maxRate, minRating })
+        return NextResponse.json({ success: true, data: profiles })
+    }
+    catch (err) {
+        logger.error((err as Error).message)
+        return NextResponse.json(
+            { success: false, message: 'Failed to search provders' }, { status: 500 }
+        )
+    }
+
+}

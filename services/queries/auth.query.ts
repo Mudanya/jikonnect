@@ -1,12 +1,11 @@
 import { generateRandomToken } from "@/lib/auth";
-import { PrismaClient, User } from "@/lib/generated/prisma/client";
-import { RegisterUser } from "@/types/auth";
+import { User } from "@/lib/generated/prisma/client";
+import { prisma } from "@/prisma/prisma.init";
 import { RegisterFormData } from "@/validators/auth.validator";
-import { profile } from "console";
 import { NextRequest } from "next/server";
 
 
-const prisma = new PrismaClient()
+
 export const getUser = async (email: string) => {
     return await prisma.user.findUnique({
         where: { email }
@@ -73,14 +72,16 @@ export const findUserbyEmailOrPhone = async (email: string, phone?: string): Pro
     })
     return user
 }
-export const createAuditLog = async (req: NextRequest, userId: string, action: string, entity: string) => {
+export const createAuditLog = async (req: NextRequest, userId: string, action: string, entity: string, body?: object, entityId?: string) => {
     await prisma.auditLogs.create({
         data: {
             action,
             entity,
             userId,
-            entityId: userId,
-            ipAddress: req.headers.get('x-forwarded-for') || 'unknown'
+            entityId: entityId || userId,
+            ipAddress: req.headers.get('x-forwarded-for') || 'unknown',
+            userAgent: req.headers.get('user-agent') || 'unknown',
+            details: body ? { updateFields: Object.keys(body) } : ""
         }
     })
 }
@@ -127,3 +128,8 @@ export const removeVerificationToken = async (token: string, isPasswordReset?: b
 export const updatePassword = async (id: string, password: string) => {
     await prisma.user.update({ where: { id }, data: { password } })
 }
+
+export const getUserWithProfileById = async (id: string) => {
+    return await prisma.user.findUnique({ where: { id }, include: { profile: true } })
+}
+

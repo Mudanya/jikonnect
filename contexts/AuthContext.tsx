@@ -1,6 +1,5 @@
 "use client";
-import logger from "@/lib/logger";
-import { AuthContextType, RegisterData, User } from "@/types/auth";
+import { AuthContextType, User } from "@/types/auth";
 import { RegisterFormData } from "@/validators/auth.validator";
 import { useRouter } from "next/navigation";
 
@@ -27,6 +26,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   //   login
   const login = async (email: string, password: string) => {
     try {
+    
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -34,21 +34,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       const data = await response.json();
+
       if (!data.success) throw new Error(data.message || "Login failed");
       const {
         tokens: { accessToken, refreshToken },
         user: reUser,
       } = data.data;
+
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("user", JSON.stringify(reUser));
 
       setUser(reUser);
+      if (reUser.role === "CLIENT") {
+        router.push("/dashboard");
+        return;
+      }
       router.push("/dashboard");
-      
     } catch (err) {
       if (err instanceof Error) {
-        logger.error(err.message);
+        console.error("Login error:", err); // Debugging line
         throw new Error(err.message || "Login failed");
       }
     }
@@ -56,7 +61,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   //   register
   const register = async (data: RegisterFormData) => {
     try {
-      debugger
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -79,7 +83,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       router.push("/dashboard");
     } catch (err) {
       if (err instanceof Error) {
-        logger.error(err.message);
         throw new Error(err.message || "Registration failed");
       }
     }
@@ -123,7 +126,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     register,
     logout,
     refreshToken,
-    isAuthenticated: !user,
+    isAuthenticated: user ? true : false,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

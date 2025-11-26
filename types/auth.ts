@@ -43,6 +43,7 @@ export type User = {
     status: string;
     emailVerified: boolean;
     phoneVerified: boolean;
+    avatar?: string;
 }
 
 export type AuthContextType = {

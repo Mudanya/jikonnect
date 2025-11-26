@@ -42,12 +42,12 @@ const HeroSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <div className="inline-block mb-4 px-4 py-2 bg-blue-100 rounded-full text-blue-700 text-sm font-medium">
-              🇰 🇪 Kenya&apos;s Trusted Service Platform
+            <div className="mb-4 px-4 py-2 rounded-full text-jiko-primary text-sm font-medium flex items-center bg-jiko-secondary/15">
+               Connecting prople, skills, services and care
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               Connecting You to{" "}
-              <span className="bg-linear-to-r from-purple-700 to-blue-700 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-jiko-primary to-jiko-secondary bg-clip-text text-transparent">
                 What You Need
               </span>
               , When You Need It
@@ -59,14 +59,14 @@ const HeroSection = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <button className="cursor-pointer group bg-linear-to-r from-purple-700 to-blue-700 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl transition transform hover:-translate-y-1 flex items-center justify-center">
+              <button className="cursor-pointer group bg-jiko-primary  text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl transition transform hover:-translate-y-1 flex items-center justify-center">
                 Find a Professional
                 <ArrowRight
                   className="ml-2 group-hover:translate-x-1 transition"
                   size={20}
                 />
               </button>
-              <button className="cursor-pointer border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition">
+              <button className="cursor-pointer border-2 border-jiko-secondary text-jiko-secondary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition">
                 Join as a Pro
               </button>
             </div>

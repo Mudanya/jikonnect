@@ -29,6 +29,7 @@ import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AuthLayoutContext } from "../layout";
+import { toast } from "sonner";
 
 const Register = () => {
   const {
@@ -43,15 +44,14 @@ const Register = () => {
     shouldUnregister: true,
   });
 
-
-  
   const { register: registerUser } = useAuth();
   const onSubmit = async (data: RegisterFormData) => {
     try {
       await registerUser(data);
-      
     } catch (err) {
-      // if (err instanceof Error) logger.error(err.message);
+      if (err instanceof Error) {
+        toast.error(err.message);
+      }
     }
   };
 
@@ -69,8 +69,6 @@ const Register = () => {
   ]; // todo: retrieve from db
   const { setHeaderDesc } = useContext(AuthLayoutContext);
 
-  
-
   useEffect(() => {
     setHeaderDesc({
       title: "Create your account and get started",
@@ -80,7 +78,6 @@ const Register = () => {
     setValue("role", "CLIENT");
   }, [setHeaderDesc]);
 
-  
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       {/* User Type Selection */}
@@ -442,7 +439,7 @@ const Register = () => {
         <button
           type="submit"
           disabled={!isValid || isSubmitting}
-          className="disabled:opacity-30 disabled:cursor-not-allowed w-full cursor-pointer mt-6 bg-linear-to-r from-purple-700 to-blue-700 text-white py-3 rounded-xl font-bold hover:shadow-lg transition transform hover:-translate-y-0.5"
+          className="disabled:opacity-30 disabled:cursor-not-allowed w-full cursor-pointer mt-6 bg-jiko-primary  text-white py-3 rounded-xl font-bold hover:shadow-lg transition transform hover:-translate-y-0.5"
         >
           {isSubmitting ? "Submitting ..." : "Create Account"}
         </button>

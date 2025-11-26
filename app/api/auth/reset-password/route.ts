@@ -1,12 +1,12 @@
 import { hashPassword } from "@/lib/auth";
 import logger from "@/lib/logger";
-import { createAuditLog, findVerificationToken, removeVerificationToken, updatePassword } from "@/services/auth.query";
+import { createAuditLog, findVerificationToken, removeVerificationToken, updatePassword } from "@/services/queries/auth.query";
 import { resetPasswordSchema } from "@/validators/auth.validator";
 import { NextRequest } from "next/server";
 
 export const POST = async (req: NextRequest) => {
     try {
-        const body = req.json();
+        const body = await req.json();
         const validationRes = resetPasswordSchema.safeParse(body)
         if (!validationRes.success) return Response.json({
 

@@ -1,6 +1,6 @@
 import { sendPasswordResetEmail } from "@/lib/email";
 import logger from "@/lib/logger";
-import { createAuditLog, createVerificationTokenSettings, findUserbyEmailOrPhone, getUser } from "@/services/auth.query";
+import { createAuditLog, createVerificationTokenSettings, findUserbyEmailOrPhone, getUser } from "@/services/queries/auth.query";
 import { forgotPasswordSchema } from "@/validators/auth.validator";
 import { NextRequest } from "next/server";
 

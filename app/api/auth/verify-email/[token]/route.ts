@@ -1,10 +1,13 @@
 import logger from "@/lib/logger";
-import { activateUser, createAuditLog, findVerificationToken, removeVerificationToken } from "@/services/auth.query";
-import { NextRequest } from "next/server";
+import { activateUser, createAuditLog, findVerificationToken, removeVerificationToken } from "@/services/queries/auth.query";
+import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest, { params }: { params: { token: string } }) => {
+
     try {
-        const { token } = params
+
+        const { token } = await params;
+        
         const verification = await findVerificationToken(token);
         if (!verification) return Response.json({
 
@@ -15,14 +18,14 @@ export const POST = async (req: NextRequest, { params }: { params: { token: stri
         await activateUser(data.userId) //update verification status
         await removeVerificationToken(token); //delete verification token
         await createAuditLog(req, data.userId, 'EMAIL_VERIFIED', 'User')
-        return Response.json({
-            success: false,
+        return NextResponse.json({
+            success: true,
             message: 'Email verified successfully'
         })
     }
     catch (ex) {
         if (ex instanceof Error) logger.error(ex.message)
-        return Response.json({
+        return NextResponse.json({
 
             success: false,
             message: 'Failed to verify email. Please try again.'

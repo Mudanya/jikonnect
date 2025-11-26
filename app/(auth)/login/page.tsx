@@ -5,11 +5,22 @@ import { useContext, useEffect, useState } from "react";
 import { AuthLayoutContext } from "../layout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { LoginFormData, loginSchema } from "@/validators/auth.validator";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { is } from "zod/locales";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Login = () => {
-  const [signInData, setSignInData] = useState({
-    email: "",
-    password: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: "onBlur",
+    shouldUnregister: true,
   });
   const [showPassword, setShowPassword] = useState(false);
   const { setHeaderDesc } = useContext(AuthLayoutContext);
@@ -20,8 +31,20 @@ const Login = () => {
       classFlex: "flex items-center justify-center w-full p-4",
     });
   }, [setHeaderDesc]);
+
+  const { login } = useAuth();
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      await login(data.email, data.password);
+      toast.success("Logged in successfully!");
+    } catch (err) {
+      console.error("Login error:", err);
+      toast.error((err as Error).message || "Login failed. Please retry!");
+    }
+  };
+
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       {/* Sign In Form */}
       <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
         <div className="mb-6">
@@ -35,14 +58,18 @@ const Login = () => {
             />
             <Input
               type="email"
-              value={signInData.email}
-              onChange={(e) =>
-                setSignInData({ ...signInData, email: e.target.value })
-              }
+              {...register("email")}
               placeholder="your.email@example.com"
-              className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 !focus:ring-red-500"
+              className={`w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 !focus:ring-red-500 ${
+                errors.email ? "border-red-300" : ""
+              }`}
             />
-          </div>
+          </div>{" "}
+          {errors.email && (
+            <small className="text-xs text-red-300">
+              {errors.email.message}
+            </small>
+          )}
         </div>
 
         <div className="mb-6">
@@ -56,14 +83,14 @@ const Login = () => {
             />
             <Input
               type={showPassword ? "text" : "password"}
-              value={signInData.password}
-              onChange={(e) =>
-                setSignInData({ ...signInData, password: e.target.value })
-              }
+              {...register("password")}
               placeholder="Enter your password"
-              className="w-full pl-12 pr-12 py-3 border  border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full pl-12 pr-12 py-3 border  border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.password ? "border-red-300" : ""
+              }`}
             />
             <Button
+              type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-4 top-1/2 transform bg-transparent! cursor-pointer -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
@@ -74,6 +101,11 @@ const Login = () => {
               )}
             </Button>
           </div>
+          {errors.password && (
+            <small className="text-xs text-red-300">
+              {errors.password.message}
+            </small>
+          )}
         </div>
 
         <div className="flex items-center justify-between mb-6">
@@ -86,14 +118,18 @@ const Login = () => {
           </label>
           <Link
             href="/forgot-password"
-            className="text-sm text-blue-600 hover:underline font-semibold cursor-pointer"
+            className="text-sm text-jiko-primary hover:underline font-semibold cursor-pointer"
           >
             Forgot password?
           </Link>
         </div>
 
-        <button className="w-full cursor-pointer bg-linear-to-r from-purple-700 to-blue-700 text-white py-3 rounded-xl font-bold hover:shadow-lg transition transform hover:-translate-y-0.5">
-          Sign In
+        <button
+          type="submit"
+          disabled={!isValid || isSubmitting}
+          className="disabled:opacity-50 disabled:cursor-not-allowed w-full cursor-pointer bg-jiko-primary  text-white py-3 rounded-xl font-bold hover:shadow-lg transition transform hover:-translate-y-0.5"
+        >
+          {isSubmitting ? "Signing In..." : "Sign In"}
         </button>
 
         <div className="mt-6 text-center">
@@ -101,7 +137,7 @@ const Login = () => {
             Don&apos;t have an account?{" "}
             <Link
               href={"/register"}
-              className="text-blue-600 font-semibold hover:underline cursor-pointer"
+              className="text-jiko-primary font-semibold hover:underline cursor-pointer"
             >
               Sign Up
             </Link>
@@ -133,7 +169,7 @@ const Login = () => {
             </button>
           </div>
         </div> */}
-    </>
+    </form>
   );
 };
 

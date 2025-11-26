@@ -5,16 +5,16 @@ const transporter = nodemailer.createTransport({
     port: parseInt(process.env.SMTP_PORT!),
     secure: false,
     auth: {
-        user: process.env.SMT_USER,
+        user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
     }
 })
 
 export const sendVerificationEmail = async (email: string, token: string) => {
     const verificationUrl = `${process.env.PUBLIC_APP_URL}/verify-email/${token}`
-
+    
     await transporter.sendMail({
-        from: process.env.SMTP_FROM,
+        from: `${process.env.SMTP_FROM}`,
         to: email,
         subject: 'Verify Email',
         html: `

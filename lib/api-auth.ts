@@ -1,6 +1,5 @@
 import { AuthenticatedRequest } from "@/types/auth";
 import { NextRequest, NextResponse } from "next/server";
-import logger from "./logger";
 
 export const withAuth = (handler: (req: AuthenticatedRequest) => Promise<NextResponse>) => {
     return async (req: NextRequest) => {
@@ -23,7 +22,7 @@ export const withAuth = (handler: (req: AuthenticatedRequest) => Promise<NextRes
             return await handler(authenticatedReq)
         }
         catch (ex) {
-            if (ex instanceof Error) logger.error(ex.message)
+
             return NextResponse.json(
                 {
                     success: false,

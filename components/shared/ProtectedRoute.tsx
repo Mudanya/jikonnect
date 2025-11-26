@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 interface ProtectedRouteProps {
@@ -10,13 +10,13 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated ,refreshToken} = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) router.push("/login");
+    if (!loading && !isAuthenticated) {router.push("/login");}
     if (!loading && user && allowedRoles && !allowedRoles.includes(user.role))
-      router.push("/unauthorized");
+      {router.push("/unauthorized");}
   }, [loading, user, router, isAuthenticated, allowedRoles]);
 
   if (loading) {

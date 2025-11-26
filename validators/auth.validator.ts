@@ -23,7 +23,7 @@ export const registerSchema = z.object({
     { message: "Passwords don't match", path: ['confirmPassword'] })
     .superRefine((data, ctx) => {
         if (data.role && data.role === 'PROFESSIONAL') {
-            debugger
+            
             if (!data.category) {
                 ctx.addIssue({
                     code: "custom",
@@ -90,3 +90,6 @@ export const resetPasswordSchema = z.object({
 });
 
 export type RegisterFormData = z.infer<typeof registerSchema>;
+export type LoginFormData = z.infer<typeof loginSchema>;
+export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;

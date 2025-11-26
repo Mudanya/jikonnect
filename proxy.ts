@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessToken } from "./lib/jwt";
 
-export const middleware = (req: NextRequest) => {
+export const proxy = (req: NextRequest) => {
     const token = req.cookies.get('accessToken')?.value ||
         req.headers.get('authorization')?.replace('Bearer ', '');
     const { pathname } = req.nextUrl;
+    
     const publicRoutes = [
         '/api/auth/login',
         '/api/auth/register',
@@ -22,12 +23,14 @@ export const middleware = (req: NextRequest) => {
             { status: 401 }
         );
         const user = verifyAccessToken(token!)
-        if (!user) return Response.json({
-            success: false,
-            message: 'Invalid or expired token'
-        },
-            { status: 401 });
+        if (!user) {
 
+            return Response.json({
+                success: false,
+                message: 'Invalid or expired token'
+            },
+                { status: 401 });
+        }
         const requestHeaders = new Headers(req.headers)
         requestHeaders.set('x-user-id', user.userId)
         requestHeaders.set('x-user-email', user.email)

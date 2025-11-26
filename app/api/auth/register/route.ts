@@ -1,8 +1,9 @@
+
 import { hashPassword } from "@/lib/auth";
 import { sendVerificationEmail } from "@/lib/email";
 import { generateTokens } from "@/lib/jwt";
 import logger from "@/lib/logger";
-import { createAuditLog, createUser, createVerificationTokenSettings, findUserbyEmailOrPhone } from "@/services/auth.query";
+import { createAuditLog, createUser, createVerificationTokenSettings, findUserbyEmailOrPhone } from "@/services/queries/auth.query";
 import { registerSchema } from "@/validators/auth.validator";
 
 import { NextRequest } from "next/server";
@@ -58,6 +59,7 @@ export const POST = async (req: NextRequest) => {
                     lastName: createdUser.lastName,
                     role: createdUser.role,
                     status: createdUser.status,
+                    avatar: createdUser.avatar,
                 },
                 tokens
             }
@@ -65,10 +67,9 @@ export const POST = async (req: NextRequest) => {
     }
     catch (ex: unknown) {
         if (ex instanceof Error) logger.error(ex.message)
-
         return Response.json({
             success: false,
-            message: "Login failed. Please retry!"
+            message: "Registration failed. Please retry!"
         }, { status: 500 })
     }
 }

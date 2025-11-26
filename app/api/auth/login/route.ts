@@ -1,13 +1,13 @@
 import { verifyPassword } from "@/lib/auth";
 import { generateTokens } from "@/lib/jwt";
 import logger from "@/lib/logger";
-import { createAuditLog, getUser, updateLastLogin } from "@/services/auth.query";
+import { createAuditLog, getUser, updateLastLogin } from "@/services/queries/auth.query";
 import { loginSchema } from "@/validators/auth.validator";
 import { NextRequest } from "next/server";
 
 export const POST = async (req: NextRequest) => {
     try {
-        const body = req.json();
+        const body = await req.json();
         const validationRes = loginSchema.safeParse(body);
         if (!validationRes.success) return Response.json(
             {
@@ -21,6 +21,7 @@ export const POST = async (req: NextRequest) => {
             }, { status: 400 })
         const { email, password } = validationRes.data;
         const user = await getUser(email)
+
         if (!user) return Response.json(
             {
 
@@ -33,6 +34,7 @@ export const POST = async (req: NextRequest) => {
                 message: 'Account is suspended please. Please contact support',
                 success: false
             }, { status: 403, })
+
         const isValidPwd = await verifyPassword(password, user.password)
         if (!isValidPwd) return Response.json({
 
@@ -52,11 +54,13 @@ export const POST = async (req: NextRequest) => {
         logger.info(`${user.email} Logged In`)
         return Response.json({
             message: 'login successful',
+            success: true,
             data: {
                 user: {
                     id: user.id,
                     email: user.email,
                     phone: user.phone,
+                    avatar: user.avatar,
                     firstName: user.firstName,
                     lastName: user.lastName,
                     role: user.role,

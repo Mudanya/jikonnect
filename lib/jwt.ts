@@ -1,6 +1,7 @@
 import { AuthUser } from "@/types/auth"
 import jwt from 'jsonwebtoken'
 import * as ms from 'ms'
+import logger from "./logger"
 const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET as string
 const REFRESH_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET || ""
 const ACCESS_TOKEN_EXPIRY = process.env.JWT_ACCESS_EXPIRY as ms.StringValue
@@ -20,7 +21,7 @@ export const verifyAccessToken = (token: string):
         return jwt.verify(token, ACCESS_TOKEN_SECRET) as AuthUser
     }
     catch (ex) {
-        console.log(ex)
+
         return null
     }
 
@@ -31,7 +32,7 @@ export const verifyRefreshToken = (token: string):
         return jwt.verify(token, REFRESH_TOKEN_SECRET) as AuthUser
     }
     catch (ex) {
-        console.log(ex)
+        logger.error((ex as Error).message)
         return null
     }
 
