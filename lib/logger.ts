@@ -4,7 +4,11 @@ import "winston-daily-rotate-file";
 import path from "path";
 
 // Log directory
-const logDir = path.join(process.cwd(), "logs");
+const isVercel = process.env.VERCEL === '1';
+
+const logDir = isVercel ? '/tmp/logs' : path.join(process.cwd(), 'logs');
+
+// const logDir = path.join(process.cwd(), "logs");
 
 // Daily rotate transport
 const dailyRotateFileTransport = new winston.transports.DailyRotateFile({
