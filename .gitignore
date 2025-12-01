@@ -13,7 +13,8 @@
 # testing
 /coverage
 
-/logs/*
+logs/
+*.log   
 
 # next.js
 /.next/
