@@ -5,14 +5,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const POST = async (
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) => {
     try {
         const authHeader = req.headers.get('authorization');
         if (!authHeader) {
             return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
         }
- const {id} = await params
+        const { id } = await params
         const token = authHeader.substring(7);
 
         const user = verifyAccessToken(token);
@@ -42,7 +42,7 @@ export const POST = async (
         // Update booking status
         await cancelBooking(bookingId)
         // Create audit log
-      
+
         await createAuditLog(req, user.userId, 'BOOKING_CANCELLED', 'Booking', { message: `Admin cancelled booking #${bookingId}` }, bookingId)
         // TODO: Process refund if payment was made
         // TODO: Send notification emails to both parties

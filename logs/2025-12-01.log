@@ -741,3 +741,12 @@ Invalid `prisma.$queryRaw()` invocation:
 Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
 [2025-12-01 14:13:02] INFO: nexobentola@gmail.com Logged In
 [2025-12-01 14:13:57] INFO: nmudanya94@gmail.com Logged In
+[2025-12-01 15:09:06] ERROR: 'Failed to update settings', 
+Invalid `prisma.settings.upsert()` invocation in
+/home/bentola/Prog/Proj/jikonnect/services/queries/admin.query.ts:381:31
+
+  378     description?: string
+  379 ): Promise<void> {
+  380     try {
+→ 381         await prisma.settings.upsert(
+

@@ -2,7 +2,7 @@ import logger from "@/lib/logger";
 import { activateUser, createAuditLog, findVerificationToken, removeVerificationToken } from "@/services/queries/auth.query";
 import { NextRequest, NextResponse } from "next/server";
 
-export const POST = async (req: NextRequest, { params }: { params: { token: string } }) => {
+export const POST = async (req: NextRequest, { params }: { params: Promise<{ token: string }> }) => {
 
     try {
 

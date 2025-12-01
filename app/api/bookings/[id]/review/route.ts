@@ -3,7 +3,7 @@ import { createReview } from "@/services/queries/client.query";
 import { getBookingById, getReviewByid, updateProviderRating } from "@/services/queries/provider.query";
 import { NextRequest, NextResponse } from "next/server";
 
-export const POST_REVIEW = async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const POST = async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
         const authHeader = req.headers.get('authorization');
         if (!authHeader) {
