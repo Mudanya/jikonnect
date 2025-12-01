@@ -1,0 +1,23 @@
+[2025-11-24 00:57:50] INFO: nmudanya94@gmail.com Logged In
+[2025-11-24 01:54:35] INFO: nmudanya94@gmail.com Logged In
+[2025-11-24 18:49:17] INFO: soarex.ke@gmail.com registered
+[2025-11-24 18:51:00] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.update()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__b4c2ca0a._.js:997:149
+
+  994         }
+  995     });
+  996 const activateUser = async (id)=>{
+→ 997     await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.update(
+An operation failed because it depends on one or more records that were required but not found. No record was found for an update.
+[2025-11-24 18:51:21] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.update()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__b4c2ca0a._.js:997:149
+
+  994         }
+  995     });
+  996 const activateUser = async (id)=>{
+→ 997     await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.update(
+An operation failed because it depends on one or more records that were required but not found. No record was found for an update.
+[2025-11-24 18:52:40] INFO: soarex.ke@gmail.com Logged In
+[2025-11-24 18:55:41] INFO: nmudanya94@gmail.com Logged In

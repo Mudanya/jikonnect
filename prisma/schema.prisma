@@ -1,0 +1,302 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+// enums
+enum UserRole {
+  CLIENT
+  PROFESSIONAL
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+ enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED 
+  DISPUTED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum DisputeStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+// models
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  phone String @unique
+  password String
+  firstName String
+  lastName String
+  role UserRole @default(CLIENT)
+  status UserStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  avatar String?
+  phoneVerified Boolean @default(false)
+  emailVerified Boolean @default(false)
+  lastLogin DateTime?
+
+  // Relations
+  profile Profile?
+  bookingsAsClient Booking[] @relation("ClientBookings")
+  bookingAsProvider Booking[] @relation("ProviderBookings")
+  reviews Review[]
+  receivedReviews Review[] @relation("ReviewReceiver")
+  payments Payment[]
+  notifications Notification[]
+  disputes Dispute[]
+  auditLogs AuditLogs[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+}
+
+model ServiceCategory {
+  id String @id @default(cuid())
+  title String
+}
+
+model Profile {
+  id String @id @default(cuid())
+  userId String @unique
+  user User @relation(fields:[userId],references: [id],onDelete: Cascade)
+
+  bio String? @db.Text
+  services String[]
+  hourlyRate Decimal @db.Decimal(10,2)
+  yearsOfExperience Int?
+  location String?
+  languages String[]
+  availability Json?
+
+  idNumber String? @unique
+  idDocument String?
+  certificates String[]
+  verificationStatus VerificationStatus @default(PENDING)
+  verifiedAt DateTime?
+  rejectionReason String?
+
+  totalJobs Int @default(0)
+  completionRate Decimal @default(0) @db.Decimal(5,2)
+  averageRating Decimal @default(0) @db.Decimal(3,2)
+  totalEarnings Decimal @default(0) @db.Decimal(10,2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime? @updatedAt
+  portfolio Portfolio[]
+  @@index([verificationStatus])
+}
+
+model Portfolio {
+  id String @id @default(cuid())
+  profileId String
+  profile Profile @relation(fields:[profileId],references: [id],onDelete: Cascade)
+
+  title String
+  description String? @db.Text
+  images String[]
+  category String 
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([profileId])
+}
+
+model Booking {
+  id String @id @default(cuid())
+  bookingNumber String @unique
+
+  clientId String
+  client User @relation("ClientBookings",fields: [clientId],references: [id])
+
+  providerId String
+  provider User @relation("ProviderBookings", fields: [providerId], references: [id])
+
+  service String
+  description String @db.Text
+  scheduledDate DateTime
+  scheduledTime String
+  duration Int? //in hours
+  location String
+
+  status BookingStatus @default(PENDING)
+  amount Decimal @db.Decimal(10,2)
+  commission Decimal @db.Decimal(10,2)
+  providerPayout Decimal @db.Decimal(10,2)
+
+  completedAt DateTime?
+  cancelledAt DateTime?
+  CancellationReason String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  payment Payment?
+  review Review?
+  dispute Dispute?
+
+  @@index([clientId])
+  @@index([providerId])
+  @@index([status])
+  @@index([scheduledDate])
+}
+
+model Payment {
+  id String @id @default(cuid())
+  bookingId String @unique
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  userId String
+  user User @relation(fields:[userId], references: [id])
+
+  amount Decimal @db.Decimal(10,2)
+  mpesaCode String? @unique
+  phoneNumber String
+  status PaymentStatus @default(PENDING)
+
+  checkoutRequestId String? @unique
+  merchantRequestId String?
+
+  paidAt DateTime?
+  failureReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([mpesaCode])
+}
+
+model Review {
+  id String @id @default(cuid())
+  bookingId String @unique
+  booking Booking @relation(fields: [bookingId],references: [id], onDelete: Cascade)
+
+  reviewerId String
+  reviewer User @relation(fields: [reviewerId],references: [id], onDelete: Cascade)
+
+  revieweeId String
+  reviewee User @relation("ReviewReceiver",fields: [revieweeId],references: [id], onDelete: Cascade)
+
+  rating Int
+  comment String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reviewerId])
+  @@index([revieweeId])
+  @@index([rating])
+
+}
+
+model Dispute {
+  id String @id @default(cuid())
+  bookingId String @unique
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  raisedBy String
+  user User @relation(fields:[raisedBy], references: [id])
+
+  reason String @db.Text
+  resolution String? @db.Text
+  status DisputeStatus @default(OPEN) 
+
+  resolvedAt DateTime?
+  resolvedBy String? //AdminId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+
+  title String
+  message String @db.Text
+  type String
+  read Boolean
+  data Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+}
+
+model AuditLogs {
+  id String @id @default(cuid())
+  userId String?
+  user User? @relation(fields: [userId], references: [id],onDelete: SetNull)
+
+  action String
+  entity String
+  entityId String?
+  details Json?
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+
+}
+
+model Settings {
+  id String @id @default(cuid())
+  key String @unique
+  value Json
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+

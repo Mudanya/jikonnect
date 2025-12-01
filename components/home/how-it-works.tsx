@@ -11,7 +11,7 @@ const HowItWorks = () => {
   return (
     <section
       id="how-it-works"
-      className="py-20 bg-linear-to-br from-blue-600 to-cyan-500 text-white px-4 sm:px-6 lg:px-8"
+      className="py-20 bg-linear-to-br from-jiko-primary to-jiko-secondary text-white px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">

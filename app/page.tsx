@@ -10,7 +10,7 @@ import Header from "@/components/layout/header";
 export default function Home() {
  
   return (
-    <main className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <main className="min-h-screen bg-linear-to-br from-jiko-primary/15 via-jiko-primary/10 to-jiko-secondary/50">
       {/* Navigation */}
       <Header />
       {/* Hero Section  */}

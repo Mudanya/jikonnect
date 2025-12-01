@@ -1,0 +1,743 @@
+[2025-12-01 00:59:53] INFO: soarex.ke@gmail.com Logged In
+[2025-12-01 01:00:09] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__3a2f7998._.js:1066:159
+
+  1063     });
+  1064 };
+  1065 const getAllDisputes = async (status)=>{
+→ 1066     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany({
+             where: {
+               status: "OPEN"
+             },
+             include: {
+               booking: {
+                 select: {
+                 ~~~~~~
+                   id: true,
+                   amount: true
+                 },
+                 include: {
+                 ~~~~~~~
+                   provider: {
+                     select: {
+                       id: true,
+                       firstName: true,
+                       lastName: true,
+                       email: true,
+                       phone: true,
+                       avatar: true
+                     }
+                   }
+                 }
+               },
+               user: {
+                 select: {
+                   id: true,
+                   firstName: true,
+                   lastName: true,
+                   email: true,
+                   phone: true,
+                   avatar: true
+                 }
+               }
+             },
+             orderBy: {
+               createdAt: "desc"
+             }
+           })
+
+Please either use `include` or `select`, but not both at the same time.
+[2025-12-01 01:00:09] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__3a2f7998._.js:1066:159
+
+  1063     });
+  1064 };
+  1065 const getAllDisputes = async (status)=>{
+→ 1066     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany({
+             where: {
+               status: "OPEN"
+             },
+             include: {
+               booking: {
+                 select: {
+                 ~~~~~~
+                   id: true,
+                   amount: true
+                 },
+                 include: {
+                 ~~~~~~~
+                   provider: {
+                     select: {
+                       id: true,
+                       firstName: true,
+                       lastName: true,
+                       email: true,
+                       phone: true,
+                       avatar: true
+                     }
+                   }
+                 }
+               },
+               user: {
+                 select: {
+                   id: true,
+                   firstName: true,
+                   lastName: true,
+                   email: true,
+                   phone: true,
+                   avatar: true
+                 }
+               }
+             },
+             orderBy: {
+               createdAt: "desc"
+             }
+           })
+
+Please either use `include` or `select`, but not both at the same time.
+[2025-12-01 01:04:00] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__3ff13d3f._.js:1066:159
+
+  1063     });
+  1064 };
+  1065 const getAllDisputes = async (status)=>{
+→ 1066     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany({
+             where: {
+               status: "OPEN"
+             },
+             include: {
+               booking: {
+                 select: {
+                 ~~~~~~
+                   id: true,
+                   amount: true
+                 },
+                 include: {
+                 ~~~~~~~
+                   provider: {
+                     select: {
+                       id: true,
+                       firstName: true,
+                       lastName: true,
+                       email: true,
+                       phone: true,
+                       avatar: true
+                     }
+                   }
+                 }
+               },
+               user: {
+                 select: {
+                   id: true,
+                   firstName: true,
+                   lastName: true,
+                   email: true,
+                   phone: true,
+                   avatar: true
+                 }
+               }
+             },
+             orderBy: {
+               createdAt: "desc"
+             }
+           })
+
+Please either use `include` or `select`, but not both at the same time.
+[2025-12-01 01:04:00] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__3ff13d3f._.js:1066:159
+
+  1063     });
+  1064 };
+  1065 const getAllDisputes = async (status)=>{
+→ 1066     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany({
+             where: {
+               status: "OPEN"
+             },
+             include: {
+               booking: {
+                 select: {
+                 ~~~~~~
+                   id: true,
+                   amount: true
+                 },
+                 include: {
+                 ~~~~~~~
+                   provider: {
+                     select: {
+                       id: true,
+                       firstName: true,
+                       lastName: true,
+                       email: true,
+                       phone: true,
+                       avatar: true
+                     }
+                   }
+                 }
+               },
+               user: {
+                 select: {
+                   id: true,
+                   firstName: true,
+                   lastName: true,
+                   email: true,
+                   phone: true,
+                   avatar: true
+                 }
+               }
+             },
+             orderBy: {
+               createdAt: "desc"
+             }
+           })
+
+Please either use `include` or `select`, but not both at the same time.
+[2025-12-01 01:04:04] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:04:04] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:04:10] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:04:10] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:05:52] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:05:52] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:06:07] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:06:07] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:10] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:10] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:14] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:14] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:21] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:21] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:26] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:26] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:40] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:40] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:56] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:09:56] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:12:34] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:12:35] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:12:41] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__914a7865._.js:1066:159
+
+  1063     });
+  1064 };
+  1065 const getAllDisputes = async (status)=>{
+→ 1066     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany({
+             where: {
+               status: "OPEN"
+             },
+             include: {
+               booking: {
+                 select: {
+                 ~~~~~~
+                   id: true,
+                   amount: true
+                 },
+                 include: {
+                 ~~~~~~~
+                   provider: {
+                     select: {
+                       id: true,
+                       firstName: true,
+                       lastName: true,
+                       email: true,
+                       phone: true,
+                       avatar: true
+                     }
+                   }
+                 }
+               },
+               user: {
+                 select: {
+                   id: true,
+                   firstName: true,
+                   lastName: true,
+                   email: true,
+                   phone: true,
+                   avatar: true
+                 }
+               }
+             },
+             orderBy: {
+               createdAt: "desc"
+             }
+           })
+
+Please either use `include` or `select`, but not both at the same time.
+[2025-12-01 01:12:41] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__914a7865._.js:1066:159
+
+  1063     });
+  1064 };
+  1065 const getAllDisputes = async (status)=>{
+→ 1066     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany({
+             where: {
+               status: "OPEN"
+             },
+             include: {
+               booking: {
+                 select: {
+                 ~~~~~~
+                   id: true,
+                   amount: true
+                 },
+                 include: {
+                 ~~~~~~~
+                   provider: {
+                     select: {
+                       id: true,
+                       firstName: true,
+                       lastName: true,
+                       email: true,
+                       phone: true,
+                       avatar: true
+                     }
+                   }
+                 }
+               },
+               user: {
+                 select: {
+                   id: true,
+                   firstName: true,
+                   lastName: true,
+                   email: true,
+                   phone: true,
+                   avatar: true
+                 }
+               }
+             },
+             orderBy: {
+               createdAt: "desc"
+             }
+           })
+
+Please either use `include` or `select`, but not both at the same time.
+[2025-12-01 01:12:43] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:12:43] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:13:53] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:13:53] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:14:19] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:14:19] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:14:43] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:14:44] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:15:02] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:15:02] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 01:33:20] INFO: nmudanya94@gmail.com Logged In
+[2025-12-01 01:53:16] INFO: nmudanya94@gmail.com Logged In
+[2025-12-01 02:08:16] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].portfolio.delete()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__d14d06f0._.js:1085:160
+
+  1082     });
+  1083 };
+  1084 const deletePortfolio = async (id)=>{
+→ 1085     await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].portfolio.delete({
+             where: {
+               id: undefined,
+           ?   AND?: PortfolioWhereInput | PortfolioWhereInput[],
+           ?   OR?: PortfolioWhereInput[],
+           ?   NOT?: PortfolioWhereInput | PortfolioWhereInput[],
+           ?   profileId?: StringFilter | String,
+           ?   title?: StringFilter | String,
+           ?   description?: StringNullableFilter | String | Null,
+           ?   images?: StringNullableListFilter,
+           ?   category?: StringFilter | String,
+           ?   createdAt?: DateTimeFilter | DateTime,
+           ?   updatedAt?: DateTimeFilter | DateTime,
+           ?   profile?: ProfileScalarRelationFilter | ProfileWhereInput
+             }
+           })
+
+Argument `where` of type PortfolioWhereUniqueInput needs at least one of `id` arguments. Available options are marked with ?.
+[2025-12-01 02:08:34] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].portfolio.delete()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__d14d06f0._.js:1085:160
+
+  1082     });
+  1083 };
+  1084 const deletePortfolio = async (id)=>{
+→ 1085     await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].portfolio.delete({
+             where: {
+               id: undefined,
+           ?   AND?: PortfolioWhereInput | PortfolioWhereInput[],
+           ?   OR?: PortfolioWhereInput[],
+           ?   NOT?: PortfolioWhereInput | PortfolioWhereInput[],
+           ?   profileId?: StringFilter | String,
+           ?   title?: StringFilter | String,
+           ?   description?: StringNullableFilter | String | Null,
+           ?   images?: StringNullableListFilter,
+           ?   category?: StringFilter | String,
+           ?   createdAt?: DateTimeFilter | DateTime,
+           ?   updatedAt?: DateTimeFilter | DateTime,
+           ?   profile?: ProfileScalarRelationFilter | ProfileWhereInput
+             }
+           })
+
+Argument `where` of type PortfolioWhereUniqueInput needs at least one of `id` arguments. Available options are marked with ?.
+[2025-12-01 02:55:16] INFO: nexobentola@gmail.com registered
+[2025-12-01 02:57:33] INFO: nexobentola@gmail.com Logged In
+[2025-12-01 03:04:28] INFO: soarex.ke@gmail.com Logged In
+[2025-12-01 03:04:49] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].profile.update()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__3a2f7998._.js:926:159
+
+  923 };
+  924 const verifyProviderProfile = async (id, action, rejectionReason)=>{
+  925     const isApprove = action === 'approve';
+→ 926     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].profile.update({
+            where: {
+              id: undefined,
+          ?   userId?: String,
+          ?   idNumber?: String,
+          ?   AND?: ProfileWhereInput | ProfileWhereInput[],
+          ?   OR?: ProfileWhereInput[],
+          ?   NOT?: ProfileWhereInput | ProfileWhereInput[],
+          ?   bio?: StringNullableFilter | String | Null,
+          ?   services?: StringNullableListFilter,
+          ?   hourlyRate?: DecimalFilter | Decimal,
+          ?   yearsOfExperience?: IntNullableFilter | Int | Null,
+          ?   location?: StringNullableFilter | String | Null,
+          ?   languages?: StringNullableListFilter,
+          ?   availability?: JsonNullableFilter,
+          ?   idDocument?: StringNullableFilter | String | Null,
+          ?   certificates?: StringNullableListFilter,
+          ?   verificationStatus?: EnumVerificationStatusFilter | VerificationStatus,
+          ?   verifiedAt?: DateTimeNullableFilter | DateTime | Null,
+          ?   rejectionReason?: StringNullableFilter | String | Null,
+          ?   totalJobs?: IntFilter | Int,
+          ?   completionRate?: DecimalFilter | Decimal,
+          ?   averageRating?: DecimalFilter | Decimal,
+          ?   totalEarnings?: DecimalFilter | Decimal,
+          ?   createdAt?: DateTimeFilter | DateTime,
+          ?   updatedAt?: DateTimeNullableFilter | DateTime | Null,
+          ?   user?: UserScalarRelationFilter | UserWhereInput,
+          ?   portfolio?: PortfolioListRelationFilter
+            },
+            data: {
+              verificationStatus: "VERIFIED",
+              verifiedAt: new Date("2025-12-01T00:04:49.707Z"),
+              rejectionReason: null
+            },
+            include: {
+              user: true
+            }
+          })
+
+Argument `where` of type ProfileWhereUniqueInput needs at least one of `id`, `userId` or `idNumber` arguments. Available options are marked with ?.
+[2025-12-01 03:05:09] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].profile.update()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__3a2f7998._.js:926:159
+
+  923 };
+  924 const verifyProviderProfile = async (id, action, rejectionReason)=>{
+  925     const isApprove = action === 'approve';
+→ 926     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].profile.update({
+            where: {
+              id: undefined,
+          ?   userId?: String,
+          ?   idNumber?: String,
+          ?   AND?: ProfileWhereInput | ProfileWhereInput[],
+          ?   OR?: ProfileWhereInput[],
+          ?   NOT?: ProfileWhereInput | ProfileWhereInput[],
+          ?   bio?: StringNullableFilter | String | Null,
+          ?   services?: StringNullableListFilter,
+          ?   hourlyRate?: DecimalFilter | Decimal,
+          ?   yearsOfExperience?: IntNullableFilter | Int | Null,
+          ?   location?: StringNullableFilter | String | Null,
+          ?   languages?: StringNullableListFilter,
+          ?   availability?: JsonNullableFilter,
+          ?   idDocument?: StringNullableFilter | String | Null,
+          ?   certificates?: StringNullableListFilter,
+          ?   verificationStatus?: EnumVerificationStatusFilter | VerificationStatus,
+          ?   verifiedAt?: DateTimeNullableFilter | DateTime | Null,
+          ?   rejectionReason?: StringNullableFilter | String | Null,
+          ?   totalJobs?: IntFilter | Int,
+          ?   completionRate?: DecimalFilter | Decimal,
+          ?   averageRating?: DecimalFilter | Decimal,
+          ?   totalEarnings?: DecimalFilter | Decimal,
+          ?   createdAt?: DateTimeFilter | DateTime,
+          ?   updatedAt?: DateTimeNullableFilter | DateTime | Null,
+          ?   user?: UserScalarRelationFilter | UserWhereInput,
+          ?   portfolio?: PortfolioListRelationFilter
+            },
+            data: {
+              verificationStatus: "VERIFIED",
+              verifiedAt: new Date("2025-12-01T00:05:09.951Z"),
+              rejectionReason: null
+            },
+            include: {
+              user: true
+            }
+          })
+
+Argument `where` of type ProfileWhereUniqueInput needs at least one of `id`, `userId` or `idNumber` arguments. Available options are marked with ?.
+[2025-12-01 03:14:49] INFO: nmudanya94@gmail.com Logged In
+[2025-12-01 03:15:07] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].portfolio.delete()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__c33c2886._.js:1096:160
+
+  1093     });
+  1094 };
+  1095 const deletePortfolio = async (id)=>{
+→ 1096     await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].portfolio.delete({
+             where: {
+               id: undefined,
+           ?   AND?: PortfolioWhereInput | PortfolioWhereInput[],
+           ?   OR?: PortfolioWhereInput[],
+           ?   NOT?: PortfolioWhereInput | PortfolioWhereInput[],
+           ?   profileId?: StringFilter | String,
+           ?   title?: StringFilter | String,
+           ?   description?: StringNullableFilter | String | Null,
+           ?   images?: StringNullableListFilter,
+           ?   category?: StringFilter | String,
+           ?   createdAt?: DateTimeFilter | DateTime,
+           ?   updatedAt?: DateTimeFilter | DateTime,
+           ?   profile?: ProfileScalarRelationFilter | ProfileWhereInput
+             }
+           })
+
+Argument `where` of type PortfolioWhereUniqueInput needs at least one of `id` arguments. Available options are marked with ?.
+[2025-12-01 03:16:02] INFO: nexobentola@gmail.com Logged In
+[2025-12-01 03:19:54] INFO: nmudanya94@gmail.com Logged In
+[2025-12-01 14:11:55] INFO: soarex.ke@gmail.com Logged In
+[2025-12-01 14:12:27] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__3a2f7998._.js:1066:159
+
+  1063     });
+  1064 };
+  1065 const getAllDisputes = async (status)=>{
+→ 1066     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany({
+             where: {
+               status: "OPEN"
+             },
+             include: {
+               booking: {
+                 select: {
+                 ~~~~~~
+                   id: true,
+                   amount: true
+                 },
+                 include: {
+                 ~~~~~~~
+                   provider: {
+                     select: {
+                       id: true,
+                       firstName: true,
+                       lastName: true,
+                       email: true,
+                       phone: true,
+                       avatar: true
+                     }
+                   }
+                 }
+               },
+               user: {
+                 select: {
+                   id: true,
+                   firstName: true,
+                   lastName: true,
+                   email: true,
+                   phone: true,
+                   avatar: true
+                 }
+               }
+             },
+             orderBy: {
+               createdAt: "desc"
+             }
+           })
+
+Please either use `include` or `select`, but not both at the same time.
+[2025-12-01 14:12:27] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__3a2f7998._.js:1066:159
+
+  1063     });
+  1064 };
+  1065 const getAllDisputes = async (status)=>{
+→ 1066     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany({
+             where: {
+               status: "OPEN"
+             },
+             include: {
+               booking: {
+                 select: {
+                 ~~~~~~
+                   id: true,
+                   amount: true
+                 },
+                 include: {
+                 ~~~~~~~
+                   provider: {
+                     select: {
+                       id: true,
+                       firstName: true,
+                       lastName: true,
+                       email: true,
+                       phone: true,
+                       avatar: true
+                     }
+                   }
+                 }
+               },
+               user: {
+                 select: {
+                   id: true,
+                   firstName: true,
+                   lastName: true,
+                   email: true,
+                   phone: true,
+                   avatar: true
+                 }
+               }
+             },
+             orderBy: {
+               createdAt: "desc"
+             }
+           })
+
+Please either use `include` or `select`, but not both at the same time.
+[2025-12-01 14:12:33] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 14:12:33] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 14:13:02] INFO: nexobentola@gmail.com Logged In
+[2025-12-01 14:13:57] INFO: nmudanya94@gmail.com Logged In
