@@ -121,10 +121,15 @@ const GenProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl shadow-sm border p-8">
+      <div className="bg-white rounded-2xl shadow-md p-8">
         <div className="flex items-start space-x-6 mb-8">
-          <div className="w-32 h-32 bg-linear-to-br relative from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-6xl">
-            {!avatar && "👩🏾"}
+          <div className="w-32 h-32  relative rounded-full flex items-center justify-center text-6xl">
+            {!avatar && (
+              <div className="w-full h-full bg-linear-to-br from-jiko-primary/80 via-jiko-primary/70 to-jiko-secondary/70 rounded-full flex items-center justify-center text-white text-  xl">
+                {user?.firstName[0]}
+                {user?.lastName[0]}
+              </div>
+            )}
             {avatar && (
               <Image
                 src={avatar}
@@ -143,7 +148,7 @@ const GenProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
             />
             <label
               htmlFor="avatar-upload"
-              className="absolute hover:scale-110 bottom-0 text-white right-2 bg-linear-to-br from-purple-400 to-blue-400 border-2 border-white p-1 rounded-full cursor-pointer shadow-md"
+              className="absolute hover:scale-110 bottom-0 text-white right-2 bg-linear-to-br from-jiko-primary/80  to-jiko-secondary/70 border-2 border-white p-1 rounded-full cursor-pointer shadow-md"
             >
               <ArrowUp />
             </label>

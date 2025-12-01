@@ -30,22 +30,25 @@ const AppNavBar = () => {
     }, 0);
   }, []);
   return (
-    <div className="w-full bg-white border-b fixed top-0 z-40 shadow-sm">
+    <div className="w-full from-jiko-secondary/10  to-jiko-primary/10 backdrop-blur-md bg-linear-to-b border-b fixed top-0 z-40 shadow-md">
       <div className="mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-linear-to-r from-jiko-primary to-jiko-secondary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">Ji</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">Jikonnect</h1>
-              <p className="text-xs text-gray-500 capitalize">
-                Welcome back, {user?.firstName.toLowerCase()}!
-              </p>
-            </div>
-            <SidebarTrigger className="cursor-pointer" />
-          </div>
+          <div>
+            <div className="flex items-center space-x-3">
+              <Image
+                src={"/assets/images/jiko-logo-lg.png"}
+                alt="Jikonnect logo"
+                width={800}
+                height={600}
+                className="w-auto h-12"
+              />
 
+              <SidebarTrigger className="cursor-pointer" />
+            </div>
+            <p className="text-xs text-gray-500 capitalize text-end me-12">
+              Welcome back, {user?.firstName.toLowerCase()}!
+            </p>
+          </div>
           <div className="flex items-center space-x-4">
             <div className="relative p-2 rounded-lg">
               <DropdownMenu>
@@ -71,7 +74,7 @@ const AppNavBar = () => {
               </DropdownMenu>
             </div>
             <Link
-              href="/dashboard/profile"
+              href="/profile"
               className="w-10 h-10 bg-linear-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-2xl cursor-pointer"
             >
               {user?.avatar ? (
@@ -83,7 +86,10 @@ const AppNavBar = () => {
                   className="rounded-full object-cover"
                 />
               ) : (
-                "👩🏾"
+                <div className="w-10 h-10 bg-linear-to-br from-jiko-primary/80 via-jiko-primary/70 to-jiko-secondary/70 rounded-full flex items-center justify-center text-white text-lg">
+                  {user?.firstName[0]}
+                  {user?.lastName[0]}
+                </div>
               )}
             </Link>
           </div>

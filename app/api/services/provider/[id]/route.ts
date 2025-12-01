@@ -2,7 +2,7 @@ import logger from "@/lib/logger";
 import { getProviderbyId, getProviderCompletedJobs, getReviewsByid } from "@/services/queries/provider.query";
 import { NextRequest, NextResponse } from "next/server";
 
-export const GET_PROVIDER = async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
     try {
         const { id } = await params
         const profile = await getProviderbyId(id)
@@ -26,7 +26,7 @@ export const GET_PROVIDER = async (req: NextRequest, { params }: { params: { id:
     catch (err) {
         logger.error((err as Error).message)
         return NextResponse.json(
-            { success: false, message: 'Failed to fetch provider details' },
+            { success: false, message: 'Failed to fetch provider details' },    
             { status: 500 })
     }
 }

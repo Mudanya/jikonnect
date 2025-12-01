@@ -59,7 +59,7 @@ const Header = () => {
             </Link>
             <Link
               href={"/register"}
-              className="cursor-pointer bg-jiko-secondary text-jiko-primary px-6 py-2 rounded-lg hover:shadow-lg transition transform hover:-translate-y-0.5"
+              className="cursor-pointer shadow-md shadow-jiko-primary/20 bg-jiko-secondary text-jiko-primary px-6 py-2 rounded-lg hover:shadow-lg transition transform hover:-translate-y-0.5"
             >
               Sign Up
             </Link>

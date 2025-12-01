@@ -108,3 +108,8 @@ export const uploadDocument = async (e: React.ChangeEvent<HTMLInputElement>, doc
         throw new Error("Failed to upload document : " + (err as Error).message);
     }
 }
+
+export const getProviderProfile = async (providerId: string) => {
+    const response = await fetch(`/api/services/provider/${providerId}`);
+    return await response.json();
+}

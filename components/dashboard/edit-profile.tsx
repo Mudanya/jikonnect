@@ -212,7 +212,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
           Cancel
         </Button>
       </div>
-      <div className="bg-white rounded-2xl shadow-sm border p-6">
+      <div className="bg-white rounded-2xl shadow-md p-6">
         <h2 className="text-xl font-bold mb-6">Basic Information</h2>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -295,7 +295,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
 
       {user?.role === "PROFESSIONAL" && (
         <>
-          <div className="bg-white rounded-2xl shadow-sm border p-6 mt-4">
+          <div className="bg-white rounded-2xl shadow-md p-6 mt-4">
             <h2 className="text-xl font-bold mb-6">Professional Details</h2>
 
             <div className="space-y-6">
@@ -416,7 +416,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
           </div>
 
           {/* ID & Document Upload */}
-          <div className="bg-white rounded-2xl shadow-sm border p-6 mt-4">
+          <div className="bg-white rounded-2xl shadow-md p-6 mt-4">
             <h2 className="text-xl font-bold mb-6">
               ID & Document Verification
             </h2>
@@ -547,14 +547,14 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
         >
           Cancel
         </Button>
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting || !isValid}
           className="px-6 !disabled:cursor-not-allowed py-3 cursor-pointer bg-linear-to-r from-purple-500 to-blue-600 text-white rounded-xl font-bold hover:shadow-lg transition disabled:opacity-50 flex items-center space-x-2"
         >
           <Save size={20} />
           <span>{isSubmitting ? "Saving..." : "Save Changes"}</span>
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -10,7 +10,10 @@ export const registerSchema = z.object({
         .regex(/[0-9]/, 'Password must contain atleast one number')
         .regex(/[^A-Za-z0-9]/, 'Password must contain atleast one special character'),
     confirmPassword: z.string(),
-    fullName: z.string().min(2, 'First name must be atleast 2 characters'),
+    fullName: z.string().min(3, 'First name must be atleast 2 characters').refine(
+        (val) => val.includes(" "),
+        { message: "Please provide your full name (first and last name)." }
+    ),
     // firstName: z.string().min(2, 'First name must be atleast 2 characters'),
     // lastName: z.string().min(2, 'Last name must be atleast 2 characters'),
     category: z.string().optional(),
@@ -23,7 +26,7 @@ export const registerSchema = z.object({
     { message: "Passwords don't match", path: ['confirmPassword'] })
     .superRefine((data, ctx) => {
         if (data.role && data.role === 'PROFESSIONAL') {
-            
+
             if (!data.category) {
                 ctx.addIssue({
                     code: "custom",

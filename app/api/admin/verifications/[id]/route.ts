@@ -8,11 +8,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const PUT = (async (
     req: NextRequest,
-    { params: { id } }: { params: { id: string } }
+    { params }: { params: { id: string } }
 ) => {
     try {
         const authHeader = req.headers.get('authorization');
-
+        const {id} = await params
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return NextResponse.json(
                 { success: false, message: 'Authentication required' },

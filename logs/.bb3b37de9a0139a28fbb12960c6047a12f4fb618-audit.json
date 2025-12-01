@@ -44,6 +44,31 @@
             "date": 1764154051300,
             "name": "/home/bentola/Prog/Proj/jikonnect/logs/2025-11-26.log",
             "hash": "ceb4275882af0aa02de7e504758918b25717c0013809156f1b1f211891a39d61"
+        },
+        {
+            "date": 1764191224628,
+            "name": "/home/bentola/Prog/Proj/jikonnect/logs/2025-11-27.log",
+            "hash": "fa9ac094b248ba43ddf73e4541829850ee0a65c89a670723308f45e157c90749"
+        },
+        {
+            "date": 1764277724294,
+            "name": "/home/bentola/Prog/Proj/jikonnect/logs/2025-11-28.log",
+            "hash": "225c12abcef3ffacd115d01dbb090f2ee33b5b86f34b971fab08444d791a9539"
+        },
+        {
+            "date": 1764363848212,
+            "name": "/home/bentola/Prog/Proj/jikonnect/logs/2025-11-29.log",
+            "hash": "9f1a26f4d87f7eedf2a3a0e65a156fba2d48bd3b36482f1224daedca0a4d840a"
+        },
+        {
+            "date": 1764501952341,
+            "name": "/home/bentola/Prog/Proj/jikonnect/logs/2025-11-30.log",
+            "hash": "7ae756b91128b1f74989d29f68d3d0152093f63ed10298b0e1342f49bea3feee"
+        },
+        {
+            "date": 1764536617898,
+            "name": "/home/bentola/Prog/Proj/jikonnect/logs/2025-12-01.log",
+            "hash": "618609e755667b1f22970d11be00f411ddd17ab4a5d1f7f98b5034f5e159e65f"
         }
     ],
     "hashType": "sha256"

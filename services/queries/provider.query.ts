@@ -1,7 +1,8 @@
+import { BookingStatus } from "@/lib/generated/prisma/enums"
 import { prisma } from "@/prisma/prisma.init"
 import { serviceSearchParams } from "@/types/service.type"
 import { ProfileFormData } from "@/validators/profile.validator"
-import { Decimal } from "@prisma/client/runtime/client"
+import { Decimal, InputJsonValue } from "@prisma/client/runtime/client"
 import { use } from "react"
 
 export const getUserByUserId = async (userId: string) => {
@@ -134,8 +135,8 @@ export const getProviderbyId = async (id: string) => {
 
 }
 
-export const getReviewsByid = async (id: string) => {
-    await prisma.review.findMany({
+export const getReviewsByid = async (id: string, take = 20) => {
+    return await prisma.review.findMany({
         where: { revieweeId: id },
         include: {
             reviewer: {
@@ -153,7 +154,7 @@ export const getReviewsByid = async (id: string) => {
             }
         },
         orderBy: { createdAt: 'desc' },
-        take: 20
+        take
     });
 }
 
@@ -218,5 +219,166 @@ export const createBooking = async ({
                 }
             }
         }
+    });
+}
+
+export const getBookingById = async (id: string) => await prisma.booking.findUnique({
+    where: { id }
+});
+
+export const updateBookingStatus = async (id: string, status: 'CANCELLED' | 'COMPLETED', cancellationReason: string) => {
+    return await prisma.booking.update({
+        where: { id },
+        data: {
+            status,
+            ...(status === 'CANCELLED' && {
+                cancelledAt: new Date(),
+                cancellationReason
+            }),
+            ...(status === 'COMPLETED' && {
+                completedAt: new Date()
+            })
+        },
+        include: {
+            client: {
+                select: {
+                    firstName: true,
+                    lastName: true
+                }
+            },
+            provider: {
+                select: {
+                    firstName: true,
+                    lastName: true
+                }
+            }
+        }
+    });
+}
+
+export const updateProfileStats = async (providerId: string, providerPayout: string, status: string) => {
+    if (status === 'COMPLETED') {
+        await prisma.profile.update({
+            where: { userId: providerId },
+            data: {
+                totalJobs: { increment: 1 },
+                totalEarnings: { increment: Number(providerPayout) }
+            }
+        });
+    }
+
+}
+
+export const getReviewByid = async (id: string) => await prisma.review.findUnique({
+    where: { bookingId: id }
+});
+
+export const updateProviderRating = async (providerId: string) => {
+    const allReviews = await prisma.review.findMany({
+        where: { revieweeId: providerId }
+    });
+
+    const averageRating = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+
+    await prisma.profile.update({
+        where: { userId: providerId },
+        data: { averageRating }
+    });
+}
+
+export const findUserWithPortfolio = async (id: string) => {
+    return await prisma.user.findUnique({
+        where: { id },
+        include: {
+            profile: {
+                include: {
+                    portfolio: true
+                }
+            }
+        }
+    })
+}
+
+export const findProfileWithPortfolio = async (userId: string) => await prisma.profile.findUnique({
+    where: {
+        userId
+    }, include: {
+        portfolio: true
+    }
+});
+
+export const createPortfolio = async (profileId: string, title: string, description: string, category: string, imageUrls: string[]) => {
+    return await prisma.portfolio.create({
+        data: {
+            profileId,
+            title,
+            description: description || null,
+            category,
+            images: imageUrls
+        }
+    });
+}
+
+export const deletePortfolio = async (id: string) => {
+    await prisma.portfolio.delete({
+        where: { id }
+    });
+
+}
+
+export const updateProfileAvailability = async (userId: string, availability: InputJsonValue) => {
+    return await prisma.profile.update({
+        where: { userId },
+        data: { availability }
+    });
+}
+
+export const findBookingById = async (providerId: string) => await prisma.booking.findMany({
+    where: { providerId },
+    include: {
+        client: {
+            select: {
+                firstName: true,
+                lastName: true,
+                avatar: true
+            }
+        },
+        review: true
+    },
+    orderBy: { createdAt: 'desc' }
+});
+
+export const getEarnings = async (providerId: string, i: number, now: Date, date: Date) => {
+    const nextMonth = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+    return await prisma.booking.aggregate({
+        where: {
+            providerId,
+            status: 'COMPLETED',
+            completedAt: {
+                gte: date,
+                lt: nextMonth
+            }
+        },
+        _sum: {
+            providerPayout: true
+        }
+    });
+}
+
+export const getCompletedBookings = async (providerId: string) => {
+    return await prisma.booking.findMany({
+        where: {
+            providerId,
+            status: 'COMPLETED'
+        },
+        include: {
+            client: {
+                select: {
+                    firstName: true,
+                    lastName: true
+                }
+            }
+        },
+        orderBy: { completedAt: 'desc' }
     });
 }

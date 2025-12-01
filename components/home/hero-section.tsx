@@ -66,7 +66,7 @@ const HeroSection = () => {
                   size={20}
                 />
               </button>
-              <button className="cursor-pointer border-2 border-jiko-secondary text-jiko-secondary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition">
+              <button className="cursor-pointer bg-white shadow-md shadow-jiko-primary/10 border-2 border-jiko-secondary text-jiko-secondary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition">
                 Join as a Pro
               </button>
             </div>

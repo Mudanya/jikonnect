@@ -38,3 +38,23 @@ export const getBookingsById = async (clientId: string, status: BookingStatus) =
         orderBy: { createdAt: 'desc' }
     })
 }
+
+export const createReview = async (
+    { id, userId, providerId, rating, comment }:
+        {
+            id: string,
+            userId: string,
+            providerId: string,
+            rating: number,
+            comment: string
+        }) => {
+    return await prisma.review.create({
+        data: {
+            bookingId: id,
+            reviewerId: userId,
+            revieweeId: providerId,
+            rating,
+            comment: comment || ''
+        }
+    })
+}

@@ -47,7 +47,7 @@ const VerificationPage = () => {
   useEffect(() => {
     setTimeout(async () => {
       setMounted(true);
-      if (user?.role !== "PROFESSIONAL") {
+      if (user?.role !== "ADMIN") {
         router.push("/dashboard");
       } else {
         const res = await loadVerifications();
@@ -108,7 +108,7 @@ const VerificationPage = () => {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-white text-2xl">
+                    <div className="w-16 h-16 bg-linear-to-br from-jiko-primary/80 via-jiko-primary/70 to-jiko-secondary/70 rounded-full flex items-center justify-center text-white text-2xl">
                       {profile.user.firstName[0]}
                       {profile.user.lastName[0]}
                     </div>

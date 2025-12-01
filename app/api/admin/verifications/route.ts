@@ -1,11 +1,11 @@
-import { withAuth } from "@/lib/api-auth";
+import { withRole } from "@/lib/api-auth";
 import logger from "@/lib/logger";
 import { getAllPendingProfiles } from "@/services/queries/admin.query";
 import { AuthenticatedRequest } from "@/types/auth";
 import { NextResponse } from "next/server";
 
 // TODO: use withRole:Admin
-export const GET = withAuth(async (req: AuthenticatedRequest) => {
+export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
     try {
         const profiles = await getAllPendingProfiles()
         return NextResponse.json({
