@@ -630,3 +630,114 @@ Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$ini
 Argument `where` of type PortfolioWhereUniqueInput needs at least one of `id` arguments. Available options are marked with ?.
 [2025-12-01 03:16:02] INFO: nexobentola@gmail.com Logged In
 [2025-12-01 03:19:54] INFO: nmudanya94@gmail.com Logged In
+[2025-12-01 14:11:55] INFO: soarex.ke@gmail.com Logged In
+[2025-12-01 14:12:27] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__3a2f7998._.js:1066:159
+
+  1063     });
+  1064 };
+  1065 const getAllDisputes = async (status)=>{
+→ 1066     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany({
+             where: {
+               status: "OPEN"
+             },
+             include: {
+               booking: {
+                 select: {
+                 ~~~~~~
+                   id: true,
+                   amount: true
+                 },
+                 include: {
+                 ~~~~~~~
+                   provider: {
+                     select: {
+                       id: true,
+                       firstName: true,
+                       lastName: true,
+                       email: true,
+                       phone: true,
+                       avatar: true
+                     }
+                   }
+                 }
+               },
+               user: {
+                 select: {
+                   id: true,
+                   firstName: true,
+                   lastName: true,
+                   email: true,
+                   phone: true,
+                   avatar: true
+                 }
+               }
+             },
+             orderBy: {
+               createdAt: "desc"
+             }
+           })
+
+Please either use `include` or `select`, but not both at the same time.
+[2025-12-01 14:12:27] ERROR: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany()` invocation in
+/home/bentola/Prog/Proj/jikonnect/.next/dev/server/chunks/[root-of-the-server]__3a2f7998._.js:1066:159
+
+  1063     });
+  1064 };
+  1065 const getAllDisputes = async (status)=>{
+→ 1066     return await __TURBOPACK__imported__module__$5b$project$5d2f$prisma$2f$prisma$2e$init$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].dispute.findMany({
+             where: {
+               status: "OPEN"
+             },
+             include: {
+               booking: {
+                 select: {
+                 ~~~~~~
+                   id: true,
+                   amount: true
+                 },
+                 include: {
+                 ~~~~~~~
+                   provider: {
+                     select: {
+                       id: true,
+                       firstName: true,
+                       lastName: true,
+                       email: true,
+                       phone: true,
+                       avatar: true
+                     }
+                   }
+                 }
+               },
+               user: {
+                 select: {
+                   id: true,
+                   firstName: true,
+                   lastName: true,
+                   email: true,
+                   phone: true,
+                   avatar: true
+                 }
+               }
+             },
+             orderBy: {
+               createdAt: "desc"
+             }
+           })
+
+Please either use `include` or `select`, but not both at the same time.
+[2025-12-01 14:12:33] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 14:12:33] ERROR: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42P01`. Message: `relation "Provider" does not exist`
+[2025-12-01 14:13:02] INFO: nexobentola@gmail.com Logged In
+[2025-12-01 14:13:57] INFO: nmudanya94@gmail.com Logged In
