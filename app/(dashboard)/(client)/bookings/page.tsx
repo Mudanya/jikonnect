@@ -117,8 +117,8 @@ const Bookings = () => {
 
   const filteredBookings =
     selectedStatus === "all"
-      ? bookings : ''
-    //   : bookings && bookings?.filter((b) => b.status === selectedStatus);
+      ? bookings 
+      : bookings?.filter((b) => b.status === selectedStatus);
 
   if (!mounted || loading) return <Loading />;
 
@@ -167,7 +167,7 @@ const Bookings = () => {
         {/* Bookings List */}
         {filteredBookings.length > 0 ? (
           <div className="space-y-4">
-            {filteredBookings.map((booking) => (
+            {filteredBookings?.map((booking) => (
               <div
                 key={booking.id}
                 className="bg-white rounded-2xl shadow-md p-6 hover:shadow-md transition"

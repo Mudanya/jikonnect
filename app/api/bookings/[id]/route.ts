@@ -3,7 +3,7 @@ import { getBookingById, updateBookingStatus, updateProfileStats } from "@/servi
 import { NextRequest, NextResponse } from "next/server";
 const { verifyAccessToken } = await import('@/lib/jwt');
 
-export const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const PUT = async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
         const authHeader = req.headers.get('authorization');
         if (!authHeader) {

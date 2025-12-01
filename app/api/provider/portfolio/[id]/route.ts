@@ -2,7 +2,7 @@ import logger from "@/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessToken } from '@/lib/jwt';
 import { deletePortfolio } from "@/services/queries/provider.query";
-export const DELETE= async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const DELETE= async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
         const authHeader = req.headers.get('authorization');
         if (!authHeader) {
@@ -16,7 +16,7 @@ export const DELETE= async (req: NextRequest, { params }: { params: { id: string
         if (!user) {
             return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 401 });
         }
-        await deletePortfolio(await params.id)
+        await deletePortfolio((await params).id)
 
         return NextResponse.json({
             success: true,

@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const PUT = (async (
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) => {
     try {
         const authHeader = req.headers.get('authorization');

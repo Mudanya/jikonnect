@@ -7,7 +7,7 @@ import {
   XCircle,
   Eye,
   FileText,
-  User,
+ 
   Mail,
   Phone,
   Calendar,
@@ -34,13 +34,14 @@ import { Input } from "@/components/ui/input";
 
 import { Label } from "@radix-ui/react-select";
 import { Textarea } from "@/components/ui/textarea";
+import { User } from "@/types/auth";
 const VerificationPage = () => {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [verifications, setVerifications] = useState([]);
-  const [selectedProfile, setSelectedProfile] = useState<object | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<{user:User,id:string} | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
 
@@ -253,7 +254,7 @@ const VerificationPage = () => {
                         </DialogClose>
                         <Button
                           onClick={() =>
-                            handleAction(selectedProfile.id, "reject")
+                            handleAction(selectedProfile!.id, "reject")
                           }
                           disabled={actionLoading || !rejectionReason}
                           className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 disabled:opacity-50"
