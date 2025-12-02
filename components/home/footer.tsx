@@ -1,16 +1,23 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-slate-900 text-gray-400 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <footer className="bg-linear-to-b  from-jiko-primary/70 to-jiko-primary text-white py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[90vw] xl:max-w-[1440px] mx-auto">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-linear-to-br from-jiko-primary to-jiko-secondary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">Ji</span>
-              </div>
+              
+                <Image
+                  src={"/assets/images/jiko-logo-white-sm.png"}
+                  alt="Jikonnect logo"
+                  width={800}
+                  height={600}
+                  className="w-auto h-10"
+                />
+              
               <span className="text-xl font-bold text-white">JiKonnect</span>
             </div>
             <p className="text-sm">

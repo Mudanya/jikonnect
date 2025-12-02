@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   //   login
   const login = async (email: string, password: string) => {
     try {
-    
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -46,11 +45,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem("user", JSON.stringify(reUser));
 
       setUser(reUser);
-      if (reUser.role === "CLIENT") {
-        router.push("/dashboard");
+      if (reUser.role === "PROFESSIONAL") {
+        router.push("/provider/dashboard");
         return;
       }
-      router.push("/dashboard");
+      if (reUser.role === "ADMIN") {
+        router.push("/admin");
+        return;
+      }
+      router.push("/services");
     } catch (err) {
       if (err instanceof Error) {
         console.error("Login error:", err); // Debugging line

@@ -1,6 +1,7 @@
+import { LandingPageData } from "@/types/service.type";
 import { Star } from "lucide-react";
 
-const Testimonials = () => {
+const Testimonials = ({data}:{data:LandingPageData|null}) => {
   const testimonials = [
     {
       name: "Grace Mwangi",
@@ -24,7 +25,7 @@ const Testimonials = () => {
 
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-[90vw] xl:max-w-[1440px] mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             What Our Customers Say
@@ -38,7 +39,7 @@ const Testimonials = () => {
           {testimonials.map((test, i) => (
             <div
               key={i}
-              className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"
+              className="bg-white p-8 rounded-2xl shadow-md   "
             >
               <div className="flex space-x-1 mb-4">
                 {[...Array(test.rating)].map((_, j) => (

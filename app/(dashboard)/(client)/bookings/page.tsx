@@ -23,6 +23,7 @@ import {
 } from "@/services/apis/booking.api";
 import { toast } from "sonner";
 import Loading from "@/components/shared/Loading";
+import { Button } from "@/components/ui/button";
 const Bookings = () => {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -129,12 +130,12 @@ const Bookings = () => {
         <div className="px-4 py-4">
           <div className="flex items-center justify-end">
             
-            <button
+            <Button
               onClick={() => router.push("/services")}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
+              className="px-4 py-2 bg-jiko-primary text-white rounded-lg font-semibold hover:bg-jiko-primary/90"
             >
               + New Booking
-            </button>
+            </Button>
           </div>
         </div>
       </div>

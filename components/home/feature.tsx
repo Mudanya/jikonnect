@@ -25,8 +25,8 @@ const Feature = () => {
   ];
 
   return (
-    <section id="services" className="py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <section id="about" className="py-20 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[90vw] xl:max-w-[1440px] mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Why Choose JiKonnect?
@@ -40,10 +40,10 @@ const Feature = () => {
           {features.map((feature, i) => (
             <div
               key={i}
-              className="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition border border-gray-100 hover:border-blue-200"
+              className="group bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition  border-gray-100 hover:border-blue-200"
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                <feature.icon className="text-white" size={28} />
+              <div className="w-14 h-14 bg-jiko-primary  rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                <feature.icon className="text-jiko-secondary" size={28} />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
                 {feature.title}

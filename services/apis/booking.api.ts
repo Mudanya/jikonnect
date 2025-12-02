@@ -43,3 +43,6 @@ export const submitReview = async (token: string, bookingId: string, reviewForm:
 
     return await response.json();
 }
+
+
+export const getLandingData = async () => { const res = await fetch('/api/landing'); return await res.json() }

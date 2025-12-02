@@ -124,7 +124,7 @@ const Services = () => {
      
 
       {/* Hero Search Section */}
-      <div className="bg-linear-to-br from-jiko-primary via-jiko-primary to-jiko-secondary text-white py-16">
+      <div className="bg-linear-to-br from-jiko-primary/60 via-jiko-primary/70 to-jiko-secondary/70 rounded-md  text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-4">
             Find the Perfect Service Provider
