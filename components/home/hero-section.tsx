@@ -1,3 +1,4 @@
+import { LandingPageData } from "@/types/service.type";
 import {
   ArrowRight,
   CheckCircle,
@@ -8,8 +9,9 @@ import {
   Star,
   Wrench,
 } from "lucide-react";
+import Link from "next/link";
 
-const HeroSection = () => {
+const HeroSection = ({ data }: { data: LandingPageData | null }) => {
   const services = [
     {
       icon: Wrench,
@@ -38,12 +40,12 @@ const HeroSection = () => {
   ];
 
   return (
-    <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8" id="services">
+      <div className="max-w-[90vw] xl:max-w-[1440px] mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <div className="mb-4 px-4 py-2 rounded-full text-jiko-primary text-sm font-medium flex items-center bg-jiko-secondary/15">
-               Connecting prople, skills, services and care
+              Connecting prople, skills, services and care
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               Connecting You to{" "}
@@ -59,16 +61,22 @@ const HeroSection = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <button className="cursor-pointer group bg-jiko-primary  text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl transition transform hover:-translate-y-1 flex items-center justify-center">
+              <Link
+                href={"/services"}
+                className="cursor-pointer group bg-jiko-primary  text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl transition transform hover:-translate-y-1 flex items-center justify-center"
+              >
                 Find a Professional
                 <ArrowRight
                   className="ml-2 group-hover:translate-x-1 transition"
                   size={20}
                 />
-              </button>
-              <button className="cursor-pointer bg-white shadow-md shadow-jiko-primary/10 border-2 border-jiko-secondary text-jiko-secondary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition">
+              </Link>
+              <Link
+                href={"/register?role=pro"}
+                className="cursor-pointer bg-white shadow-md shadow-jiko-primary/10 border-2 border-jiko-secondary text-jiko-secondary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition"
+              >
                 Join as a Pro
-              </button>
+              </Link>
             </div>
 
             <div className="flex items-center space-x-8 text-sm text-gray-600">
@@ -99,27 +107,32 @@ const HeroSection = () => {
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  {services.map((service, i) => (
-                    <div
-                      key={i}
-                      className="group p-4 rounded-xl bg-linear-to-br hover:shadow-lg transition cursor-pointer border border-gray-100 hover:border-transparent"
-                      style={{
-                        background: `linear-linear(135deg, ${
-                          i % 2 === 0 ? "#f0f9ff" : "#fef3f2"
-                        })`,
-                      }}
-                    >
+                  {data?.serviceCategories.map((service, i) => {
+                    const { icon: Icon, color } = services[i];
+                    return (
                       <div
-                        className={`w-10 h-10 bg-linear-to-br ${service.color} rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition`}
+                        key={i}
+                        className="group p-4 rounded-xl bg-linear-to-br hover:shadow-lg transition cursor-pointer border border-gray-100 hover:border-transparent"
+                        style={{
+                          background: `linear-linear(135deg, ${
+                            i % 2 === 0 ? "#f0f9ff" : "#fef3f2"
+                          })`,
+                        }}
                       >
-                        <service.icon className="text-white" size={20} />
+                        <div
+                          className={`w-10 h-10 bg-linear-to-br ${color} rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition`}
+                        >
+                          <Icon className="text-white" size={20} />
+                        </div>
+                        <h3 className="font-semibold text-gray-800 text-sm mb-1">
+                          {service.name}
+                        </h3>
+                        <p className="text-xs text-gray-500">
+                          {service.description}
+                        </p>
                       </div>
-                      <h3 className="font-semibold text-gray-800 text-sm mb-1">
-                        {service.title}
-                      </h3>
-                      <p className="text-xs text-gray-500">{service.desc}</p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -130,12 +143,12 @@ const HeroSection = () => {
                       {[1, 2, 3, 4].map((i) => (
                         <div
                           key={i}
-                          className="w-8 h-8 bg-linear-to-br from-blue-400 to-purple-400 rounded-full border-2 border-white"
+                          className="w-8 h-8 bg-linear-to-br from-jiko-primary to-jiko-secondary rounded-full border-2 border-white"
                         ></div>
                       ))}
                     </div>
                     <span className="text-gray-600 font-medium">
-                      10,000+ Verified Pros
+                      {data?.stats.verifiedProviders}+ Verified Pros
                     </span>
                   </div>
                   <div className="flex items-center space-x-1">
@@ -143,7 +156,7 @@ const HeroSection = () => {
                       className="text-yellow-400 fill-yellow-400"
                       size={16}
                     />
-                    <span className="font-bold text-gray-800">4.8</span>
+                    <span className="font-bold text-gray-800">{data?.stats.averageRating || 4.8}</span>
                   </div>
                 </div>
               </div>

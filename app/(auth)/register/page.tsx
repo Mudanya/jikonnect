@@ -30,6 +30,7 @@ import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AuthLayoutContext } from "../layout";
 import { toast } from "sonner";
+import { useParams, useSearchParams } from "next/navigation";
 
 const Register = () => {
   const {
@@ -43,7 +44,8 @@ const Register = () => {
     mode: "onBlur",
     shouldUnregister: true,
   });
-
+  const params = useSearchParams();
+  const role = params.get("role");
   const { register: registerUser } = useAuth();
   const onSubmit = async (data: RegisterFormData) => {
     try {
@@ -75,8 +77,17 @@ const Register = () => {
       classWidth: "max-w-5xl",
       classFlex: "py-12 px-4",
     });
-    setValue("role", "CLIENT");
-  }, [setHeaderDesc]);
+    const isRoleClient = role !== "pro";
+
+    setValue("role", !isRoleClient ? "PROFESSIONAL" : "CLIENT", {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+    setTimeout(() => {
+      setIsClient(isRoleClient);
+    });
+  }, []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

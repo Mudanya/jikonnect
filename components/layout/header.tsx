@@ -9,7 +9,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <nav className="bg-jiko-secondary/30 backdrop-blur-md shadow-sm fixed w-full top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[90vw] xl:max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-2">
             <div className="h-10 w-auto relative flex items-center justify-center">
@@ -75,35 +75,35 @@ const Header = () => {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t">
-          <div className="px-4 py-3 space-y-3">
-            <a
+        <div className="md:hidden bg-white border-t w-full">
+          <div className="px-4 py-3 space-y-3 w-full">
+            <Link
               href="#services"
-              className="block text-gray-700 hover:text-blue-600"
+              className="block text-jiko-black hover:text-jiko-primary"
             >
               Services
-            </a>
-            <a
+            </Link>
+            <Link
               href="#how-it-works"
-              className="block text-gray-700 hover:text-blue-600"
+              className="block text-jiko-black hover:text-jiko-primary"
             >
               How It Works
-            </a>
-            <a
+            </Link>
+            <Link
               href="#about"
-              className="block text-gray-700 hover:text-blue-600"
+              className="block text-jiko-black hover:text-jiko-primary"
             >
-              About
-            </a>
-            <a href="#join" className="block text-gray-700 hover:text-blue-600">
+              About 
+            </Link>
+            <Link href="#join" className="block text-jiko-black hover:text-jiko-primary">
               Join as Pro
-            </a>
-            <button className="w-full text-left text-gray-700 hover:text-blue-600 font-medium">
+            </Link>
+            <Link href={'/register'}  className="w-full inline-block text-left text-jiko-primary hover:underline font-medium">
               Login
-            </button>
-            <button className="w-full bg-linear-to-r from-jiko-primary to-jiko-secondary text-white px-6 py-2 rounded-lg">
+            </Link>
+            <Link href={'/register'} className="w-full inline-block shadow-md hover:shadow-lg bg-jiko-secondary text-center hover:bg-jiko-secondary/90 text-jiko-black hover:text-jiko-primary px-6 py-2 rounded-lg">
               Sign Up
-            </button>
+            </Link>
           </div>
         </div>
       )}

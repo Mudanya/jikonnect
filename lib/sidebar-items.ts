@@ -1,23 +1,16 @@
-import { Home, Inbox, Calendar, Search, Settings, Briefcase, DollarSign, Star, User, UserRoundCheck, ListTodo, NotebookPen, HandFist, HandCoins, Logs, GalleryVerticalEnd } from "lucide-react";
+import { Home, Inbox, Calendar, Search, Settings, Briefcase, DollarSign, Star, User, UserRoundCheck, ListTodo, NotebookPen, HandFist, HandCoins, Logs, GalleryVerticalEnd, BookCheck, StepForward, Calendar1, BriefcaseBusiness } from "lucide-react";
 
 export const SidebarClientItems = [
   {
-    title: "Overview",
-    url: "/dashboard",
-    icon: Briefcase,
-    role: ''
-  },
-
-  {
     title: "Services",
     url: "/services",
-    icon: DollarSign,
+    icon: Search,
     role: ''
   },
   {
     title: "Bookings",
     url: "/bookings",
-    icon: Star,
+    icon: BookCheck,
     role: ''
   },
   {
@@ -88,7 +81,7 @@ export const SidebarProviderItems = [
   {
     title: "Onboarding",
     url: "/provider/onboarding",
-    icon: GalleryVerticalEnd,
+    icon: StepForward,
     role: ''
   },
   {
@@ -100,19 +93,19 @@ export const SidebarProviderItems = [
   {
     title: "Verification",
     url: "/provider/verification",
-    icon: GalleryVerticalEnd,
+    icon: BookCheck,
     role: ''
   },
   {
     title: "Availability",
     url: "/provider/availability",
-    icon: GalleryVerticalEnd,
+    icon: Calendar1,
     role: ''
   },
   {
     title: "My Jobs",
     url: "/provider/my-jobs",
-    icon: Calendar,
+    icon: BriefcaseBusiness,
     role: ''
   },
   {

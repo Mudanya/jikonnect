@@ -58,3 +58,71 @@ export const createReview = async (
         }
     })
 }
+
+export const [
+    totalProviders,
+    verifiedProviders,
+    totalBookings,
+    completedBookings,
+    totalReviews
+] = await Promise.all([
+    prisma.user.count({ where: { role: { equals: 'PROFESSIONAL' } } }),
+    prisma.user.count({ where: { role: { equals: 'PROFESSIONAL' }, profile: { verifiedAt: { not: null } } } }),
+    prisma.booking.count(),
+    prisma.booking.count({ where: { status: 'COMPLETED' } }),
+    prisma.review.count()
+]);
+
+export const getAvgRatingResult = async () => await prisma.review.aggregate({
+    _avg: {
+        rating: true
+    }
+});
+
+export const getAllProviders = async (): Promise<{ location: string, firstName: string, lastName: string, avatar: string, rating: number, id: string, bio: string, services: string[] }[]> => await prisma.$queryRaw`
+  SELECT u.*,p.bio,p.services,p.location, MAX(r.rating) as rating
+  FROM "User" u
+  LEFT JOIN "Review" r ON r."revieweeId" = u.id
+  INNER JOIN "Profile" p ON p."userId" = u.id
+  GROUP BY u.id,p.bio,p.services,p.location
+  ORDER BY rating DESC NULLS LAST
+  LIMIT 10
+`;
+
+export const getRecentReviews = async () => await prisma.review.findMany({
+    where: {
+        rating: { gte: 4 }
+    },
+    include: {
+        reviewer: {
+            select: {
+                firstName: true,
+                lastName: true,
+                avatar: true
+            }
+        },
+        reviewee: {
+            include: { profile: { select: { services: true, location: true } } }
+        },
+        booking: {
+            select: {
+                scheduledDate: true
+            }
+        }
+    },
+    orderBy: {
+        createdAt: 'desc'
+    },
+    take: 6
+});
+
+export const geetProviderServices = async () =>
+    await prisma.user.findMany({
+        where: {
+            role: 'PROFESSIONAL',
+            profile: { verifiedAt: { not: null }, }
+        },
+        include: {
+            profile: { select: { services: true } }
+        }
+    });
