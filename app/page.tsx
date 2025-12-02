@@ -17,7 +17,7 @@ export default function Home() {
     setTimeout(async () => {
       try {
         const getData = await getLandingData();
-        alert(getData.success);
+       
         if (getData.success) {
           setData(getData.data);
         }
