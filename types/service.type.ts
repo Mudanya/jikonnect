@@ -50,4 +50,9 @@ export interface LandingPageData {
         count: number;
         description: string;
     }>;
+    platform?:{
+        phone: string,
+        email: string,
+        name: string
+    }
 }

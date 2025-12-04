@@ -1,7 +1,7 @@
 import { LandingPageData } from "@/types/service.type";
 import { Star } from "lucide-react";
 
-const Testimonials = ({data}:{data:LandingPageData|null}) => {
+const Testimonials = ({ data }: { data: LandingPageData | null }) => {
   const testimonials = [
     {
       name: "Grace Mwangi",
@@ -36,32 +36,58 @@ const Testimonials = ({data}:{data:LandingPageData|null}) => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((test, i) => (
-            <div
-              key={i}
-              className="bg-white p-8 rounded-2xl shadow-md   "
-            >
-              <div className="flex space-x-1 mb-4">
-                {[...Array(test.rating)].map((_, j) => (
-                  <Star
-                    key={j}
-                    className="text-yellow-400 fill-yellow-400"
-                    size={20}
-                  />
-                ))}
-              </div>
-              <p className="text-gray-700 mb-6 italic">
-                &quot;{test.text}&quot;
-              </p>
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-linear-to-br from-blue-400 to-purple-400 rounded-full"></div>
-                <div>
-                  <div className="font-semibold text-gray-900">{test.name}</div>
-                  <div className="text-sm text-gray-500">{test.role}</div>
+       
+          {data?.recentReviews 
+            ? data?.recentReviews.map((review, i) => (
+                <div key={i} className="bg-white p-8 rounded-2xl shadow-md   ">
+                  <div className="flex space-x-1 mb-4">
+                    {[...Array(review.rating)].map((_, j) => (
+                      <Star
+                        key={j}
+                        className="text-yellow-400 fill-yellow-400"
+                        size={20}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-gray-700 mb-6 italic">
+                    &quot;{review.comment}&quot;
+                  </p>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-linear-to-br from-blue-400 to-purple-400 rounded-full"></div>
+                    <div>
+                      <div className="font-semibold text-gray-900">
+                        {review.reviewerName}
+                      </div>
+                      <div className="text-sm text-gray-500">{review.providerLocation}</div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              ))
+            : testimonials.map((test, i) => (
+                <div key={i} className="bg-white p-8 rounded-2xl shadow-md   ">
+                  <div className="flex space-x-1 mb-4">
+                    {[...Array(test.rating)].map((_, j) => (
+                      <Star
+                        key={j}
+                        className="text-yellow-400 fill-yellow-400"
+                        size={20}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-gray-700 mb-6 italic">
+                    &quot;{test.text}&quot;
+                  </p>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-linear-to-br from-blue-400 to-purple-400 rounded-full"></div>
+                    <div>
+                      <div className="font-semibold text-gray-900">
+                        {test.name}
+                      </div>
+                      <div className="text-sm text-gray-500">{test.role}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
         </div>
       </div>
     </section>

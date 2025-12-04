@@ -27,6 +27,7 @@ model User {
   bookingAsProvider Booking[]      @relation("ProviderBookings")
   disputes          Dispute[]
   notifications     Notification[]
+  policyViolation   PolicyViolation[]
   payments          Payment[]
   profile           Profile?
   receivedReviews   Review[]       @relation("ReviewReceiver")
@@ -40,6 +41,8 @@ model User {
 model ServiceCategory {
   id    String @id @default(cuid())
   title String
+  description String
+  icon String
 }
 
 model Profile {
@@ -174,18 +177,40 @@ model Dispute {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
+  id        String               @id @default(cuid())
   userId    String
   title     String
   message   String
-  type      String
-  read      Boolean
+  type      NotificationType     @default(INFO)
+  priority  NotificationPriority @default(MEDIUM)
+  read      Boolean              @default(false)
+  readAt    DateTime?
   data      Json?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actionUrl String?
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  expiresAt DateTime?            @updatedAt
+
+  
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read, createdAt(sort: Desc)])
+}
+
+model PolicyViolation {
+  id          String   @id @default(cuid())
+  userId      String
+  violationType String
+  severity    String
+  description String
+  evidence    Json?
+  resolved    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([read])
+  @@index([severity])
 }
 
 model AuditLogs {
@@ -255,4 +280,24 @@ enum DisputeStatus {
   IN_REVIEW
   RESOLVED
   CLOSED
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  ERROR
+  SUCCESS
+  SECURITY_ALERT
+  POLICY_VIOLATION
+  STRIKE_WARNING
+  PAYMENT
+  JOB_UPDATE
+  SYSTEM
+}
+
+enum NotificationPriority {
+  LOWProfile
+  MEDIUM
+  HIGH
+  URGENT
 }

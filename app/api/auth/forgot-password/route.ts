@@ -17,12 +17,14 @@ export const POST = async (req: NextRequest) => {
 
         const { email } = validationRes.data
         const user = await findUserbyEmailOrPhone(email)
-        if (!user) Response.json({
+        logger.warn('user:'+user)
+        
+        if (!user) return Response.json({
             success: true,
             message: 'If an account with this email exists, A password reset link has been sent!'
         })
 
-        const resetToken = await createVerificationTokenSettings(user!.id, true, true)
+        const resetToken = await createVerificationTokenSettings(user?.id, true, true)
         await sendPasswordResetEmail(user!.email, resetToken)
         // audit trail
         await createAuditLog(req, user!.id, 'PASSWORD_RESET', 'User')

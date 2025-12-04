@@ -10,6 +10,8 @@ import {
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 
 const HeroSection = ({ data }: { data: LandingPageData | null }) => {
   const services = [
@@ -38,6 +40,14 @@ const HeroSection = ({ data }: { data: LandingPageData | null }) => {
       color: "from-emerald-500 to-teal-500",
     },
   ];
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+
+  function handleSearch(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+    router.push(`/services?q=${encodeURIComponent(searchQuery)}`);
+  }
 
   return (
     <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8" id="services">
@@ -98,41 +108,75 @@ const HeroSection = ({ data }: { data: LandingPageData | null }) => {
             <div className="absolute inset-0 bg-linear-to-br from-blue-400 to-cyan-400 rounded-3xl blur-3xl opacity-20"></div>
             <div className="relative bg-white rounded-3xl shadow-2xl p-8">
               <div className="mb-6">
-                <div className="flex items-center space-x-2 mb-4">
+                <form
+                  onSubmit={handleSearch}
+                  className="flex items-center space-x-2 mb-4"
+                >
                   <Search className="text-gray-400" size={20} />
                   <input
                     type="text"
                     placeholder="Search for services..."
                     className="flex-1 outline-none text-gray-700"
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
-                </div>
+                </form>
                 <div className="grid grid-cols-2 gap-3">
-                  {data?.serviceCategories.map((service, i) => {
-                    const { icon: Icon, color } = services[i];
-                    return (
-                      <div
-                        key={i}
-                        className="group p-4 rounded-xl bg-linear-to-br hover:shadow-lg transition cursor-pointer border border-gray-100 hover:border-transparent"
-                        style={{
-                          background: `linear-linear(135deg, ${
-                            i % 2 === 0 ? "#f0f9ff" : "#fef3f2"
-                          })`,
-                        }}
-                      >
+                  {data?.serviceCategories &&
+                    data?.serviceCategories.map((service, i) => {
+                      const { icon: Icon, color } = services[i];
+                      return (
                         <div
-                          className={`w-10 h-10 bg-linear-to-br ${color} rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition`}
+                          onClick={() =>
+                            router.push(`/services?category=${service.name}`)
+                          }
+                          key={i}
+                          className="group p-4 rounded-xl bg-linear-to-br hover:shadow-lg transition cursor-pointer border border-gray-100 hover:border-transparent"
+                          style={{
+                            background: `linear-linear(135deg, ${
+                              i % 2 === 0 ? "#f0f9ff" : "#fef3f2"
+                            })`,
+                          }}
                         >
-                          <Icon className="text-white" size={20} />
+                          <div
+                            className={`w-10 h-10 bg-linear-to-br ${color} rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition`}
+                          >
+                            <Icon className="text-white" size={20} />
+                          </div>
+                          <h3 className="font-semibold text-gray-800 text-sm mb-1">
+                            {service.name}
+                          </h3>
+                          <p className="text-xs text-gray-500">
+                            {service.description}
+                          </p>
                         </div>
-                        <h3 className="font-semibold text-gray-800 text-sm mb-1">
-                          {service.name}
-                        </h3>
-                        <p className="text-xs text-gray-500">
-                          {service.description}
-                        </p>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  {data?.serviceCategories.length === 0 &&
+                    services.map((service, i) => {
+                      return (
+                        <div
+                          key={i}
+                          className="group p-4 rounded-xl bg-linear-to-br hover:shadow-lg transition cursor-pointer border border-gray-100 hover:border-transparent"
+                          style={{
+                            background: `linear-linear(135deg, ${
+                              i % 2 === 0 ? "#f0f9ff" : "#fef3f2"
+                            })`,
+                          }}
+                        >
+                          <div
+                            className={`w-10 h-10 bg-linear-to-br ${service.color} rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition`}
+                          >
+                            <service.icon className="text-white" size={20} />
+                          </div>
+                          <h3 className="font-semibold text-gray-800 text-sm mb-1">
+                            {service.title}
+                          </h3>
+                          <p className="text-xs text-gray-500">
+                            {service.desc}
+                          </p>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
 
@@ -148,7 +192,7 @@ const HeroSection = ({ data }: { data: LandingPageData | null }) => {
                       ))}
                     </div>
                     <span className="text-gray-600 font-medium">
-                      {data?.stats.verifiedProviders}+ Verified Pros
+                      {data?.stats.verifiedProviders || 10}+ Verified Pros
                     </span>
                   </div>
                   <div className="flex items-center space-x-1">
@@ -156,7 +200,9 @@ const HeroSection = ({ data }: { data: LandingPageData | null }) => {
                       className="text-yellow-400 fill-yellow-400"
                       size={16}
                     />
-                    <span className="font-bold text-gray-800">{data?.stats.averageRating || 4.8}</span>
+                    <span className="font-bold text-gray-800">
+                      {data?.stats.averageRating || 4.8}
+                    </span>
                   </div>
                 </div>
               </div>

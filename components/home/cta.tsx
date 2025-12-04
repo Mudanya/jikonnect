@@ -1,7 +1,8 @@
+import { LandingPageData } from "@/types/service.type"
 import { ArrowRight, Phone, Mail, MapPin } from "lucide-react"
 import Link from "next/link"
 
-const Cta = () => {
+const Cta = ({data}:{data:LandingPageData | null}) => {
   return (
     
       <section id="join" className="py-20 bg-linear-to-b from-jiko-primary/30  to-jiko-secondary text-jiko-primary px-4 sm:px-6 lg:px-8">
@@ -22,11 +23,11 @@ const Cta = () => {
           <div className="flex flex-wrap justify-center gap-8 text-sm text-jiko-primary">
             <div className="flex items-center space-x-2">
               <Phone size={16} />
-              <span>+254 700 000 000</span>
+              <span>{data?.platform?.phone}</span>
             </div>
             <div className="flex items-center space-x-2">
               <Mail size={16} />
-              <span>hello@jikonnect.co.ke</span>
+              <span>{data?.platform?.email}</span>
             </div>
             <div className="flex items-center space-x-2">
               <MapPin size={16} />

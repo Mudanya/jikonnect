@@ -17,7 +17,7 @@ export const POST = async (
 
         const user = verifyAccessToken(token);
 
-        if (!user) {
+        if (!user ) {
             return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 401 });
         }
         if (!user || user.role !== 'ADMIN') {
