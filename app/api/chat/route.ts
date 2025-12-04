@@ -1,12 +1,12 @@
 // app/api/chat/send/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { MessageFilter } from '@/lib/services/messageFilter';
+
 
 import { pusherServer } from '@/lib/pusher';
 import { prisma } from '@/prisma/prisma.init';
 import { withAuth } from '@/lib/api-auth';
 import { AuthenticatedRequest } from '@/types/auth';
+import { MessageFilter } from '@/lib/chat/messageFilter';
 
 export const POST = withAuth( async (req: AuthenticatedRequest) =>{
   try {
@@ -59,38 +59,38 @@ export const POST = withAuth( async (req: AuthenticatedRequest) =>{
     }
 
     // Save message to database
-    const chatMessage = await prisma.message.create({
-      data: {
-        content: message,
-        senderId: user.id,
-        recipientId,
-        conversationId,
-      },
-      include: {
-        sender: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
-    });
+    // const chatMessage = await prisma.message.create({
+    //   data: {
+    //     content: message,
+    //     senderId: user.id,
+    //     recipientId,
+    //     conversationId,
+    //   },
+    //   include: {
+    //     sender: {
+    //       select: {
+    //         id: true,
+    //         name: true,
+    //         image: true,
+    //       },
+    //     },
+    //   },
+    // });
 
     // Send real-time message via Pusher
-    if (conversationId) {
-      await pusherServer.trigger(`chat-${conversationId}`, 'new-message', {
-        id: chatMessage.id,
-        content: chatMessage.content,
-        senderId: chatMessage.senderId,
-        sender: chatMessage.sender,
-        createdAt: chatMessage.createdAt,
-      });
-    }
+    // if (conversationId) {
+    //   await pusherServer.trigger(`chat-${conversationId}`, 'new-message', {
+    //     id: chatMessage.id,
+    //     content: chatMessage.content,
+    //     senderId: chatMessage.senderId,
+    //     sender: chatMessage.sender,
+    //     createdAt: chatMessage.createdAt,
+    //   });
+    // }
 
     return NextResponse.json({
       success: true,
-      message: chatMessage,
+    //   message: chatMessage,
     });
   } catch (error) {
     console.error('Error sending message:', error);
