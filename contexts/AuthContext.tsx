@@ -1,7 +1,7 @@
 "use client";
 import { AuthContextType, User } from "@/types/auth";
 import { RegisterFormData } from "@/validators/auth.validator";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -24,7 +24,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   //   login
-  const login = async (email: string, password: string) => {
+  const login = async (
+    email: string,
+    password: string,
+    callbackUrl?: string
+  ) => {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
@@ -45,15 +49,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem("user", JSON.stringify(reUser));
 
       setUser(reUser);
+
+      let callback = "/services";
       if (reUser.role === "PROFESSIONAL") {
-        router.push("/provider/dashboard");
-        return;
+        callback = "/provider/dashboard"; 
       }
       if (reUser.role === "ADMIN") {
-        router.push("/admin");
-        return;
+        callback = "/admin";
       }
-      router.push("/services");
+      console.log('callback',callback)
+      router.push(callbackUrl || callback);
+      return;
     } catch (err) {
       if (err instanceof Error) {
         console.error("Login error:", err); // Debugging line

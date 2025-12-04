@@ -1,16 +1,16 @@
 "use client";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
-import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
-import { AuthLayoutContext } from "../layout";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 import { LoginFormData, loginSchema } from "@/validators/auth.validator";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { is } from "zod/locales";
-import { useAuth } from "@/contexts/AuthContext";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { AuthLayoutContext } from "../layout";
 
 const Login = () => {
   const {
@@ -24,6 +24,9 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const { setHeaderDesc } = useContext(AuthLayoutContext);
+  const params = useSearchParams();
+  const callbackUrl = params.get("callbackUrl") || "";
+
   useEffect(() => {
     setHeaderDesc({
       title: "Welcome Back! Sign in to your account",
@@ -35,7 +38,7 @@ const Login = () => {
   const { login } = useAuth();
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data.email, data.password);
+      await login(data.email, data.password, callbackUrl);
       toast.success("Logged in successfully!");
     } catch (err) {
       console.error("Login error:", err);
@@ -46,7 +49,7 @@ const Login = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       {/* Sign In Form */}
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+      <div className="bg-white rounded-2xl shadow-xl  border-gray-100 p-8">
         <div className="mb-6">
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Email Address

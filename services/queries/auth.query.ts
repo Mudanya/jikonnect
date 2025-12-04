@@ -86,7 +86,7 @@ export const createAuditLog = async (req: NextRequest, userId: string, action: s
     })
 }
 
-export const createVerificationTokenSettings = async (userId: string, expires?: boolean, isPasswordReset?: boolean): Promise<string> => {
+export const createVerificationTokenSettings = async (userId?: string, expires?: boolean, isPasswordReset?: boolean): Promise<string> => {
     const value = (expires) ? { userId, expiresAt: new Date(Date.now() + 3600000) }
         : { userId, createdAt: new Date() }
 

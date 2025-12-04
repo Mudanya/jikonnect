@@ -116,7 +116,7 @@ export const getRecentReviews = async () => await prisma.review.findMany({
     take: 6
 });
 
-export const geetProviderServices = async () =>
+export const getProviderServices = async () =>
     await prisma.user.findMany({
         where: {
             role: 'PROFESSIONAL',

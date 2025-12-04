@@ -1,29 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
+import { AuthLayoutContext } from "../../layout";
+import { useForm } from "react-hook-form";
+import {
+  ResetPasswordFormData,
+  resetPasswordSchema,
+} from "@/validators/auth.validator";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const params = useParams();
   const token = params.token as string;
 
-  const [formData, setFormData] = useState({
-    newPassword: "",
-    confirmPassword: "",
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isValid, isSubmitting },
+    setValue,
+  } = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema),
+    mode: "onBlur",
+    shouldUnregister: true,
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const { setHeaderDesc } = useContext(AuthLayoutContext);
+
+  useEffect(() => {
+    setHeaderDesc({
+      title: "",
+      classWidth: "w-xl",
+      classFlex: "flex items-center justify-center w-full p-4",
+    });
+    setValue("token", token, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+  }, [setHeaderDesc, setValue, token]);
+
+  const submitForm = async ({
+    newPassword,
+    confirmPassword,
+  }: ResetPasswordFormData) => {
     setError("");
 
-    if (formData.newPassword !== formData.confirmPassword) {
+    if (newPassword !== confirmPassword) {
       setError("Passwords don't match");
-      setLoading(false);
+
       return;
     }
 
@@ -33,8 +64,8 @@ export default function ResetPasswordPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           token,
-          newPassword: formData.newPassword,
-          confirmPassword: formData.confirmPassword,
+          newPassword,
+          confirmPassword,
         }),
       });
 
@@ -50,91 +81,81 @@ export default function ResetPasswordPage() {
       router.push("/login");
     } catch (err) {
       if (err instanceof Error) setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Set new password
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your new password below.
-          </p>
-        </div>
+    <div className="bg-white rounded-2xl shadow-xl  border-gray-100 p-8">
+      <div>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Set new password
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Enter your new password below.
+        </p>
+      </div>
+      <form className="mt-8 space-y-6" onSubmit={handleSubmit(submitForm)}>
+        {error && (
+          <div className="rounded-md bg-red-50 p-4">
+            <div className="text-sm text-red-700">{error}</div>
+          </div>
+        )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
-            </div>
-          )}
+        <div className="space-y-4">
+          <div>
+            <label
+              htmlFor="newPassword"
+              className="block text-sm font-medium text-gray-700"
+            >
+              New Password
+            </label>
 
-          <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="newPassword"
-                className="block text-sm font-medium text-gray-700"
-              >
-                New Password
-              </label>
-              <input
-                id="newPassword"
-                name="newPassword"
-                type="password"
-                required
-                value={formData.newPassword}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="••••••••"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Must contain uppercase, lowercase, number, and special character
-              </p>
-            </div>
-
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Confirm New Password
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="••••••••"
-              />
-            </div>
+            <Input
+              {...register("newPassword")}
+              type="password"
+              className={cn(
+                "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                errors.newPassword ? "border border-red-500" : ""
+              )}
+              placeholder="••••••••"
+            />
+             {errors.newPassword && <p className="text-sm mt-1 text-red-500">{errors.newPassword.message}</p>}
+            <p className="mt-1 text-xs text-gray-500">
+              Must contain uppercase, lowercase, number, and special character
+            </p>
           </div>
 
           <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            <label 
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-gray-700"
             >
-              {loading ? "Resetting..." : "Reset password"}
-            </button>
+              Confirm New Password
+            </label>
+            <Input
+              {...register("confirmPassword")}
+              type="password"
+              className={cn(
+                "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                errors.confirmPassword ? "border border-red-500" : ""
+              )}
+              placeholder="••••••••"
+            />
+            {errors.confirmPassword && <p className="text-sm mt-1 text-red-500">{errors.confirmPassword.message}</p>}
           </div>
-        </form>
-      </div>
+        </div>
+
+        <div>
+          <Button
+            type="submit"
+            disabled={!isValid || isSubmitting}
+            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-jiko-primary hover:bg-jiko-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "Resetting..." : "Reset password"}
+          </Button>
+        </div>
+      </form>
+      s
     </div>
   );
 }

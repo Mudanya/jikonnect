@@ -42,7 +42,7 @@ const Services = () => {
     minRating: "",
   });
   const categories = [
-    { value: "CLEANING", label: "Cleaning", icon: "🧹" },
+    { value: "CLEANING", label: "Cleaning", icon: "\u{1F9F9}" },
     { value: "PLUMBING", label: "Plumbing", icon: "🔧" },
     { value: "ELECTRICAL", label: "Electrical", icon: "⚡" },
     { value: "CARPENTRY", label: "Carpentry", icon: "🔨" },

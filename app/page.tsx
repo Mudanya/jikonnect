@@ -45,7 +45,7 @@ export default function Home() {
       {/* Testimonials Section */}
       <Testimonials data={data}/>
       {/* Call to Action Section */}
-      <Cta />
+      <Cta data={data}/>
       {/* Footer Section */}
       <Footer />
     </main>

@@ -1,5 +1,6 @@
 import logger from '@/lib/logger';
-import { completedBookings, geetProviderServices, getAllProviders, getAvgRatingResult, getRecentReviews, totalBookings, totalProviders, totalReviews, verifiedProviders } from '@/services/queries/client.query';
+import { getSettingsByKey } from '@/services/queries/admin.query';
+import { completedBookings, getAllProviders, getAvgRatingResult, getProviderServices, getRecentReviews, totalBookings, totalProviders, totalReviews, verifiedProviders } from '@/services/queries/client.query';
 import { NextRequest, NextResponse } from 'next/server';
 
 
@@ -20,7 +21,9 @@ export const GET = async (request: NextRequest) => {
         const recentReviews = await getRecentReviews()
 
         // Get service categories with provider counts
-        const allProviders = await geetProviderServices()
+        const allProviders = await getProviderServices()
+
+        const platformDetails = await getSettingsByKey('platform')
 
         // Count providers by category
         const categoryMap = new Map<string, number>();
@@ -68,7 +71,8 @@ export const GET = async (request: NextRequest) => {
                     providerLocation: r.reviewee.profile?.location,
                     serviceDate: r.booking.scheduledDate
                 })),
-                serviceCategories: serviceCategories.slice(0, 12) // Top 12 categories
+                serviceCategories: serviceCategories.slice(0, 12), // Top 12 categories,
+                platform: { name: platformDetails?.platformName, phone: platformDetails?.supportPhone, email: platformDetails?.supportEmail }
             }
         });
 
