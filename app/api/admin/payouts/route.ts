@@ -1,6 +1,7 @@
-import { withRole, AuthenticatedRequest } from '@/lib/api-auth';
+import { withRole} from '@/lib/api-auth';
 import { MpesaService } from '@/lib/mpesa';
 import { prisma } from '@/prisma/prisma.init';
+import { AuthenticatedRequest } from '@/types/auth';
 import { NextResponse } from 'next/server';
 
 // GET - Get pending payouts
@@ -51,7 +52,7 @@ export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
       data: Object.values(payoutsByProvider)
     });
   } catch (error) {
-    console.error('Get payouts error:', error);
+    console.error('Get payouts error:', error,req.user.userId);
     return NextResponse.json(
       { success: false, message: 'Failed to fetch payouts' },
       { status: 500 }
@@ -91,7 +92,7 @@ export const POST_PAYOUT = withRole('ADMIN')(async (req: AuthenticatedRequest) =
     );
 
     // Log payout
-    await prisma.auditLog.create({
+    await prisma.auditLogs.create({
       data: {
         userId: req.user.userId,
         action: 'PAYOUT_INITIATED',
@@ -102,7 +103,7 @@ export const POST_PAYOUT = withRole('ADMIN')(async (req: AuthenticatedRequest) =
           bookingIds,
           conversationId: payoutResponse.ConversationID
         },
-        ipAddress: req.ip || req.headers.get('x-forwarded-for') || 'unknown',
+        ipAddress: req.headers.get('x-forwarded-for') || 'unknown',
         userAgent: req.headers.get('user-agent')
       }
     });

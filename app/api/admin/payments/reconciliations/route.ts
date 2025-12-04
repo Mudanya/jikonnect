@@ -3,7 +3,7 @@ import { prisma } from "@/prisma/prisma.init";
 import { AuthenticatedRequest } from "@/types/auth";
 import { NextResponse } from "next/server";
 
-export const GET_RECONCILIATION = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
+export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
   try {
     const { searchParams } = new URL(req.url);
     const startDate = searchParams.get('startDate');

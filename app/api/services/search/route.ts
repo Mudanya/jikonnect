@@ -1,7 +1,6 @@
 import logger from "@/lib/logger";
 import { getUserProfiles } from "@/services/queries/provider.query";
 import { NextRequest, NextResponse } from "next/server";
-import { success } from "zod";
 
 export const GET = async (req: NextRequest) => {
     try {

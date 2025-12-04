@@ -1,6 +1,7 @@
-import { AuthenticatedRequest, withAuth } from '@/lib/api-auth';
+import {  withAuth } from '@/lib/api-auth';
 import { MpesaService } from '@/lib/mpesa';
 import { prisma } from '@/prisma/prisma.init';
+import { AuthenticatedRequest } from '@/types/auth';
 import { NextResponse } from 'next/server';
 
 
