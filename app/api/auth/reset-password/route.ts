@@ -16,7 +16,7 @@ export const POST = async (req: NextRequest) => {
         }, { status: 400, })
 
         const { token, newPassword } = validationRes.data
-        const pwdReset = await findVerificationToken(token, true)
+        const pwdReset = await findVerificationToken(token!, true)
         if (!pwdReset) return Response.json({
 
             success: false,
@@ -26,7 +26,7 @@ export const POST = async (req: NextRequest) => {
         const data = pwdReset.value as { expiresAt: string, userId: string, email: string }
         const expriresAt = new Date(data.expiresAt)
         if (expriresAt < new Date()) {
-            await removeVerificationToken(token, true)
+            await removeVerificationToken(token!, true)
             return Response.json({
                 success: false,
                 message: 'Reset token has expired'
@@ -34,7 +34,7 @@ export const POST = async (req: NextRequest) => {
         }
         const hashedPaswword = await hashPassword(newPassword)
         await updatePassword(data.userId, hashedPaswword)
-        await removeVerificationToken(token, true)
+        await removeVerificationToken(token!, true)
 
         await createAuditLog(req, data.userId, 'PASSWORD_RESET_COMPLETE', 'User')
         logger.info(`${data.email} password reset successfully!`)
