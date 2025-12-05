@@ -83,7 +83,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
           amount: booking.amount,
           checkoutRequestId: stkPushResponse.CheckoutRequestID
         },
-        ipAddress: req.ip || req.headers.get('x-forwarded-for') || 'unknown',
+        ipAddress: req.headers.get('x-forwarded-for') || 'unknown',
         userAgent: req.headers.get('user-agent')
       }
     });

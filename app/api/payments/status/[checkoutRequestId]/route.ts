@@ -32,7 +32,7 @@ export const GET = async (
         if (payment.status === 'PENDING') {
             try {
                 const mpesa = new MpesaService();
-                const status = await mpesa.querySTKPushStatus(params.checkoutRequestId);
+                const status = await mpesa.querySTKPushStatus(checkoutRequestId);
 
                 if (status.ResultCode === '0') {
                     // Payment successful - update
