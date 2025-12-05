@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user: reUser,
       } = data.data;
 
-      if (!user?.emailVerified) {
+      if (!(reUser?.emailVerified)) {
         throw new Error("Verify your email address to login");
       }
 
