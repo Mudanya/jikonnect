@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JiKonnect - Connecting prople, skills, services and care",
+  title: "JiKonnect - Connecting people, skills, services and care",
   description:
     "Find trusted service professionals in Kenya with JiKonnect. Book home services, care, cleaning, and more with verified experts. Safe, reliable, and convenient.",
 };

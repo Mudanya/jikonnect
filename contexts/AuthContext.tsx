@@ -44,6 +44,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user: reUser,
       } = data.data;
 
+      if (user?.status !== "ACTIVE") {
+        throw new Error("Verify your email address to login");
+      }
+
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("user", JSON.stringify(reUser));
@@ -52,12 +56,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       let callback = "/services";
       if (reUser.role === "PROFESSIONAL") {
-        callback = "/provider/dashboard"; 
+        callback = "/provider/dashboard";
       }
       if (reUser.role === "ADMIN") {
         callback = "/admin";
       }
-      console.log('callback',callback)
+      console.log("callback", callback);
       router.push(callbackUrl || callback);
       return;
     } catch (err) {
@@ -89,7 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem("user", regUser);
 
       setUser(regUser);
-      router.push("/dashboard");
+      router.push("/login");
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message || "Registration failed");
