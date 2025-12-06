@@ -123,6 +123,7 @@ export const removeVerificationToken = async (token: string, isPasswordReset?: b
             key: `${isPasswordReset ? 'password_reset' : 'email_verification'}:${token}`
         }
     })
+    
 }
 
 export const updatePassword = async (id: string, password: string) => {
