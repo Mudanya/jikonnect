@@ -8,29 +8,29 @@ datasource db {
 }
 
 model User {
-  id                String         @id @default(cuid())
-  email             String         @unique
-  phone             String         @unique
+  id                String            @id @default(cuid())
+  email             String            @unique
+  phone             String            @unique
   password          String
   firstName         String
   lastName          String
-  role              UserRole       @default(CLIENT)
-  status            UserStatus     @default(PENDING)
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  phoneVerified     Boolean        @default(false)
-  emailVerified     Boolean        @default(false)
+  role              UserRole          @default(CLIENT)
+  status            UserStatus        @default(PENDING)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  phoneVerified     Boolean           @default(false)
+  emailVerified     Boolean           @default(false)
   lastLogin         DateTime?
   avatar            String?
   auditLogs         AuditLogs[]
-  bookingsAsClient  Booking[]      @relation("ClientBookings")
-  bookingAsProvider Booking[]      @relation("ProviderBookings")
+  bookingsAsClient  Booking[]         @relation("ClientBookings")
+  bookingAsProvider Booking[]         @relation("ProviderBookings")
   disputes          Dispute[]
   notifications     Notification[]
-  policyViolations   PolicyViolation[]
   payments          Payment[]
+  policyViolations  PolicyViolation[]
   profile           Profile?
-  receivedReviews   Review[]       @relation("ReviewReceiver")
+  receivedReviews   Review[]          @relation("ReviewReceiver")
   reviews           Review[]
 
   @@index([email])
@@ -39,10 +39,10 @@ model User {
 }
 
 model ServiceCategory {
-  id    String @id @default(cuid())
-  title String
+  id          String @id @default(cuid())
+  title       String
   description String
-  icon String
+  icon        String
 }
 
 model Profile {
@@ -181,33 +181,30 @@ model Notification {
   userId    String
   title     String
   message   String
-  type      NotificationType     @default(INFO)
-  priority  NotificationPriority @default(MEDIUM)
   read      Boolean              @default(false)
-  readAt    DateTime?
   data      Json?
-  actionUrl String?
   createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
+  actionUrl String?
   expiresAt DateTime?            @updatedAt
-
-  
+  priority  NotificationPriority @default(MEDIUM)
+  readAt    DateTime?
+  updatedAt DateTime             @updatedAt
+  type      NotificationType     @default(INFO)
   user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, read, createdAt(sort: Desc)])
 }
 
 model PolicyViolation {
-  id          String   @id @default(cuid())
-  userId      String
+  id            String   @id @default(cuid())
+  userId        String
   violationType String
-  severity    String
-  description String
-  evidence    Json?
-  resolved    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  severity      String
+  description   String
+  evidence      Json?
+  resolved      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([severity])

@@ -528,6 +528,7 @@ export const initializeAdmin = async () => {
             role: 'ADMIN',
             status: 'ACTIVE',
             createdAt: new Date(),
+            emailVerified: true
         }
     })
 }
