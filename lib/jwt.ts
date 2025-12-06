@@ -8,6 +8,7 @@ const ACCESS_TOKEN_EXPIRY = process.env.JWT_ACCESS_EXPIRY as ms.StringValue
 const REFRESH_TOKEN_EXPIRY = process.env.JWT_ACCESS_EXPIRY as ms.StringValue
 
 export const generateTokens = (payload: AuthUser) => {
+    logger.info('secret: '+ACCESS_TOKEN_SECRET+" tokens"+ACCESS_TOKEN_SECRET)
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
         expiresIn: ACCESS_TOKEN_EXPIRY
     })
