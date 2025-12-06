@@ -27,7 +27,7 @@ model User {
   bookingAsProvider Booking[]      @relation("ProviderBookings")
   disputes          Dispute[]
   notifications     Notification[]
-  policyViolation   PolicyViolation[]
+  policyViolations   PolicyViolation[]
   payments          Payment[]
   profile           Profile?
   receivedReviews   Review[]       @relation("ReviewReceiver")

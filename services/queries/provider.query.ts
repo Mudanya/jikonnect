@@ -226,14 +226,14 @@ export const getBookingById = async (id: string) => await prisma.booking.findUni
     where: { id }
 });
 
-export const updateBookingStatus = async (id: string, status: 'CANCELLED' | 'COMPLETED', cancellationReason: string) => {
+export const updateBookingStatus = async (id: string, status: 'CANCELLED' | 'COMPLETED', CancellationReason: string) => {
     return await prisma.booking.update({
         where: { id },
         data: {
             status,
             ...(status === 'CANCELLED' && {
                 cancelledAt: new Date(),
-                cancellationReason
+                CancellationReason
             }),
             ...(status === 'COMPLETED' && {
                 completedAt: new Date()
@@ -381,4 +381,36 @@ export const getCompletedBookings = async (providerId: string) => {
         },
         orderBy: { completedAt: 'desc' }
     });
+}
+
+export const getProviderBookingsById = async (providerId: string, status?: BookingStatus) => {
+    return await prisma.booking.findMany({
+        where: {
+            providerId: providerId,
+            ...(status && { status })
+        },
+        include: {
+            provider: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    avatar: true,
+                    phone: true
+                }
+            },
+            client: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    avatar: true,
+                    phone: true
+                }
+            },
+            payment: true,
+            review: true
+        },
+        orderBy: { createdAt: 'desc' }
+    })
 }

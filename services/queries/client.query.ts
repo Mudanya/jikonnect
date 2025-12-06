@@ -16,10 +16,10 @@ export const updateUserProfile = async (userId: string, data: Partial<ClientForm
     })
 }
 
-export const getBookingsById = async (clientId: string, status: BookingStatus) => {
+export const getBookingsById = async (clientId: string, status?: BookingStatus) => {
     return await prisma.booking.findMany({
         where: {
-            clientId: clientId,
+            clientId,
             ...(status && { status })
         },
         include: {

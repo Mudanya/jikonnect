@@ -109,7 +109,13 @@ export const uploadDocument = async (e: React.ChangeEvent<HTMLInputElement>, doc
     }
 }
 
-export const getProviderProfile = async (providerId: string) => {
-    const response = await fetch(`/api/services/provider/${providerId}`);
+export const getProviderProfile = async (providerId: string, token: string) => {
+
+    const response = await fetch(`/api/services/provider/${providerId}`, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        }
+    });
     return await response.json();
 }

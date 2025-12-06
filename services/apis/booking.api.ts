@@ -1,5 +1,10 @@
-export const searchService = async (queryParams: URLSearchParams) => {
-    const response = await fetch(`/api/services/search?${queryParams}`);
+export const searchService = async (queryParams: URLSearchParams,token:string) => {
+    const response = await fetch(`/api/services/search?${queryParams}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
     return await response.json();
 }
 

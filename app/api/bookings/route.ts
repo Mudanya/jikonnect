@@ -3,15 +3,25 @@ import { BookingStatus } from "@/lib/generated/prisma/enums";
 import logger from "@/lib/logger";
 import { createAuditLog } from "@/services/queries/auth.query";
 import { getBookingsById } from "@/services/queries/client.query";
-import { createBooking, getUserProfileById } from "@/services/queries/provider.query";
+import { createBooking, getUserByUserId, getUserProfileById } from "@/services/queries/provider.query";
 import { AuthenticatedRequest } from "@/types/auth";
 import { NextResponse } from "next/server";
 
 export const GET = withAuth(async (req: AuthenticatedRequest) => {
     try {
         const { searchParams } = new URL(req.url);
-        const status = searchParams.get('status');
-        const bookings = getBookingsById(req.user.userId, status as BookingStatus)
+        const status = searchParams.get('status'); //TODO
+
+        const user = await getUserByUserId(req.user.userId)
+
+        if (!user) {
+            return NextResponse.json(
+                { success: false, message: 'User not found' },
+                { status: 404 }
+            );
+        }
+
+        const bookings = await getBookingsById(user.id)
         return NextResponse.json({
             success: true,
             data: bookings

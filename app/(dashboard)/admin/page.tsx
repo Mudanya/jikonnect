@@ -168,7 +168,7 @@ export default function AdminDashboard() {
             value={stats.activeProviders}
             icon={Users}
             color="blue"
-            onClick={() => router.push('/admin/users?role=PROVIDER')}
+            onClick={() => router.push('/admin/users?role=PROFESSIONAL')}
           />
           <StatCard
             title="Active Clients"

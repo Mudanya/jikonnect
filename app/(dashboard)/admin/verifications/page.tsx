@@ -49,7 +49,7 @@ const VerificationPage = () => {
     setTimeout(async () => {
       setMounted(true);
       if (user?.role !== "ADMIN") {
-        router.push("/dashboard");
+        router.push("/services");
       } else {
         const res = await loadVerifications();
         console.log(res);
