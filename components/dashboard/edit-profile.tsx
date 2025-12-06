@@ -31,23 +31,39 @@ import Loading from "../shared/Loading";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import { UserStatus } from "@/lib/generated/prisma/enums";
 
 const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
   const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   const [uploading, setUploading] = useState(false);
-
+  const isProvider = user?.role === "PROFESSIONAL";
   const {
     register,
     handleSubmit,
     formState: { errors, isValid, isSubmitting },
     setValue,
     getValues,
+    reset,
+    watch,
   } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
-    mode: "onBlur",
-    shouldUnregister: true,
+    mode: "onChange",
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      phone: "",
+      avatar: "",
+      bio: "",
+      services: [],
+      hourlyRate: undefined,
+      yearsOfExperience: undefined,
+      location: "",
+      languages: [],
+      idNumber: "",
+      role: "CLIENT",
+    },
   });
 
   const [documents, setDocuments] = useState({
@@ -80,76 +96,43 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
       toast.error((err as Error).message);
     }
   };
-
+  const allValues = watch();
   useEffect(() => {
     setTimeout(async () => {
       setMounted(true);
+
       if (user) {
         try {
           const token = localStorage.getItem("accessToken");
 
           const data = await loadUserProfile(token || "");
           if (data.success) {
-            setValue("firstName", data.data.firstName || "", {
-              shouldDirty: true,
-              shouldValidate: true,
-              shouldTouch: true,
+            console.log("✅ About to reset with:", {
+              firstName: data.data.firstName,
+              lastName: data.data.lastName,
+              phone: data.data.phone,
             });
-            setValue("lastName", data.data.lastName || "", {
-              shouldDirty: true,
-              shouldValidate: true,
-              shouldTouch: true,
-            });
-            setValue("phone", data.data.phone || "", {
-              shouldDirty: true,
-              shouldValidate: true,
-              shouldTouch: true,
-            });
-            setValue("avatar", data.data.avatar || "", {
-              shouldDirty: true,
-              shouldValidate: true,
-              shouldTouch: true,
-            });
-            setValue("bio", data.data.profile?.bio || "", {
-              shouldDirty: true,
-              shouldValidate: true,
-              shouldTouch: true,
-            });
-            setValue("services", data.data.profile?.services || [], {
-              shouldDirty: true,
-              shouldValidate: true,
-              shouldTouch: true,
-            });
-            setValue(
-              "hourlyRate",
-              data.data.profile?.hourlyRate?.toString() || "",
-              { shouldDirty: true, shouldValidate: true, shouldTouch: true }
+            reset(
+              {
+                firstName: data.data.firstName || "",
+                lastName: data.data.lastName || "",
+                phone: data.data.phone || "",
+                avatar: data.data?.avatar || "",
+                bio: data.data?.profile?.bio || "",
+                services: data.data?.profile?.services || [],
+                hourlyRate: data.data?.profile?.hourlyRate || 0,
+                yearsOfExperience: data.data?.profile?.yearsOfExperience || 0,
+                languages: data.data?.profile?.languages || [],
+                idNumber: data.data?.profile?.idNumber || "",
+                role: user.role as "CLIENT" | "PROFESSIONAL" | "ADMIN",
+              },
+              {
+                keepDirty: false, // Mark form as pristine
+                keepTouched: false,
+                keepIsValid: false,
+                
+              }
             );
-            setValue(
-              "yearsOfExperience",
-              data.data.profile?.yearsOfExperience?.toString() || "",
-              { shouldDirty: true, shouldValidate: true, shouldTouch: true }
-            );
-            setValue("location", data.data.profile?.location || "", {
-              shouldDirty: true,
-              shouldValidate: true,
-              shouldTouch: true,
-            });
-            setValue("languages", data.data.profile?.languages || [], {
-              shouldDirty: true,
-              shouldValidate: true,
-              shouldTouch: true,
-            });
-            setValue("idNumber", data.data.profile?.idNumber || "", {
-              shouldDirty: true,
-              shouldValidate: true,
-              shouldTouch: true,
-            });
-            setValue("role", user.role as "CLIENT" | "PROFESSIONAL", {
-              shouldDirty: true,
-              shouldValidate: true,
-              shouldTouch: true,
-            });
             setDocuments({
               idDocument: data.data.profile?.idDocument || "",
               certificates: data.data.profile?.certificates || [],
@@ -160,7 +143,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
         }
       }
     }, 0);
-  }, [user, register, setValue]);
+  }, [user, reset]);
 
   const handleFileUpload = async (
     e: ChangeEvent<HTMLInputElement>,
@@ -203,15 +186,17 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="py-5 flex justify-end">
-        <Button
-          type="button"
-          className="bg-red-50 text-red-500 hover:bg-red-100 cursor-pointer"
-          onClick={onClickEdit}
-        >
-          Cancel
-        </Button>
-      </div>
+      {user?.role === "PROFESSIONAL" && (
+        <div className="py-5 flex justify-end">
+          <Button
+            type="button"
+            className="bg-red-50 text-red-500 hover:bg-red-100 cursor-pointer"
+            onClick={onClickEdit}
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
       <div className="bg-white rounded-2xl shadow-md p-6">
         <h2 className="text-xl font-bold mb-6">Basic Information</h2>
 
