@@ -4,7 +4,7 @@ export const clientSchema = z.object({
     lastName: z.string().min(1, 'Last name is required'),
     phone: z.string().regex(/^(\+254|0)[17]\d{8}$/, 'Invalid kenyan number'),
     avatar: z.string().optional(),
-    role: z.enum(["CLIENT", "PROFESSIONAL"]).optional(),
+    role: z.enum(["CLIENT", "PROFESSIONAL","ADMIN"]).optional(),
 
 });
 export const profileSchema = z.object({

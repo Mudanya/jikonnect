@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
-  let edit: string | null = null;
-  if (typeof window !== "undefined") {
-    edit = localStorage.getItem("isEditing");
-  }
+  const [edit, setEdit] = useState<string | null | undefined>(null);
+
   useEffect(() => {
     const timer = setTimeout(() => {
+      const theEdit = localStorage.getItem("isEditing");
+      if (theEdit) setEdit(theEdit);
+
       if (edit && edit === "true") {
         setIsEditing(true);
       }
@@ -18,7 +19,6 @@ const Profile = () => {
     return () => clearTimeout(timer);
   }, [edit]);
   const updateEditing = (value: boolean) => {
-    if (typeof window === "undefined") return;
     localStorage.setItem("isEditing", value ? "true" : "false");
     setIsEditing(value);
   };

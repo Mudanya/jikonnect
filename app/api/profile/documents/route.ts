@@ -7,7 +7,9 @@ import { join } from "path";
 import { mkdir, unlink, writeFile } from "fs/promises";
 import { getUserByUserId, getUserProfileById, updateDocument } from "@/services/queries/provider.query";
 import { createAuditLog } from "@/services/queries/auth.query";
-
+import { uploadToCloudinary } from "@/lib/cloudinary";
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 export const POST = withAuth(async (req: AuthenticatedRequest) => {
     try {
         const formData = await req.formData();
@@ -48,13 +50,19 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
         }
 
         const timestamp = Date.now();
-        const extension = file.name.split('.').pop();
-        const fileName = `${req.user.userId}_${documentType}_${timestamp}.${extension}`;
-        const filePath = join(uploadDir, fileName);
+        // const extension = file.name.split('.').pop();
+        // const fileName = `${req.user.userId}_${documentType}_${timestamp}.${extension}`;
+        const fileName = `${req.user.userId}_${documentType}_${timestamp}`;
+        // const filePath = join(uploadDir, fileName);
 
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
-        await writeFile(filePath, buffer);
+        // await writeFile(filePath, buffer);
+        const result = await uploadToCloudinary(
+            buffer,
+            uploadDir, // folder name
+            fileName // filename without extension
+        ) as any;
 
         const fileUrl = `/uploads/documents/${isAvatar ? 'avatars/' : ''}${fileName}`;
 
@@ -76,7 +84,8 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
 
             }
         }
-        await updateDocument(req.user.userId, fileUrl, documentType as 'certificate' | 'idDocument' | 'avatar', profile.certificates);
+        // await updateDocument(req.user.userId, fileUrl, documentType as 'certificate' | 'idDocument' | 'avatar', profile.certificates);
+        await updateDocument(req.user.userId, result.secure_url, documentType as 'certificate' | 'idDocument' | 'avatar', profile.certificates);
         // Audit Log
         await createAuditLog(req, req.user.userId, 'DOCUMENT_UPLOADED', 'Profile', { documentType: fileName }, profile.id);
 
@@ -84,7 +93,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
             success: true,
             message: 'Document uploaded successfully',
             data: {
-                fileUrl
+                fileUrl: result.secure_url
             }
         });
     }

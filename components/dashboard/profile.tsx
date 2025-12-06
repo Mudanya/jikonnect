@@ -43,19 +43,17 @@ const GenProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
   };
   const updateProfile = async () => {
     try {
-      if (window !== undefined) {
-        const theUser = localStorage.getItem("user");
-        if (theUser) {
-          const storedUser = JSON.parse(theUser) as User;
-          const res = await submitProfile({
-            ...storedUser,
-            ...profile!.profile,
-            role: storedUser.role as "CLIENT" | "PROFESSIONAL" | undefined,
-            hourlyRate: +(profile?.profile.hourlyRate || 0),
-          });
-          if (res.success) toast.success("Profile updated successfully");
-          setUploading(false);
-        }
+      const theUser = localStorage.getItem("user");
+      if (theUser) {
+        const storedUser = JSON.parse(theUser) as User;
+        const res = await submitProfile({
+          ...storedUser,
+          ...profile!.profile,
+          role: storedUser.role as "CLIENT" | "PROFESSIONAL" | undefined,
+          hourlyRate: +(profile?.profile.hourlyRate || 0),
+        });
+        if (res.success) toast.success("Profile updated successfully");
+        setUploading(false);
       }
     } catch (err) {
       setUploading(false);
@@ -67,15 +65,16 @@ const GenProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
   const setService = async (val: string) => {
     setUploading(true);
     if (
-      !profile?.profile.services
-        .map((s) => s.toLowerCase())
+      profile?.profile &&
+      !profile?.profile?.services
+        ?.map((s) => s.toLowerCase())
         .includes(val?.toLowerCase())
     ) {
-      if (val) {
+      if (val && profile?.profile) {
         setProfile({
           profile: {
             ...profile!.profile,
-            services: [...profile!.profile.services, val],
+            services: [...(profile?.profile?.services || []), val],
           },
         });
         await updateProfile();
@@ -86,19 +85,18 @@ const GenProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
   useEffect(() => {
     setTimeout(async () => {
       if (user && user.role === "PROFESSIONAL") await loadProfile();
-      if (window !== undefined) {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setAvatarUrl(parsedUser.avatar || null);
-        }
+
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setAvatarUrl(parsedUser.avatar || null);
       }
     }, 0);
   }, [user]);
   const handleChange = async (event: ChangeEvent<HTMLTextAreaElement>) => {
     setUploading(true);
     const val = event.target.value;
-    if (profile?.profile.bio.toLowerCase() !== val?.toLowerCase()) {
+    if (profile?.profile?.bio?.toLowerCase() !== val?.toLowerCase()) {
       if (val) {
         setProfile({ profile: { ...profile!.profile, bio: val } });
         await updateProfile();
@@ -214,7 +212,7 @@ const GenProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
                 Skills
               </label>
               <div className="flex flex-wrap gap-2 mb-3">
-                {profile?.profile?.services.map((skill) => (
+                {profile?.profile?.services?.map((skill) => (
                   <span
                     key={skill}
                     className="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium flex items-center space-x-2"
@@ -228,7 +226,7 @@ const GenProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
                         setProfile({
                           profile: {
                             ...profile.profile!,
-                            services: profile.profile.services.filter(
+                            services: profile.profile?.services?.filter(
                               (val) =>
                                 val?.toLowerCase() !== skill.toLowerCase()
                             ),
