@@ -1,11 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { 
-  Eye, ArrowLeft, Search, Filter, User, 
-  FileText, Settings, Shield, AlertTriangle, CheckCircle 
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle,
+  Eye,
+  FileText,
+  Search,
+  Settings, Shield,
+  User
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface AuditLog {
   id: string;
@@ -42,14 +48,7 @@ export default function AuditLogsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const logsPerPage = 20;
 
-  useEffect(() => {
-    loadAuditLogs();
-  }, []);
-
-  useEffect(() => {
-    filterLogs();
-  }, [searchQuery, categoryFilter, statusFilter, logs]);
-
+ 
   const loadAuditLogs = async () => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -96,6 +95,15 @@ export default function AuditLogsPage() {
     setFilteredLogs(filtered);
     setCurrentPage(1);
   };
+
+   useEffect(() => {
+    loadAuditLogs();
+  }, []);
+
+  useEffect(() => {
+    filterLogs();
+  }, []);
+
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -152,92 +160,22 @@ export default function AuditLogsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <button
-            onClick={() => router.push('/admin/dashboard')}
-            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-4"
-          >
-            <ArrowLeft size={20} />
-            <span>Back to Dashboard</span>
-          </button>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Audit Logs</h1>
-              <p className="text-gray-600 mt-1">{filteredLogs.length} log entries found</p>
-            </div>
+     
 
-            {/* Filters */}
-            <div className="flex items-center space-x-3 mt-4 md:mt-0">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search logs..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
-                />
-              </div>
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="ALL">All Categories</option>
-                <option value="USER">User</option>
-                <option value="BOOKING">Booking</option>
-                <option value="PAYMENT">Payment</option>
-                <option value="VERIFICATION">Verification</option>
-                <option value="SECURITY">Security</option>
-                <option value="SYSTEM">System</option>
-              </select>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="ALL">All Status</option>
-                <option value="SUCCESS">Success</option>
-                <option value="FAILURE">Failure</option>
-                <option value="WARNING">Warning</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className=" px-4 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border p-4">
+          <div className="bg-white rounded-xl shadow-md  p-4">
             <p className="text-sm text-gray-600">Total Logs</p>
             <p className="text-2xl font-bold text-gray-900">{logs.length}</p>
           </div>
-          <div className="bg-white rounded-xl shadow-sm border p-4">
-            <p className="text-sm text-gray-600">Success</p>
-            <p className="text-2xl font-bold text-green-600">
-              {logs.filter(l => l.status === 'SUCCESS').length}
-            </p>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border p-4">
-            <p className="text-sm text-gray-600">Failures</p>
-            <p className="text-2xl font-bold text-red-600">
-              {logs.filter(l => l.status === 'FAILURE').length}
-            </p>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border p-4">
-            <p className="text-sm text-gray-600">Warnings</p>
-            <p className="text-2xl font-bold text-orange-600">
-              {logs.filter(l => l.status === 'WARNING').length}
-            </p>
-          </div>
+         
         </div>
 
         {/* Logs Table */}
-        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
@@ -246,8 +184,8 @@ export default function AuditLogsPage() {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actor</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Category</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Action</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Details</th>
+                  {/* <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th> */}
+                  {/* <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Details</th> */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -290,17 +228,17 @@ export default function AuditLogsPage() {
                         </p>
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       <span className={`inline-flex items-center space-x-1 ${getStatusColor(log.status)}`}>
                         {getStatusIcon(log.status)}
                         <span className="text-sm font-medium">{log.status}</span>
                       </span>
-                    </td>
-                    <td className="px-6 py-4">
+                    </td> */}
+                    {/* <td className="px-6 py-4">
                       <p className="text-sm text-gray-700 line-clamp-2 max-w-md">
-                        {log.details}
+                        {log?.details}
                       </p>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -373,11 +311,11 @@ export default function AuditLogsPage() {
       {/* Log Details Modal */}
       {selectedLog && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/20 bg-opacity-50 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedLog(null)}
         >
           <div 
-            className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-2xl shadow-xl  w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b">

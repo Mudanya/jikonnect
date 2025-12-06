@@ -133,3 +133,10 @@ export const getUserWithProfileById = async (id: string) => {
     return await prisma.user.findUnique({ where: { id }, include: { profile: true } })
 }
 
+export const deleteUser = async (id: string) => {
+    return await prisma.user.delete({ where: { id } })
+}
+export const suspendUser = async (id: string, action: 'suspend' | 'unsuspend') => {
+    const status = action === 'suspend' ? 'SUSPENDED' : 'ACTIVE';
+    return await prisma.user.update({ where: { id }, data: { status } })
+}

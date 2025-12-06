@@ -30,7 +30,7 @@ interface Booking {
   };
   status: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "FAILED";
   scheduledFor: string;
-  price: number;
+  amount: number;
   createdAt: string;
   mpesaReceipt?: string;
 }
@@ -296,6 +296,8 @@ export default function BookingsOversightPage() {
                           }
                           alt={booking.client.firstName}
                           className="w-8 h-8 rounded-full"
+                          width={800}
+                          height={600}
                         />
                         <div>
                           <p className="text-sm font-medium text-gray-900">
@@ -337,7 +339,7 @@ export default function BookingsOversightPage() {
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-sm font-semibold text-gray-900">
-                        KSH {booking.price.toLocaleString()}
+                        KSH {booking.amount.toLocaleString()}
                       </p>
                     </td>
                     <td className="px-6 py-4">
@@ -412,7 +414,7 @@ export default function BookingsOversightPage() {
       {/* Booking Details Modal */}
       {selectedBooking && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/30 bg-opacity-50 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedBooking(null)}
         >
           <div
@@ -481,7 +483,7 @@ export default function BookingsOversightPage() {
                   </p>
                   <p className="text-sm">
                     <span className="text-gray-600">Price:</span> KSH{" "}
-                    {selectedBooking.price.toLocaleString()}
+                    {selectedBooking.amount.toLocaleString()}
                   </p>
                   <p className="text-sm">
                     <span className="text-gray-600">Status:</span>

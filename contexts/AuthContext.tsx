@@ -44,8 +44,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user: reUser,
       } = data.data;
 
-      if (!(reUser?.emailVerified)) {
+      if (!reUser?.emailVerified) {
         throw new Error("Verify your email address to login");
+      }
+      if (reUser?.status !== "ACTIVE") {
+        throw new Error(
+          `Your account is ${reUser?.status?.toLowerCase()}, please contact support team for assistance`
+        );
       }
 
       localStorage.setItem("accessToken", accessToken);

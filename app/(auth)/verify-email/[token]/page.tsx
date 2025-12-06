@@ -27,7 +27,7 @@ const VerifyEmail = () => {
           setStatus('success');
           setMessage('Your email has been verified successfully!');
           setTimeout(() => {
-            router.push('/dashboard');
+            router.push('/login');
           }, 3000);
         } else {
           setStatus('error');

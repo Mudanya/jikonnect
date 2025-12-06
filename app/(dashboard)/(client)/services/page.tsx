@@ -60,7 +60,8 @@ const Services = () => {
       if (filters.minRate) queryParams.append("minRate", filters.minRate);
       if (filters.maxRate) queryParams.append("maxRate", filters.maxRate);
       if (filters.minRating) queryParams.append("minRating", filters.minRating);
-      const data = await searchService(queryParams);
+      const token = localStorage.getItem('accessToken')
+      const data = await searchService(queryParams,token!);
       if (data.success) {
         setProviders(data.data);
         setFilteredProviders(data.data);
@@ -298,6 +299,8 @@ const Services = () => {
                       src={provider.portfolio[0].images[0]}
                       alt={provider.user.firstName}
                       className="w-full h-full object-cover"
+                      width={800}
+                      height={600}
                     />
                     {provider.portfolio.length > 1 && (
                       <div className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs">
@@ -353,7 +356,7 @@ const Services = () => {
                       <div className="flex items-center justify-center space-x-1 text-yellow-500 mb-1">
                         <Star size={16} className="fill-yellow-500" />
                         <span className="font-bold text-gray-900">
-                          {provider.averageRating.toFixed(1)}
+                          {/* {provider.averageRating} */}
                         </span>
                       </div>
                       <div className="text-xs text-gray-500">Rating</div>

@@ -61,7 +61,7 @@ export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
 });
 
 // POST - Process payout to provider
-export const POST_PAYOUT = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
+export const POST = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
   try {
     const body = await req.json();
     const { providerId, bookingIds, phoneNumber } = body;

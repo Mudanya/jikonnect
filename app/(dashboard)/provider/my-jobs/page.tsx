@@ -27,11 +27,7 @@ interface Booking {
     phone: string;
     avatar: string | null;
   };
-  address: {
-    street: string;
-    city: string;
-    county: string;
-  };
+  location:string;
   review: {
     id: string;
     rating: number;
@@ -287,7 +283,7 @@ function BookingCard({ booking, onClick }: { booking: Booking; onClick: () => vo
         </div>
         <div className="flex items-center space-x-2 text-gray-600">
           <MapPin size={16} />
-          <span>{booking.address.city}, {booking.address.county}</span>
+          <span>{booking.location}</span>
         </div>
         <div className="flex items-center space-x-2 text-green-600 font-medium">
           <DollarSign size={16} />
@@ -402,8 +398,8 @@ function BookingDetailsModal({ booking, onClose, onUpdate }: {
             <div className="flex items-start space-x-2 text-gray-700">
               <MapPin size={20} className="text-gray-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p>{booking.address.street}</p>
-                <p>{booking.address.city}, {booking.address.county}</p>
+                <p>{booking.location}</p>
+                
               </div>
             </div>
           </div>

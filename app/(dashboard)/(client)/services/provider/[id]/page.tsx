@@ -1,24 +1,21 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import Loading from "@/components/shared/Loading";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
+import logger from "@/lib/logger";
+import { getProviderProfile } from "@/services/apis/profile.api";
 import {
-  Star,
-  MapPin,
+  ArrowLeft,
   Award,
   CheckCircle,
-  DollarSign,
-  Calendar,
-  Clock,
-  Briefcase,
-  ArrowLeft,
+  MapPin,
   Send,
+  Star,
 } from "lucide-react";
-import { toast } from "sonner";
-import { getProviderProfile } from "@/services/apis/profile.api";
-import Loading from "@/components/shared/Loading";
 import Image from "next/image";
-import { Input } from "@/components/ui/input";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 const SvcProvider = () => {
   const router = useRouter();
   const params = useParams();
@@ -42,7 +39,8 @@ const SvcProvider = () => {
 
   const loadProviderProfile = async () => {
     try {
-      const data = await getProviderProfile(providerId);
+      const token = localStorage.getItem("accessToken");
+      const data = await getProviderProfile(providerId, token!);
       if (data.success) {
         setProviderData(data.data);
       }
@@ -58,7 +56,47 @@ const SvcProvider = () => {
     }, 0);
   }, [providerId]);
 
-//   if (!mounted || loading) return <Loading />;
+  const handleBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!isAuthenticated) {
+      router.push("/login?redirect=/services/provider/" + providerId);
+      return;
+    }
+
+    setBookingLoading(true);
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          providerId,
+          ...bookingForm,
+          duration: parseInt(bookingForm.duration),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success("Booking request sent successfully!");
+        router.push("/bookings");
+      } else {
+        toast.error(data.message || "Failed to create booking");
+      }
+    } catch (error) {
+      console.error("Failed to create booking:", error);
+      toast.error("Failed to create booking");
+    } finally {
+      setBookingLoading(false);
+    }
+  };
+  if (!mounted) return <Loading />;
 
   if (!providerData) {
     return (
@@ -78,12 +116,13 @@ const SvcProvider = () => {
     );
   }
   const { profile, reviews, completedJobs } = providerData;
-  return ( <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-cyan-50">
+  return (
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-cyan-50">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <button
-            onClick={() => router.push('/services')}
+            onClick={() => router.push("/services")}
             className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft size={20} />
@@ -92,7 +131,7 @@ const SvcProvider = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className=" px-4 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Provider Info */}
           <div className="lg:col-span-2 space-y-6">
@@ -100,21 +139,22 @@ const SvcProvider = () => {
             <div className="bg-white rounded-2xl shadow-sm border p-6">
               <div className="flex items-start space-x-6">
                 <div className="w-24 h-24 bg-linear-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-white text-3xl font-bold flex-shrink-0">
-                  {profile.user.firstName[0]}{profile.user.lastName[0]}
+                  {profile.user.firstName[0]}
+                  {profile.user.lastName[0]}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <h1 className="text-3xl font-bold text-gray-900">
                       {profile.user.firstName} {profile.user.lastName}
                     </h1>
-                    {profile.verificationStatus === 'VERIFIED' && (
+                    {profile.verificationStatus === "VERIFIED" && (
                       <CheckCircle className="text-blue-600" size={28} />
                     )}
                   </div>
                   <div className="flex items-center space-x-4 text-gray-600 mb-4">
                     <span className="flex items-center">
                       <MapPin size={18} className="mr-1" />
-                      {profile.location || 'Location not set'}
+                      {profile.location || "Location not set"}
                     </span>
                     <span className="flex items-center">
                       <Award size={18} className="mr-1" />
@@ -127,14 +167,24 @@ const SvcProvider = () => {
                         <Star
                           key={i}
                           size={20}
-                          className={i < Math.floor(profile.averageRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}
+                          className={
+                            i < Math.floor(+profile.averageRating)
+                              ? "text-yellow-400 fill-yellow-400"
+                              : "text-gray-300"
+                          }
                         />
                       ))}
-                      <span className="ml-2 font-bold text-gray-900">{profile.averageRating.toFixed(1)}</span>
-                      <span className="text-gray-500">({reviews.length} reviews)</span>
+                      <span className="ml-2 font-bold text-gray-900">
+                        {(+profile.averageRating).toFixed(1)}
+                      </span>
+                      <span className="text-gray-500">
+                        ({reviews.length} reviews)
+                      </span>
                     </div>
                     <span className="text-gray-500">•</span>
-                    <span className="text-gray-600">{completedJobs} jobs completed</span>
+                    <span className="text-gray-600">
+                      {completedJobs} jobs completed
+                    </span>
                   </div>
                 </div>
               </div>
@@ -144,7 +194,7 @@ const SvcProvider = () => {
             <div className="bg-white rounded-2xl shadow-sm border p-6">
               <h2 className="text-xl font-bold mb-4">About</h2>
               <p className="text-gray-700 leading-relaxed">
-                {profile.bio || 'No bio provided'}
+                {profile.bio || "No bio provided"}
               </p>
             </div>
 
@@ -169,11 +219,16 @@ const SvcProvider = () => {
                 <h2 className="text-xl font-bold mb-4">Portfolio</h2>
                 <div className="grid md:grid-cols-3 gap-4">
                   {profile.portfolio.map((item: any) => (
-                    <div key={item.id} className="rounded-xl overflow-hidden border">
+                    <div
+                      key={item.id}
+                      className="rounded-xl overflow-hidden border"
+                    >
                       <Image
                         src={item.images[0]}
                         alt={item.title}
                         className="w-full h-48 object-cover"
+                        width={800}
+                        height={600}
                       />
                       <div className="p-3">
                         <h4 className="font-semibold text-sm">{item.title}</h4>
@@ -187,33 +242,47 @@ const SvcProvider = () => {
 
             {/* Reviews */}
             <div className="bg-white rounded-2xl shadow-sm border p-6">
-              <h2 className="text-xl font-bold mb-6">Reviews ({reviews.length})</h2>
+              <h2 className="text-xl font-bold mb-6">
+                Reviews ({reviews.length})
+              </h2>
               {reviews.length > 0 ? (
                 <div className="space-y-4">
                   {reviews.slice(0, 5).map((review: any) => (
-                    <div key={review.id} className="pb-4 border-b last:border-b-0">
+                    <div
+                      key={review.id}
+                      className="pb-4 border-b last:border-b-0"
+                    >
                       <div className="flex items-start space-x-4">
                         <div className="w-10 h-10 bg-linear-to-br from-green-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                          {review.reviewer.firstName[0]}{review.reviewer.lastName[0]}
+                          {review.reviewer.firstName[0]}
+                          {review.reviewer.lastName[0]}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="font-semibold">
-                              {review.reviewer.firstName} {review.reviewer.lastName}
+                              {review.reviewer.firstName}{" "}
+                              {review.reviewer.lastName}
                             </h4>
                             <div className="flex items-center space-x-1">
                               {[...Array(5)].map((_, i) => (
                                 <Star
                                   key={i}
                                   size={14}
-                                  className={i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}
+                                  className={
+                                    i < review.rating
+                                      ? "text-yellow-400 fill-yellow-400"
+                                      : "text-gray-300"
+                                  }
                                 />
                               ))}
                             </div>
                           </div>
-                          <p className="text-sm text-gray-700 mb-2">{review.comment}</p>
+                          <p className="text-sm text-gray-700 mb-2">
+                            {review.comment}
+                          </p>
                           <div className="text-xs text-gray-500">
-                            {review.booking.service} • {new Date(review.createdAt).toLocaleDateString()}
+                            {review.booking.service} •{" "}
+                            {new Date(review.createdAt).toLocaleDateString()}
                           </div>
                         </div>
                       </div>
@@ -228,7 +297,7 @@ const SvcProvider = () => {
 
           {/* Right Column - Booking Form */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-xl border p-6 sticky top-8">
+            <div className="bg-white rounded-2xl shadow-xl border p-6 sticky top-28">
               <div className="text-center mb-6 pb-6 border-b">
                 <div className="text-3xl font-bold text-gray-900 mb-1">
                   KES {profile.hourlyRate?.toLocaleString() || 0}
@@ -240,19 +309,22 @@ const SvcProvider = () => {
                 <button
                   onClick={() => {
                     if (!isAuthenticated) {
-                      router.push('/login?redirect=/services/provider/' + providerId);
+                      router.push(
+                        "/login?redirect=/services/provider/" + providerId
+                      );
                       return;
                     }
                     setShowBookingForm(true);
                   }}
-                  className="w-full py-3 bg-linear-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold hover:shadow-lg transition"
+                  className="w-full py-3 bg-jiko-primary cursor-pointer hover:bg-jiko-primary/90 text-jiko-secondary rounded-xl font-bold hover:shadow-lg transition"
                 >
                   Book Now
                 </button>
               ) : (
-                <form 
-                // onSubmit={handleBookingSubmit} //TODO
-                className="space-y-4">
+                <form
+                  onSubmit={handleBookingSubmit} //TODO
+                  className="space-y-4"
+                >
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Select Service
@@ -260,12 +332,19 @@ const SvcProvider = () => {
                     <select
                       required
                       value={bookingForm.service}
-                      onChange={(e) => setBookingForm({...bookingForm, service: e.target.value})}
+                      onChange={(e) =>
+                        setBookingForm({
+                          ...bookingForm,
+                          service: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Choose a service</option>
                       {profile.services.map((service: string) => (
-                        <option key={service} value={service}>{service}</option>
+                        <option key={service} value={service}>
+                          {service}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -278,8 +357,13 @@ const SvcProvider = () => {
                       type="date"
                       required
                       value={bookingForm.scheduledDate}
-                      onChange={(e) => setBookingForm({...bookingForm, scheduledDate: e.target.value})}
-                      min={new Date().toISOString().split('T')[0]}
+                      onChange={(e) =>
+                        setBookingForm({
+                          ...bookingForm,
+                          scheduledDate: e.target.value,
+                        })
+                      }
+                      min={new Date().toISOString().split("T")[0]}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -292,7 +376,12 @@ const SvcProvider = () => {
                       type="time"
                       required
                       value={bookingForm.scheduledTime}
-                      onChange={(e) => setBookingForm({...bookingForm, scheduledTime: e.target.value})}
+                      onChange={(e) =>
+                        setBookingForm({
+                          ...bookingForm,
+                          scheduledTime: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -306,7 +395,12 @@ const SvcProvider = () => {
                       required
                       min="1"
                       value={bookingForm.duration}
-                      onChange={(e) => setBookingForm({...bookingForm, duration: e.target.value})}
+                      onChange={(e) =>
+                        setBookingForm({
+                          ...bookingForm,
+                          duration: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -319,7 +413,12 @@ const SvcProvider = () => {
                       type="text"
                       required
                       value={bookingForm.location}
-                      onChange={(e) => setBookingForm({...bookingForm, location: e.target.value})}
+                      onChange={(e) =>
+                        setBookingForm({
+                          ...bookingForm,
+                          location: e.target.value,
+                        })
+                      }
                       placeholder="Your address"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -331,7 +430,12 @@ const SvcProvider = () => {
                     </label>
                     <textarea
                       value={bookingForm.description}
-                      onChange={(e) => setBookingForm({...bookingForm, description: e.target.value})}
+                      onChange={(e) =>
+                        setBookingForm({
+                          ...bookingForm,
+                          description: e.target.value,
+                        })
+                      }
                       rows={3}
                       placeholder="Any specific requirements..."
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -340,28 +444,45 @@ const SvcProvider = () => {
 
                   <div className="pt-4 border-t">
                     <div className="flex justify-between text-sm text-gray-600 mb-2">
-                      <span>Rate (KES {profile.hourlyRate}/hr × {bookingForm.duration || 1}hr)</span>
-                      <span>KES {(profile.hourlyRate * parseInt(bookingForm.duration || '1')).toLocaleString()}</span>
+                      <span>
+                        Rate (KES {profile.hourlyRate}/hr ×{" "}
+                        {bookingForm.duration || 1}hr)
+                      </span>
+                      <span>
+                        KES{" "}
+                        {(
+                          profile.hourlyRate *
+                          parseInt(bookingForm.duration || "1")
+                        ).toLocaleString()}
+                      </span>
                     </div>
                     <div className="flex justify-between font-bold text-lg">
                       <span>Total</span>
-                      <span>KES {(profile.hourlyRate * parseInt(bookingForm.duration || '1')).toLocaleString()}</span>
+                      <span>
+                        KES{" "}
+                        {(
+                          profile.hourlyRate *
+                          parseInt(bookingForm.duration || "1")
+                        ).toLocaleString()}
+                      </span>
                     </div>
                   </div>
 
                   <button
                     type="submit"
                     disabled={bookingLoading}
-                    className="w-full py-3 bg-linear-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold hover:shadow-lg transition disabled:opacity-50 flex items-center justify-center space-x-2"
+                    className="w-full py-3 bg-jiko-primary hover:bg-jiko-primary/90 cursor-pointer text-jiko-secondary rounded-xl font-bold hover:shadow-lg transition disabled:opacity-50 flex items-center justify-center space-x-2"
                   >
                     <Send size={20} />
-                    <span>{bookingLoading ? 'Sending...' : 'Confirm Booking'}</span>
+                    <span>
+                      {bookingLoading ? "Sending..." : "Confirm Booking"}
+                    </span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setShowBookingForm(false)}
-                    className="w-full py-2 text-gray-600 hover:text-gray-900"
+                    className="w-full cursor-pointer py-2 text-red-400 hover:text-red-600"
                   >
                     Cancel
                   </button>
