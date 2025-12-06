@@ -16,6 +16,12 @@ CREATE TYPE "VerificationStatus" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED');
 -- CreateEnum
 CREATE TYPE "DisputeStatus" AS ENUM ('OPEN', 'IN_REVIEW', 'RESOLVED', 'CLOSED');
 
+-- CreateEnum
+CREATE TYPE "NotificationType" AS ENUM ('INFO', 'WARNING', 'ERROR', 'SUCCESS', 'SECURITY_ALERT', 'POLICY_VIOLATION', 'STRIKE_WARNING', 'PAYMENT', 'JOB_UPDATE', 'SYSTEM');
+
+-- CreateEnum
+CREATE TYPE "NotificationPriority" AS ENUM ('LOWProfile', 'MEDIUM', 'HIGH', 'URGENT');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -28,10 +34,10 @@ CREATE TABLE "User" (
     "status" "UserStatus" NOT NULL DEFAULT 'PENDING',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "avatar" TEXT,
     "phoneVerified" BOOLEAN NOT NULL DEFAULT false,
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "lastLogin" TIMESTAMP(3),
+    "avatar" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -40,6 +46,8 @@ CREATE TABLE "User" (
 CREATE TABLE "ServiceCategory" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "icon" TEXT NOT NULL,
 
     CONSTRAINT "ServiceCategory_pkey" PRIMARY KEY ("id")
 );
@@ -65,6 +73,8 @@ CREATE TABLE "Profile" (
     "completionRate" DECIMAL(5,2) NOT NULL DEFAULT 0,
     "averageRating" DECIMAL(3,2) NOT NULL DEFAULT 0,
     "totalEarnings" DECIMAL(10,2) NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3),
 
     CONSTRAINT "Profile_pkey" PRIMARY KEY ("id")
 );
@@ -77,8 +87,8 @@ CREATE TABLE "Portfolio" (
     "description" TEXT,
     "images" TEXT[],
     "category" TEXT NOT NULL,
-    "createAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Portfolio_pkey" PRIMARY KEY ("id")
 );
@@ -97,13 +107,13 @@ CREATE TABLE "Booking" (
     "location" TEXT NOT NULL,
     "status" "BookingStatus" NOT NULL DEFAULT 'PENDING',
     "amount" DECIMAL(10,2) NOT NULL,
-    "commision" DECIMAL(10,2) NOT NULL,
     "providerPayout" DECIMAL(10,2) NOT NULL,
     "completedAt" TIMESTAMP(3),
     "cancelledAt" TIMESTAMP(3),
     "CancellationReason" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "commission" DECIMAL(10,2) NOT NULL,
 
     CONSTRAINT "Booking_pkey" PRIMARY KEY ("id")
 );
@@ -163,12 +173,31 @@ CREATE TABLE "Notification" (
     "userId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "message" TEXT NOT NULL,
-    "type" TEXT NOT NULL,
-    "read" BOOLEAN NOT NULL,
+    "read" BOOLEAN NOT NULL DEFAULT false,
     "data" JSONB,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "actionUrl" TEXT,
+    "expiresAt" TIMESTAMP(3),
+    "priority" "NotificationPriority" NOT NULL DEFAULT 'MEDIUM',
+    "readAt" TIMESTAMP(3),
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "type" "NotificationType" NOT NULL DEFAULT 'INFO',
 
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PolicyViolation" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "violationType" TEXT NOT NULL,
+    "severity" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "evidence" JSONB,
+    "resolved" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PolicyViolation_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -277,10 +306,13 @@ CREATE UNIQUE INDEX "Dispute_bookingId_key" ON "Dispute"("bookingId");
 CREATE INDEX "Dispute_status_idx" ON "Dispute"("status");
 
 -- CreateIndex
-CREATE INDEX "Notification_userId_idx" ON "Notification"("userId");
+CREATE INDEX "Notification_userId_read_createdAt_idx" ON "Notification"("userId", "read", "createdAt" DESC);
 
 -- CreateIndex
-CREATE INDEX "Notification_read_idx" ON "Notification"("read");
+CREATE INDEX "PolicyViolation_userId_idx" ON "PolicyViolation"("userId");
+
+-- CreateIndex
+CREATE INDEX "PolicyViolation_severity_idx" ON "PolicyViolation"("severity");
 
 -- CreateIndex
 CREATE INDEX "AuditLogs_userId_idx" ON "AuditLogs"("userId");
@@ -316,10 +348,10 @@ ALTER TABLE "Payment" ADD CONSTRAINT "Payment_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "Review" ADD CONSTRAINT "Review_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "Booking"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Review" ADD CONSTRAINT "Review_reviewerId_fkey" FOREIGN KEY ("reviewerId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Review" ADD CONSTRAINT "Review_revieweeId_fkey" FOREIGN KEY ("revieweeId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Review" ADD CONSTRAINT "Review_revieweeId_fkey" FOREIGN KEY ("revieweeId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Review" ADD CONSTRAINT "Review_reviewerId_fkey" FOREIGN KEY ("reviewerId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Dispute" ADD CONSTRAINT "Dispute_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "Booking"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -329,6 +361,9 @@ ALTER TABLE "Dispute" ADD CONSTRAINT "Dispute_raisedBy_fkey" FOREIGN KEY ("raise
 
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PolicyViolation" ADD CONSTRAINT "PolicyViolation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AuditLogs" ADD CONSTRAINT "AuditLogs_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
