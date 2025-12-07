@@ -60,8 +60,8 @@ const Services = () => {
       if (filters.minRate) queryParams.append("minRate", filters.minRate);
       if (filters.maxRate) queryParams.append("maxRate", filters.maxRate);
       if (filters.minRating) queryParams.append("minRating", filters.minRating);
-      const token = localStorage.getItem('accessToken')
-      const data = await searchService(queryParams,token!);
+      const token = localStorage.getItem("accessToken");
+      const data = await searchService(queryParams, token!);
       if (data.success) {
         setProviders(data.data);
         setFilteredProviders(data.data);
@@ -122,11 +122,9 @@ const Services = () => {
 
   return (
     <div className="min-h-screen">
-     
-
       {/* Hero Search Section */}
       <div className="bg-linear-to-br from-jiko-primary/60 via-jiko-primary/70 to-jiko-secondary/70 rounded-md  text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className=" px-4">
           <h1 className="text-4xl font-bold mb-4">
             Find the Perfect Service Provider
           </h1>
@@ -162,7 +160,7 @@ const Services = () => {
           {categories.map((cat) => (
             <button
               key={cat.value}
-              onClick={() => handleCategoryClick(cat.value)}max-w-7xl mx-auto 
+              onClick={() => handleCategoryClick(cat.value)}
               className={`p-4 rounded-xl border-2 transition text-center cursor-pointer ${
                 filters.category === cat.value
                   ? "border-jiko-primary bg-jiko-primary/5"
@@ -323,7 +321,10 @@ const Services = () => {
                           {provider.user.firstName} {provider.user.lastName}
                         </h3>
                         {provider.verificationStatus === "VERIFIED" && (
-                          <CheckCircle className="text-jiko-primary" size={18} />
+                          <CheckCircle
+                            className="text-jiko-primary"
+                            size={18}
+                          />
                         )}
                       </div>
                       <div className="flex items-center space-x-1 text-sm text-gray-600">

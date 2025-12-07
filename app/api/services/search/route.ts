@@ -6,7 +6,7 @@ export const GET = async (req: NextRequest) => {
     try {
         const { searchParams } = new URL(req.url)
         const category = searchParams.get('category')
-        const location = searchParams.get('locatiion')
+        const location = searchParams.get('location')
         const minRate = searchParams.get('minRate');
         const maxRate = searchParams.get('maxRate');
         const minRating = searchParams.get('minRating');

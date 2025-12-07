@@ -7,7 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate --schema=./prisma/schema.prisma"
+    "postinstall": "prisma generate --schema=./prisma/schema.prisma",
+    "seed:locations": "tsx prisma/seeds/locations.seed.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

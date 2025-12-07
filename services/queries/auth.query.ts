@@ -31,11 +31,12 @@ export const createUser = async (data: RegisterFormData) => {
         category,
         experience,
         hourlyRate,
-        bio } = data
+        bio, acceptTerms } = data
     const fName = fullName.split(' ');
     const firstName = fName[0]
     let lastName = "";
     if (fName.length > 1) lastName = fName[1]
+    console.log('Data to reg', data)
     return await prisma.user.create({
         data: {
             email,
@@ -51,14 +52,21 @@ export const createUser = async (data: RegisterFormData) => {
                         services: category ? [category] : [],
                         hourlyRate: parseFloat(hourlyRate!),
                         yearsOfExperience: experience ? parseInt(experience) : null,
-                        location: location || null,
+                        ...(location && { locationId: location }),
                         languages: ['English'], // Default
                         verificationStatus: 'PENDING',
                     }
                 }
+            }),
+            ...(acceptTerms && {
+                terms: {
+                    create: {
+                        isAccept: true
+                    }
+                }
             })
         },
-        include: { profile: true }
+        include: { profile: { include: { location: true } }, terms: true },
     })
 }
 export const findUserbyEmailOrPhone = async (email: string, phone?: string): Promise<User | null> => {
@@ -123,7 +131,7 @@ export const removeVerificationToken = async (token: string, isPasswordReset?: b
             key: `${isPasswordReset ? 'password_reset' : 'email_verification'}:${token}`
         }
     })
-    
+
 }
 
 export const updatePassword = async (id: string, password: string) => {

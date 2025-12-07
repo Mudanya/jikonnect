@@ -1,4 +1,5 @@
 "use client";
+import { LocationDropdown } from "@/components/locations/LocationDropdown";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -21,12 +22,11 @@ import {
   EyeOff,
   Lock,
   Mail,
-  MapPin,
   Phone,
   User,
 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -37,7 +37,7 @@ const Register = () => {
     register,
     handleSubmit,
     setValue,
-
+    getValues,
     formState: { errors, isValid, isSubmitting },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -46,9 +46,14 @@ const Register = () => {
   });
   const params = useSearchParams();
   const role = params.get("role");
+  const router = useRouter();
   const { register: registerUser } = useAuth();
   const onSubmit = async (data: RegisterFormData) => {
     try {
+      if (!data.acceptTerms) {
+        toast.warning("Please accept terms and data privacy to proceed");
+        return;
+      }
       await registerUser(data);
     } catch (err) {
       if (err instanceof Error) {
@@ -59,6 +64,8 @@ const Register = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [isClient, setIsClient] = useState<boolean>(true);
+  const [locationId, setLocationId] = useState("");
+  const [locationName, setLocationName] = useState("");
   const categories = [
     "Cleaning",
     "Plumbing",
@@ -90,7 +97,7 @@ const Register = () => {
   }, []);
 
   return (
-    <Suspense >
+    <Suspense>
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* User Type Selection */}
         <div className="bg-white rounded-2xl shadow-xl  border border-gray-100 p-6 mb-6">
@@ -220,7 +227,28 @@ const Register = () => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Location
                 </label>
-                <div className="relative">
+                {/* <LocationSelector
+                  value={locationId}
+                  onChange={(id, name) => {
+                    setLocationId(id);
+                    setLocationName(name);
+                    setValue('location',id,{shouldDirty:true,shouldTouch:true,shouldValidate:true})
+                  }}
+                  placeholder="Where do you live?"
+                  
+                /> */}
+                <LocationDropdown
+                  value={getValues("location")}
+                  onChange={(locId) => {
+                    setValue("location", locId, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    });
+                  }}
+                  required={errors.location !== undefined}
+                />
+                {/* <div className="relative">
                   <MapPin
                     className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
                     size={20}
@@ -233,7 +261,7 @@ const Register = () => {
                       errors.location && "border-red-300"
                     }`}
                   />
-                </div>
+                </div> */}
                 {errors.location && (
                   <small className="text-xs text-red-300">
                     {errors.location.message}
@@ -426,6 +454,7 @@ const Register = () => {
           <div className="mt-6">
             <label className="flex items-start">
               <Input
+                {...register("acceptTerms")}
                 type="checkbox"
                 className="w-4 h-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -434,6 +463,9 @@ const Register = () => {
                 <button
                   type="button"
                   className="text-blue-600 cursor-pointer hover:underline"
+                  onClick={() => {
+                    router.push("/terms");
+                  }}
                 >
                   Terms of Service
                 </button>{" "}
@@ -441,6 +473,9 @@ const Register = () => {
                 <button
                   type="button"
                   className="text-blue-600 cursor-pointer hover:underline"
+                  onClick={() => {
+                    router.push("/privacy-policy");
+                  }}
                 >
                   Privacy Policy
                 </button>

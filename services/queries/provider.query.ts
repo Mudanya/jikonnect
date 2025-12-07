@@ -18,18 +18,23 @@ export const getUserProfileById = async (userId: string) => {
 }
 
 export const updateUserProfile = async (userId: string, data: Partial<ProfileFormData>) => {
-    return await prisma.profile.update({
-        where: { userId },
+    return await prisma.user.update({
+        where: { id: userId },
         data: {
-            bio: data.bio,
-            services: data.services,
-            hourlyRate: data.hourlyRate,
-            yearsOfExperience: data.yearsOfExperience,
-            location: data.location,
-            languages: data.languages,
-            idNumber: data.idNumber,
+            profile: {
+                update: {
+                    bio: data.bio,
+                    services: data.services,
+                    hourlyRate: data.hourlyRate,
+                    yearsOfExperience: data.yearsOfExperience,
+                    locationId: data.location,
+                    languages: data.languages,
+                    idNumber: data.idNumber,
+                }
+            }
 
-        }
+        },
+        include: { profile: true }
     })
 }
 
@@ -76,7 +81,10 @@ export const getUserProfiles = async ({ location, minRate, maxRate, minRating, c
             }),
             ...(location && {
                 location: {
-                    contains: location, mode: 'insensitive'
+                    name: {
+                        contains: location,
+                        mode: 'insensitive'
+                    }
                 }
             }),
             ...(minRate && maxRate && {
@@ -103,7 +111,8 @@ export const getUserProfiles = async ({ location, minRate, maxRate, minRating, c
             portfolio: {
                 take: 3,
                 orderBy: { createdAt: 'desc' }
-            }
+            },
+            location: { select: { id: true } }
         },
         orderBy: {
             averageRating: 'desc'

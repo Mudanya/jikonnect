@@ -1,10 +1,9 @@
-// app/services/provider/[id]/page.tsx - Provider Profile & Booking
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, MapPin, Award, CheckCircle, DollarSign, Calendar, Clock, Briefcase, ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Award, CheckCircle, MapPin, Send, Star } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function ProviderProfilePage() {
   const router = useRouter();
@@ -114,10 +113,10 @@ export default function ProviderProfilePage() {
   const { profile, reviews, completedJobs } = providerData;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <div className="min-h-screen mt-2">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="px-4 py-4">
           <button
             onClick={() => router.push('/services')}
             className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
@@ -128,26 +127,26 @@ export default function ProviderProfilePage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="w-full px-4 py-8">
+        <div className="grid lg:grid-cols-3 grid-cols-1 gap-8 w-full">
           {/* Left Column - Provider Info */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 w-full">
             {/* Provider Header */}
-            <div className="bg-white rounded-2xl shadow-sm border p-6">
-              <div className="flex items-start space-x-6">
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-white text-3xl font-bold flex-shrink-0">
+            <div className="w-full bg-white rounded-2xl shadow-sm border p-6">
+              <div className="flex flex-col md:flex-row items-start space-x-6 w-full">
+                <div className="w-10 h-10 md:w-24 md:h-24 bg-linear-to-br from-jiko-primary to-jiko-secondary rounded-full flex items-center justify-center text-white text-lg md:text-3xl font-bold flex-shrink-0">
                   {profile.user.firstName[0]}{profile.user.lastName[0]}
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h1 className="text-3xl font-bold text-gray-900">
+                <div className="flex flex-col md:flex-row  w-full">
+                  <div className="flex-col md:flex-row flex items-center space-x-3 mb-2">
+                    <h1 className="text-lg md:text-3xl font-bold text-gray-900">
                       {profile.user.firstName} {profile.user.lastName}
                     </h1>
                     {profile.verificationStatus === 'VERIFIED' && (
                       <CheckCircle className="text-blue-600" size={28} />
                     )}
                   </div>
-                  <div className="flex items-center space-x-4 text-gray-600 mb-4">
+                  <div className="flex flex-col md:flex-row items-center space-x-4 text-gray-600 mb-4">
                     <span className="flex items-center">
                       <MapPin size={18} className="mr-1" />
                       {profile.location || 'Location not set'}
@@ -157,7 +156,7 @@ export default function ProviderProfilePage() {
                       {profile.yearsExperience || 0} years experience
                     </span>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-col md:flex-row  items-center space-x-4">
                     <div className="flex items-center space-x-1">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -229,7 +228,7 @@ export default function ProviderProfilePage() {
                   {reviews.slice(0, 5).map((review: any) => (
                     <div key={review.id} className="pb-4 border-b last:border-b-0">
                       <div className="flex items-start space-x-4">
-                        <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                        <div className="w-10 h-10 bg-linear-to-br from-green-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                           {review.reviewer.firstName[0]}{review.reviewer.lastName[0]}
                         </div>
                         <div className="flex-1">
@@ -266,7 +265,7 @@ export default function ProviderProfilePage() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-xl border p-6 sticky top-8">
               <div className="text-center mb-6 pb-6 border-b">
-                <div className="text-3xl font-bold text-gray-900 mb-1">
+                <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
                   KES {profile.hourlyRate?.toLocaleString() || 0}
                 </div>
                 <div className="text-gray-600">per hour</div>
@@ -281,7 +280,7 @@ export default function ProviderProfilePage() {
                     }
                     setShowBookingForm(true);
                   }}
-                  className="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold hover:shadow-lg transition"
+                  className="w-full py-3 bg-linear-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold hover:shadow-lg transition"
                 >
                   Book Now
                 </button>
@@ -386,7 +385,7 @@ export default function ProviderProfilePage() {
                   <button
                     type="submit"
                     disabled={bookingLoading}
-                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold hover:shadow-lg transition disabled:opacity-50 flex items-center justify-center space-x-2"
+                    className="w-full py-3 bg-linear-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold hover:shadow-lg transition disabled:opacity-50 flex items-center justify-center space-x-2"
                   >
                     <Send size={20} />
                     <span>{bookingLoading ? 'Sending...' : 'Confirm Booking'}</span>

@@ -120,7 +120,7 @@ const SvcProvider = () => {
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-cyan-50">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className=" px-4 py-4">
           <button
             onClick={() => router.push("/services")}
             className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"

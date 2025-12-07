@@ -3,6 +3,7 @@ import { generateTokens } from "@/lib/jwt";
 import logger from "@/lib/logger";
 import { createAuditLog, getUser, updateLastLogin } from "@/services/queries/auth.query";
 import { loginSchema } from "@/validators/auth.validator";
+import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
 export const POST = async (req: NextRequest) => {
@@ -46,8 +47,20 @@ export const POST = async (req: NextRequest) => {
         const tokens = generateTokens({
             userId: user.id,
             role: user.role,
-            email: user.email
-        })
+            email: user.email,
+
+        }, validationRes.data.rememberMe!)
+
+        if (tokens.rememberMe) {
+            (await cookies()).set(
+                'auth-token', tokens.accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 30 * 24 * 60 * 60,
+                path: '/'
+            })
+        }
 
         // Audit Log
         await createAuditLog(req, user.id, 'USER_LOGIN', 'User');
