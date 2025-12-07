@@ -19,7 +19,7 @@ export const GET = withAuth(async (req: AuthenticatedRequest) => {
             servicesAdded: (user.profile?.services?.length || 0) > 0,
             ratesSet: !!user.profile?.hourlyRate,
             bioAdded: !!user.profile?.bio,
-            portfolioAdded: (user.profile?.portfolio?.length || 0) > 0,
+            portfolioAdded: (user.profile?.portfolios?.length || 0) > 0,
             documentsUploaded: !!user.profile?.idDocument,
             verificationSubmitted: user.profile?.verificationStatus !== 'PENDING' || !!user.profile?.idNumber,
             availabilitySet: !!user.profile?.availability
