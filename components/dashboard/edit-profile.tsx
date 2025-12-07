@@ -25,13 +25,13 @@ import {
   User,
 } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import Loading from "../shared/Loading";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { UserStatus } from "@/lib/generated/prisma/enums";
+import { LocationDropdown } from "../locations/LocationDropdown";
 
 const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
   const { user } = useAuth();
@@ -47,6 +47,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
     getValues,
     reset,
     watch,
+    control,
   } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
     mode: "onChange",
@@ -96,7 +97,8 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
       toast.error((err as Error).message);
     }
   };
-  const allValues = watch();
+  const locationId = watch("location");
+
   useEffect(() => {
     setTimeout(async () => {
       setMounted(true);
@@ -107,11 +109,6 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
 
           const data = await loadUserProfile(token || "");
           if (data.success) {
-            console.log("✅ About to reset with:", {
-              firstName: data.data.firstName,
-              lastName: data.data.lastName,
-              phone: data.data.phone,
-            });
             reset(
               {
                 firstName: data.data.firstName || "",
@@ -125,14 +122,15 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
                 languages: data.data?.profile?.languages || [],
                 idNumber: data.data?.profile?.idNumber || "",
                 role: user.role as "CLIENT" | "PROFESSIONAL" | "ADMIN",
+                location: data.data?.profile?.locationId,
               },
               {
                 keepDirty: false, // Mark form as pristine
                 keepTouched: false,
                 keepIsValid: false,
-                
               }
             );
+
             setDocuments({
               idDocument: data.data.profile?.idDocument || "",
               certificates: data.data.profile?.certificates || [],
@@ -342,7 +340,19 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Location
                   </label>
-                  <div className="relative">
+                  <Controller
+                    name="location"
+                    control={control}
+                    render={({ field }) => (
+                      <LocationDropdown
+                        value={field.value}
+                        onChange={field.onChange}
+                        required={errors.location !== undefined}
+                      />
+                    )}
+                  />
+
+                  {/* <div className="relative">
                     <MapPin
                       className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
                       size={20}
@@ -354,7 +364,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
                       placeholder="Nairobi, Kenya"
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                  </div>
+                  </div> */}
                 </div>
 
                 <div>

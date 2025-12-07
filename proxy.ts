@@ -13,6 +13,9 @@ export const proxy = (req: NextRequest) => {
         '/api/auth/reset-password',
         '/api/auth/verify-email',
         '/api/landing',
+        '/api/locations/zones',
+        '/api/locations/search',    
+        
     ];
     const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
     if (isPublicRoute) return NextResponse.next();

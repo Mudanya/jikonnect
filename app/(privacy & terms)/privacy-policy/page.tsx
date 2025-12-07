@@ -1,23 +1,20 @@
 // app/privacy-policy/page.tsx
-import { Metadata } from 'next';
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | JiKonnect',
-  description: 'JiKonnect Privacy Policy - Learn how we collect, use, and protect your personal data in compliance with Kenya Data Protection Act 2019.',
+  title: "Privacy Policy | JiKonnect",
+  description:
+    "JiKonnect Privacy Policy - Learn how we collect, use, and protect your personal data in compliance with Kenya Data Protection Act 2019.",
 };
 
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto bg-white shadow-lg rounded-lg">
+      <div className=" bg-white shadow-lg rounded-lg">
         <div className="bg-blue-600 text-white px-8 py-6 rounded-t-lg">
           <h1 className="text-3xl font-bold">Privacy Policy</h1>
-          <p className="mt-2 text-blue-100">
-            Powered by Linkora Digital Ltd
-          </p>
-          <p className="text-sm text-blue-200">
-            Last Updated: 12.01.2025
-          </p>
+          <p className="mt-2 text-blue-100">Powered by Linkora Digital Ltd</p>
+          <p className="text-sm text-blue-200">Last Updated: 12.01.2025</p>
         </div>
 
         <div className="px-8 py-6 space-y-8">
@@ -27,7 +24,8 @@ export default function PrivacyPolicyPage() {
               1. Introduction
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              JiKonnect respects your privacy and handles data per the Kenya Data Protection Act (2019) and ODPC guidelines.
+              JiKonnect respects your privacy and handles data per the Kenya
+              Data Protection Act (2019) and ODPC guidelines.
             </p>
           </section>
 
@@ -79,7 +77,10 @@ export default function PrivacyPolicyPage() {
                   2.3 Sensitive Personal Data
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
-                  JiKonnect does not collect sensitive data unless absolutely required. However, for categories like caregiving, JiKonnect may process limited health-related information only when needed and with explicit consent.
+                  JiKonnect does not collect sensitive data unless absolutely
+                  required. However, for categories like caregiving, JiKonnect
+                  may process limited health-related information only when
+                  needed and with explicit consent.
                 </p>
               </div>
 
@@ -101,8 +102,13 @@ export default function PrivacyPolicyPage() {
                   2.5 Media Data
                 </h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                  <li>Images or videos uploaded by Providers to document work</li>
-                  <li>Voice or video recordings if communication features are introduced</li>
+                  <li>
+                    Images or videos uploaded by Providers to document work
+                  </li>
+                  <li>
+                    Voice or video recordings if communication features are
+                    introduced
+                  </li>
                 </ul>
               </div>
             </div>
@@ -137,7 +143,8 @@ export default function PrivacyPolicyPage() {
                   <li>Fraud detection & security monitoring</li>
                   <li>Maintaining audit logs</li>
                   <li>Assessing provider eligibility</li>
-                  <li>Generating a Provider Trust Score based on:
+                  <li>
+                    Generating a Provider Trust Score based on:
                     <ul className="list-circle list-inside ml-6 mt-2 space-y-1">
                       <li>ID verification</li>
                       <li>Background checks</li>
@@ -163,7 +170,8 @@ export default function PrivacyPolicyPage() {
                   <li>Send training opportunities</li>
                 </ul>
                 <p className="text-gray-700 leading-relaxed mt-3 italic">
-                  Users may opt out of marketing but not safety or operational messages.
+                  Users may opt out of marketing but not safety or operational
+                  messages.
                 </p>
               </div>
 
@@ -181,7 +189,8 @@ export default function PrivacyPolicyPage() {
                   <li>Reporting</li>
                 </ul>
                 <p className="text-gray-700 leading-relaxed mt-3 italic">
-                  Anonymized data is not personal data and may be shared with partners.
+                  Anonymized data is not personal data and may be shared with
+                  partners.
                 </p>
               </div>
             </div>
@@ -208,7 +217,7 @@ export default function PrivacyPolicyPage() {
             <p className="text-gray-700 leading-relaxed mb-4">
               JiKonnect shares data with:
             </p>
-            
+
             <div className="space-y-4">
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-semibold text-gray-800 mb-2">
@@ -238,7 +247,8 @@ export default function PrivacyPolicyPage() {
                   <li>Background-check agencies</li>
                 </ul>
                 <p className="text-gray-700 mt-2 text-sm italic">
-                  They receive only the minimum necessary data (e.g., name, ID number).
+                  They receive only the minimum necessary data (e.g., name, ID
+                  number).
                 </p>
               </div>
 
@@ -255,9 +265,7 @@ export default function PrivacyPolicyPage() {
                 <h3 className="font-semibold text-gray-800 mb-2">
                   5.5 Government/ODPC
                 </h3>
-                <p className="text-gray-700">
-                  If legally required.
-                </p>
+                <p className="text-gray-700">If legally required.</p>
               </div>
             </div>
 
@@ -351,8 +359,11 @@ export default function PrivacyPolicyPage() {
                 Rights Request Process
               </h3>
               <p className="text-gray-700">
-                All rights requests must be sent to:{' '}
-                <a href="mailto:privacy@jikonnect.co.ke" className="text-blue-600 hover:underline font-semibold">
+                All rights requests must be sent to:{" "}
+                <a
+                  href="mailto:privacy@jikonnect.co.ke"
+                  className="text-blue-600 hover:underline font-semibold"
+                >
                   privacy@jikonnect.co.ke
                 </a>
               </p>
@@ -378,7 +389,8 @@ export default function PrivacyPolicyPage() {
               10. Cross-Border Transfers
             </h2>
             <p className="text-gray-700 leading-relaxed mb-3">
-              JiKonnect may store data outside Kenya. Example: hosting in Ireland (EU).
+              JiKonnect may store data outside Kenya. Example: hosting in
+              Ireland (EU).
             </p>
             <p className="text-gray-700 leading-relaxed mb-3">
               Safeguard mechanisms include:
@@ -421,13 +433,17 @@ export default function PrivacyPolicyPage() {
             </h2>
             <div className="bg-gray-50 p-6 rounded-lg space-y-3">
               <p className="text-gray-700">
-                <span className="font-semibold">Email:</span>{' '}
-                <a href="mailto:privacy@jikonnect.co.ke" className="text-blue-600 hover:underline">
+                <span className="font-semibold">Email:</span>{" "}
+                <a
+                  href="mailto:privacy@jikonnect.co.ke"
+                  className="text-blue-600 hover:underline"
+                >
                   privacy@jikonnect.co.ke
                 </a>
               </p>
               <p className="text-gray-700">
-                <span className="font-semibold">Company:</span> Linkora Digital Ltd, Nairobi
+                <span className="font-semibold">Company:</span> Linkora Digital
+                Ltd, Nairobi
               </p>
             </div>
           </section>

@@ -10,9 +10,10 @@ export const registerSchema = z.object({
         .regex(/[0-9]/, 'Password must contain atleast one number')
         .regex(/[^A-Za-z0-9]/, 'Password must contain atleast one special character'),
     confirmPassword: z.string(),
+    acceptTerms: z.boolean().optional(),
     fullName: z.string().min(3, 'First name must be atleast 2 characters').refine(
         (val) => val.includes(" "),
-        { message: "Please provide your full name (first and last name)." }
+        { message: "Please provide your full name (first and last name).", }
     ),
     // firstName: z.string().min(2, 'First name must be atleast 2 characters'),
     // lastName: z.string().min(2, 'Last name must be atleast 2 characters'),
@@ -68,7 +69,8 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
     email: z.email('Invalid email address'),
-    password: z.string().min(1, 'Password is required')
+    password: z.string().min(1, 'Password is required'),
+    rememberMe: z.boolean().optional()
 
 });
 
@@ -78,7 +80,7 @@ export const forgotPasswordSchema = z.object({
 
 
 export const resetPasswordSchema = z.object({
-    token: z.string().min(1,"Token  is required"),
+    token: z.string().min(1, "Token  is required"),
     newPassword: z.string()
         .min(8, 'Password must be at least 8 characters')
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')

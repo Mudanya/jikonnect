@@ -7,13 +7,16 @@ const REFRESH_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET || ""
 const ACCESS_TOKEN_EXPIRY = process.env.JWT_ACCESS_EXPIRY as ms.StringValue
 const REFRESH_TOKEN_EXPIRY = process.env.JWT_ACCESS_EXPIRY as ms.StringValue
 
-export const generateTokens = (payload: AuthUser) => {
-    logger.info('secret: '+ACCESS_TOKEN_SECRET+" tokens"+ACCESS_TOKEN_SECRET)
+export const generateTokens = (payload: AuthUser, rememberMe: boolean) => {
+    logger.info('secret: ' + ACCESS_TOKEN_SECRET + " tokens" + ACCESS_TOKEN_SECRET + " remember me: " + rememberMe)
+    const expiresIn = rememberMe ? '30d' : ACCESS_TOKEN_EXPIRY;
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
-        expiresIn: ACCESS_TOKEN_EXPIRY
+        expiresIn
     })
-    const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRY })
-    return { accessToken, refreshToken }
+    const expiresInRefresh = rememberMe ? '30d' : REFRESH_TOKEN_EXPIRY;
+    const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: expiresInRefresh })
+    
+    return { accessToken, refreshToken,rememberMe }
 }
 
 export const verifyAccessToken = (token: string):

@@ -19,8 +19,8 @@ const Login = () => {
     formState: { errors, isValid, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    mode: "onBlur",
-    shouldUnregister: true,
+    mode: "onChange",
+   
   });
   const [showPassword, setShowPassword] = useState(false);
   const { setHeaderDesc } = useContext(AuthLayoutContext);
@@ -113,7 +113,8 @@ const Login = () => {
 
         <div className="flex items-center justify-between mb-6">
           <label className="flex items-center">
-            <input
+            <Input
+              {...register('rememberMe')}
               type="checkbox"
               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />

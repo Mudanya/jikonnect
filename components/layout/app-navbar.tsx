@@ -20,12 +20,10 @@ const AppNavBar = () => {
   const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
     setTimeout(() => {
-      if (window !== undefined) {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
-        }
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
       }
     }, 0);
   }, []);

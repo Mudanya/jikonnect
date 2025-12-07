@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { formatDistanceToNow } from 'date-fns';
-import { Download, Loader2, Search, Shield } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { formatDistanceToNow } from "date-fns";
+import { Download, Loader2, Search, Shield } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface Violation {
   id: string;
@@ -22,9 +22,9 @@ interface Violation {
 export default function ViolationsPage() {
   const [violations, setViolations] = useState<Violation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [severityFilter, setSeverityFilter] = useState('');
-  const [resolvedFilter, setResolvedFilter] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [severityFilter, setSeverityFilter] = useState("");
+  const [resolvedFilter, setResolvedFilter] = useState<string>("");
 
   useEffect(() => {
     fetchViolations();
@@ -34,14 +34,14 @@ export default function ViolationsPage() {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (severityFilter) params.append('severity', severityFilter);
-      if (resolvedFilter) params.append('resolved', resolvedFilter);
+      if (severityFilter) params.append("severity", severityFilter);
+      if (resolvedFilter) params.append("resolved", resolvedFilter);
 
       const response = await fetch(`/api/admin/violations?${params}`);
       const data = await response.json();
       setViolations(data.violations);
     } catch (error) {
-      console.error('Error fetching violations:', error);
+      console.error("Error fetching violations:", error);
     } finally {
       setLoading(false);
     }
@@ -56,20 +56,20 @@ export default function ViolationsPage() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'STRIKE_1':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'STRIKE_2':
-        return 'bg-orange-100 text-orange-800';
-      case 'STRIKE_3':
-        return 'bg-red-100 text-red-800';
+      case "STRIKE_1":
+        return "bg-yellow-100 text-yellow-800";
+      case "STRIKE_2":
+        return "bg-orange-100 text-orange-800";
+      case "STRIKE_3":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className=" px-4 py-8">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
@@ -78,7 +78,9 @@ export default function ViolationsPage() {
                 <Shield className="w-7 h-7 text-red-600" />
                 Policy Violations Dashboard
               </h1>
-              <p className="text-gray-600 mt-1">Monitor and manage platform violations</p>
+              <p className="text-gray-600 mt-1">
+                Monitor and manage platform violations
+              </p>
             </div>
             <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               <Download className="w-4 h-4" />
@@ -89,21 +91,25 @@ export default function ViolationsPage() {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-yellow-50 rounded-lg p-4">
-              <div className="text-sm text-yellow-600 font-medium">Strike 1</div>
+              <div className="text-sm text-yellow-600 font-medium">
+                Strike 1
+              </div>
               <div className="text-2xl font-bold text-yellow-900 mt-1">
-                {violations.filter((v) => v.severity === 'STRIKE_1').length}
+                {violations.filter((v) => v.severity === "STRIKE_1").length}
               </div>
             </div>
             <div className="bg-orange-50 rounded-lg p-4">
-              <div className="text-sm text-orange-600 font-medium">Strike 2</div>
+              <div className="text-sm text-orange-600 font-medium">
+                Strike 2
+              </div>
               <div className="text-2xl font-bold text-orange-900 mt-1">
-                {violations.filter((v) => v.severity === 'STRIKE_2').length}
+                {violations.filter((v) => v.severity === "STRIKE_2").length}
               </div>
             </div>
             <div className="bg-red-50 rounded-lg p-4">
               <div className="text-sm text-red-600 font-medium">Strike 3</div>
               <div className="text-2xl font-bold text-red-900 mt-1">
-                {violations.filter((v) => v.severity === 'STRIKE_3').length}
+                {violations.filter((v) => v.severity === "STRIKE_3").length}
               </div>
             </div>
             <div className="bg-green-50 rounded-lg p-4">
@@ -157,7 +163,9 @@ export default function ViolationsPage() {
           ) : filteredViolations.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-12 text-center">
               <Shield className="w-16 h-16 text-gray-300 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">No violations found</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                No violations found
+              </h3>
               <p className="text-sm text-gray-600">
                 All users are following platform guidelines
               </p>
@@ -192,9 +200,11 @@ export default function ViolationsPage() {
                     <tr key={violation.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {violation.user.name || 'Unknown'}
+                          {violation.user.name || "Unknown"}
                         </div>
-                        <div className="text-sm text-gray-500">{violation.user.email}</div>
+                        <div className="text-sm text-gray-500">
+                          {violation.user.email}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-medium text-gray-900">
@@ -222,9 +232,13 @@ export default function ViolationsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {violation.resolved ? (
-                          <span className="text-sm text-green-600 font-medium">Resolved</span>
+                          <span className="text-sm text-green-600 font-medium">
+                            Resolved
+                          </span>
                         ) : (
-                          <span className="text-sm text-orange-600 font-medium">Pending</span>
+                          <span className="text-sm text-orange-600 font-medium">
+                            Pending
+                          </span>
                         )}
                       </td>
                     </tr>

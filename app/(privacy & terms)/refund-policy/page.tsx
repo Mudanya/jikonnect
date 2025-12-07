@@ -1,23 +1,19 @@
-
-import { Metadata } from 'next';
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Refund & Cancellation Policy | JiKonnect',
-  description: 'JiKonnect Refund & Cancellation Policy - Learn about our fair and transparent cancellation and refund process.',
+  title: "Refund & Cancellation Policy | JiKonnect",
+  description:
+    "JiKonnect Refund & Cancellation Policy - Learn about our fair and transparent cancellation and refund process.",
 };
 
 export default function RefundPolicyPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto bg-white shadow-lg rounded-lg">
+      <div className=" bg-white shadow-lg rounded-lg">
         <div className="bg-green-600 text-white px-8 py-6 rounded-t-lg">
           <h1 className="text-3xl font-bold">Refund & Cancellation Policy</h1>
-          <p className="mt-2 text-green-100">
-            Powered by Linkora Digital Ltd
-          </p>
-          <p className="text-sm text-green-200">
-            Last Updated: 12.01.2025
-          </p>
+          <p className="mt-2 text-green-100">Powered by Linkora Digital Ltd</p>
+          <p className="text-sm text-green-200">Last Updated: 12.01.2025</p>
         </div>
 
         <div className="px-8 py-6 space-y-8">
@@ -27,7 +23,8 @@ export default function RefundPolicyPage() {
               1. Overview
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              This policy ensures fair and transparent handling of cancellations and refunds on the JiKonnect platform.
+              This policy ensures fair and transparent handling of cancellations
+              and refunds on the JiKonnect platform.
             </p>
           </section>
 
@@ -42,7 +39,8 @@ export default function RefundPolicyPage() {
                   ✅ More than 2 hours before booking
                 </h3>
                 <p className="text-gray-700">
-                  <span className="font-bold">Full refund</span> (minus M-Pesa processing fees)
+                  <span className="font-bold">Full refund</span> (minus M-Pesa
+                  processing fees)
                 </p>
               </div>
 
@@ -73,14 +71,16 @@ export default function RefundPolicyPage() {
             </h2>
             <div className="bg-blue-50 p-6 rounded-lg">
               <p className="text-gray-700 leading-relaxed mb-3">
-                If a Provider cancels a confirmed booking, the Client receives a <span className="font-bold">full refund</span>.
+                If a Provider cancels a confirmed booking, the Client receives a{" "}
+                <span className="font-bold">full refund</span>.
               </p>
               <div className="bg-white p-4 rounded border-l-4 border-blue-500 mt-3">
                 <p className="text-gray-700 font-semibold">
                   ⚠️ Important for Providers:
                 </p>
                 <p className="text-gray-700 mt-2">
-                  Frequent cancellations may result in account suspension or termination.
+                  Frequent cancellations may result in account suspension or
+                  termination.
                 </p>
               </div>
             </div>
@@ -93,7 +93,10 @@ export default function RefundPolicyPage() {
             </h2>
             <div className="space-y-4">
               <p className="text-gray-700 leading-relaxed">
-                If you're not satisfied with the service provided, you must submit evidence (photos, videos, or detailed description) within <span className="font-bold">48 hours</span> of service completion.
+                If you're not satisfied with the service provided, you must
+                submit evidence (photos, videos, or detailed description) within{" "}
+                <span className="font-bold">48 hours</span> of service
+                completion.
               </p>
 
               <div className="bg-gray-50 p-4 rounded-lg">
@@ -109,7 +112,9 @@ export default function RefundPolicyPage() {
 
               <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
                 <p className="text-gray-700">
-                  <span className="font-semibold">Note:</span> JiKonnect will review each case individually and make fair determinations based on the evidence provided.
+                  <span className="font-semibold">Note:</span> JiKonnect will
+                  review each case individually and make fair determinations
+                  based on the evidence provided.
                 </p>
               </div>
             </div>
@@ -121,7 +126,9 @@ export default function RefundPolicyPage() {
               5. Overpayments
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              If you've been charged more than the agreed amount, the overpayment will be refunded within <span className="font-bold">48-72 hours</span> after verification.
+              If you've been charged more than the agreed amount, the
+              overpayment will be refunded within{" "}
+              <span className="font-bold">48-72 hours</span> after verification.
             </p>
           </section>
 
@@ -135,10 +142,15 @@ export default function RefundPolicyPage() {
                 The following are non-refundable:
               </p>
               <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Completed services (where no dissatisfaction was reported within 48 hours)</li>
+                <li>
+                  Completed services (where no dissatisfaction was reported
+                  within 48 hours)
+                </li>
                 <li>Tips paid to providers</li>
                 <li>Subscription fees</li>
-                <li>Promotional or discounted bookings (unless otherwise stated)</li>
+                <li>
+                  Promotional or discounted bookings (unless otherwise stated)
+                </li>
               </ul>
             </div>
           </section>
@@ -150,7 +162,9 @@ export default function RefundPolicyPage() {
             </h2>
             <div className="bg-yellow-50 p-6 rounded-lg border-l-4 border-yellow-500">
               <p className="text-gray-700 leading-relaxed">
-                JiKonnect reserves the right to decline refund claims that show evidence of fraud, abuse, or attempts to exploit the refund system. This includes but is not limited to:
+                JiKonnect reserves the right to decline refund claims that show
+                evidence of fraud, abuse, or attempts to exploit the refund
+                system. This includes but is not limited to:
               </p>
               <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4 mt-3">
                 <li>False claims of service non-delivery</li>
@@ -182,7 +196,8 @@ export default function RefundPolicyPage() {
                     Processing Time:
                   </h3>
                   <p className="text-gray-700">
-                    Refunds are processed within <span className="font-bold">48-72 hours</span> of approval.
+                    Refunds are processed within{" "}
+                    <span className="font-bold">48-72 hours</span> of approval.
                   </p>
                 </div>
 
@@ -191,7 +206,8 @@ export default function RefundPolicyPage() {
                     Transaction Fees:
                   </h3>
                   <p className="text-gray-700">
-                    M-Pesa transaction fees are non-refundable and will be deducted from the refund amount where applicable.
+                    M-Pesa transaction fees are non-refundable and will be
+                    deducted from the refund amount where applicable.
                   </p>
                 </div>
               </div>
@@ -205,22 +221,31 @@ export default function RefundPolicyPage() {
             </h2>
             <div className="space-y-4">
               <p className="text-gray-700 leading-relaxed">
-                If you disagree with a refund decision, you may escalate the matter through the following process:
+                If you disagree with a refund decision, you may escalate the
+                matter through the following process:
               </p>
 
               <div className="bg-gray-50 p-4 rounded-lg">
                 <ol className="list-decimal list-inside space-y-3 text-gray-700 ml-4">
                   <li>
-                    <span className="font-semibold">Internal Support:</span> Contact our support team at{' '}
-                    <a href="mailto:support@jikonnect.co.ke" className="text-green-600 hover:underline">
+                    <span className="font-semibold">Internal Support:</span>{" "}
+                    Contact our support team at{" "}
+                    <a
+                      href="mailto:support@jikonnect.co.ke"
+                      className="text-green-600 hover:underline"
+                    >
                       support@jikonnect.co.ke
                     </a>
                   </li>
                   <li>
-                    <span className="font-semibold">Mediation:</span> If unresolved, the dispute will be handled through internal mediation
+                    <span className="font-semibold">Mediation:</span> If
+                    unresolved, the dispute will be handled through internal
+                    mediation
                   </li>
                   <li>
-                    <span className="font-semibold">Arbitration/Court:</span> As a last resort, disputes may be resolved through arbitration or courts under Kenyan law
+                    <span className="font-semibold">Arbitration/Court:</span> As
+                    a last resort, disputes may be resolved through arbitration
+                    or courts under Kenyan law
                   </li>
                 </ol>
               </div>
@@ -244,8 +269,11 @@ export default function RefundPolicyPage() {
                 <li>Submit supporting evidence if applicable</li>
               </ol>
               <p className="text-gray-700 leading-relaxed mt-4">
-                Alternatively, contact our support team directly at:{' '}
-                <a href="mailto:support@jikonnect.co.ke" className="text-green-600 hover:underline font-semibold">
+                Alternatively, contact our support team directly at:{" "}
+                <a
+                  href="mailto:support@jikonnect.co.ke"
+                  className="text-green-600 hover:underline font-semibold"
+                >
                   support@jikonnect.co.ke
                 </a>
               </p>
@@ -262,19 +290,26 @@ export default function RefundPolicyPage() {
                 For questions or concerns about refunds and cancellations:
               </p>
               <p className="text-gray-700">
-                <span className="font-semibold">Email:</span>{' '}
-                <a href="mailto:support@jikonnect.co.ke" className="text-green-600 hover:underline">
+                <span className="font-semibold">Email:</span>{" "}
+                <a
+                  href="mailto:support@jikonnect.co.ke"
+                  className="text-green-600 hover:underline"
+                >
                   support@jikonnect.co.ke
                 </a>
               </p>
               <p className="text-gray-700">
-                <span className="font-semibold">Phone:</span>{' '}
-                <a href="tel:+254792480522" className="text-green-600 hover:underline">
+                <span className="font-semibold">Phone:</span>{" "}
+                <a
+                  href="tel:+254792480522"
+                  className="text-green-600 hover:underline"
+                >
                   +254 792 480 522
                 </a>
               </p>
               <p className="text-gray-700">
-                <span className="font-semibold">Company:</span> Linkora Digital Ltd, Nairobi
+                <span className="font-semibold">Company:</span> Linkora Digital
+                Ltd, Nairobi
               </p>
             </div>
           </section>
@@ -285,14 +320,14 @@ export default function RefundPolicyPage() {
               Related Policies
             </h3>
             <div className="space-y-2">
-              <a 
-                href="/terms" 
+              <a
+                href="/terms"
                 className="block text-green-600 hover:text-green-800 font-semibold hover:underline"
               >
                 → Terms & Conditions
               </a>
-              <a 
-                href="/privacy-policy" 
+              <a
+                href="/privacy-policy"
                 className="block text-green-600 hover:text-green-800 font-semibold hover:underline"
               >
                 → Privacy Policy

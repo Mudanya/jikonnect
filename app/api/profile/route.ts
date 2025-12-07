@@ -5,7 +5,6 @@ import { updateUserProfile } from "@/services/queries/client.query";
 import { AuthenticatedRequest } from "@/types/auth";
 import { clientSchema } from "@/validators/profile.validator";
 import { NextResponse } from "next/server";
-import { cli } from "winston/lib/winston/config";
 
 
 export const GET = withAuth(async (req: AuthenticatedRequest) => {
@@ -27,7 +26,7 @@ export const GET = withAuth(async (req: AuthenticatedRequest) => {
                 avatar: user.avatar,
                 emailVerified: user.emailVerified,
                 phoneVerified: user.phoneVerified,
-                profile: user.profile
+                profile: user.profile,
             }
         });
     } catch (error) {

@@ -30,14 +30,75 @@ model User {
   payments          Payment[]
   policyViolations  PolicyViolation[]
   profile           Profile?
-  receivedReviews   Review[]          @relation("ReviewReceiver")
+  terms             Terms?
+  receivedReviews   Review[]          @relation("ReviewReceiver") 
   reviews           Review[]
-
+  
   @@index([email])
   @@index([phone])
   @@index([role])
 }
 
+model Zone {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  color       String     @default("#3B82F6") 
+  order       Int        @default(0)
+  active      Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  clusters    Cluster[]
+  locations   Location[]
+
+  @@index([slug])
+  @@index([active])
+}
+
+
+model Cluster {
+  id          String     @id @default(cuid())
+  zoneId      String
+  name        String
+  slug        String     @unique
+  description String?
+  order       Int        @default(0)
+  active      Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  zone        Zone       @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  locations   Location[]
+
+  @@index([zoneId])
+  @@index([slug])
+  @@index([active])
+}
+
+model Location {
+  id             String   @id @default(cuid())
+  zoneId         String
+  clusterId      String?
+  name           String
+  slug           String   @unique
+  latitude       Float?
+  longitude      Float?
+  matchingRadius Int      @default(5) // Default matching radius in km
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  zone           Zone     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  cluster        Cluster? @relation(fields: [clusterId], references: [id], onDelete: SetNull)
+  profiles      Profile[]
+
+  @@index([zoneId])
+  @@index([clusterId])
+  @@index([slug])
+  @@index([active])
+}
 model ServiceCategory {
   id          String @id @default(cuid())
   title       String
@@ -52,7 +113,6 @@ model Profile {
   services           String[]
   hourlyRate         Decimal            @db.Decimal(10, 2)
   yearsOfExperience  Int?
-  location           String?
   languages          String[]
   availability       Json?
   idNumber           String?            @unique
@@ -67,9 +127,10 @@ model Profile {
   totalEarnings      Decimal            @default(0) @db.Decimal(10, 2)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime?          @updatedAt
-  portfolio          Portfolio[]
+  portfolios          Portfolio[]
   user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  locationId       String? 
+  location         Location? @relation(fields: [locationId], references: [id])
   @@index([verificationStatus])
 }
 
@@ -225,6 +286,14 @@ model AuditLogs {
   @@index([userId])
   @@index([action])
   @@index([createdAt])
+}
+model Terms {
+  id        String         @id @default(cuid())
+  userId    String         @unique
+  isAccept  Boolean        @default(true)
+  user      User?          @relation(fields: [userId], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Settings {
