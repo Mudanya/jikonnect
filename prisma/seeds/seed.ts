@@ -1,6 +1,6 @@
-import { initializeAdmin, initializeDefaultSettings } from "../services/queries/admin.query"
+import { initializeAdmin, initializeDefaultSettings } from "../../services/queries/admin.query"
 
-import { prisma } from "./prisma.init";
+import { prisma } from "../prisma.init";
 
 const main = async () => {
     await initializeDefaultSettings()

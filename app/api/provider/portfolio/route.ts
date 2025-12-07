@@ -19,7 +19,7 @@ export const GET = withAuth(async (req: AuthenticatedRequest) => {
 
         return NextResponse.json({
             success: true,
-            data: profile.portfolio
+            data: profile.portfolios
         });
     }
     catch (err) {

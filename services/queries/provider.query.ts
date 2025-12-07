@@ -108,7 +108,7 @@ export const getUserProfiles = async ({ location, minRate, maxRate, minRating, c
                     phone: true
                 }
             },
-            portfolio: {
+            portfolios: {
                 take: 3,
                 orderBy: { createdAt: 'desc' }
             },
@@ -136,7 +136,7 @@ export const getProviderbyId = async (id: string) => {
                     createdAt: true
                 }
             },
-            portfolio: {
+            portfolios: {
                 orderBy: { createdAt: 'desc' }
             }
         }
@@ -301,7 +301,7 @@ export const findUserWithPortfolio = async (id: string) => {
         include: {
             profile: {
                 include: {
-                    portfolio: true
+                    portfolios: true
                 }
             }
         }
@@ -312,7 +312,7 @@ export const findProfileWithPortfolio = async (userId: string) => await prisma.p
     where: {
         userId
     }, include: {
-        portfolio: true
+        portfolios: true
     }
 });
 

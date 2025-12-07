@@ -16,7 +16,7 @@ export const POST = async (req: NextRequest) => {
             message: 'Invalid or expired refresh token',
             success: false
         }, { status: 401, })
-        const tokens = generateTokens(payload)
+        const tokens = generateTokens(payload,false)
         return Response.json({
             success: true,
             message: 'Token refreshed successfully',

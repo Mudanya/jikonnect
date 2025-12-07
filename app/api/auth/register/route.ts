@@ -43,7 +43,7 @@ export const POST = async (req: NextRequest) => {
             userId: createdUser.id,
             role: createdUser.role,
             email: createdUser.email
-        });
+        },false);
 
         logger.info(`${createdUser.email} registered`);
         return Response.json({
