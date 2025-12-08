@@ -1,8 +1,8 @@
 // components/locations/LocationDropdown.tsx
 "use client";
 
-import { useState, useEffect } from "react";
 import { MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { FieldError } from "react-hook-form";
 
 type LocationDropdownProps = {
   value?: string;
