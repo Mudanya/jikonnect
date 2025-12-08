@@ -112,7 +112,7 @@ export const getUserProfiles = async ({ location, minRate, maxRate, minRating, c
                 take: 3,
                 orderBy: { createdAt: 'desc' }
             },
-            location: { select: { id: true } }
+            location: { select: { name: true } }
         },
         orderBy: {
             averageRating: 'desc'
