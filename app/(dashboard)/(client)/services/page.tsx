@@ -291,18 +291,18 @@ const Services = () => {
                 }
               >
                 {/* Portfolio Images */}
-                {provider.portfolio.length > 0 && (
+                {provider.portfolios.length > 0 && (
                   <div className="h-48 bg-gray-200 relative overflow-hidden">
                     <Image
-                      src={provider.portfolio[0].images[0]}
+                      src={provider?.portfolios[0]?.images[0]}
                       alt={provider.user.firstName}
                       className="w-full h-full object-cover"
                       width={800}
                       height={600}
                     />
-                    {provider.portfolio.length > 1 && (
+                    {provider?.portfolios?.length > 1 && (
                       <div className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs">
-                        +{provider.portfolio.length - 1} more
+                        +{provider?.portfolios?.length - 1} more
                       </div>
                     )}
                   </div>
@@ -324,12 +324,12 @@ const Services = () => {
                           <CheckCircle
                             className="text-jiko-primary"
                             size={18}
-                          />
+                          />  
                         )}
                       </div>
                       <div className="flex items-center space-x-1 text-sm text-gray-600">
                         <MapPin size={14} />
-                        <span>{provider.location || "Location not set"}</span>
+                        <span>{provider.location.name || "Location not set"}</span>
                       </div>
                     </div>
                   </div>

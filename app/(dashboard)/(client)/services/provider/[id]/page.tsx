@@ -2,7 +2,6 @@
 import Loading from "@/components/shared/Loading";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
-import logger from "@/lib/logger";
 import { getProviderProfile } from "@/services/apis/profile.api";
 import {
   ArrowLeft,
@@ -214,11 +213,11 @@ const SvcProvider = () => {
             </div>
 
             {/* Portfolio */}
-            {profile.portfolio.length > 0 && (
+            {profile.portfolios.length > 0 && (
               <div className="bg-white rounded-2xl shadow-sm border p-6">
                 <h2 className="text-xl font-bold mb-4">Portfolio</h2>
                 <div className="grid md:grid-cols-3 gap-4">
-                  {profile.portfolio.map((item: any) => (
+                  {profile?.portfolios?.map((item: any) => (
                     <div
                       key={item.id}
                       className="rounded-xl overflow-hidden border"
