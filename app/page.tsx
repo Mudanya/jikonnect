@@ -22,7 +22,7 @@ export default function Home() {
           setData(getData.data);
         }
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     }, 0);
   }, []);
