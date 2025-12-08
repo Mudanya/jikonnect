@@ -79,15 +79,54 @@ export const getAvgRatingResult = async () => await prisma.review.aggregate({
     }
 });
 
-export const getAllProviders = async (): Promise<{ location: string, firstName: string, lastName: string, avatar: string, rating: number, id: string, bio: string, services: string[] }[]> => await prisma.$queryRaw`
-  SELECT u.*,p.bio,p.services,p.location, MAX(r.rating) as rating
-  FROM "User" u
-  LEFT JOIN "Review" r ON r."revieweeId" = u.id
-  INNER JOIN "Profile" p ON p."userId" = u.id
-  GROUP BY u.id,p.bio,p.services,p.location
-  ORDER BY rating DESC NULLS LAST
-  LIMIT 10
-`;
+// export const getAllProviders = async (): Promise<{ location: string, firstName: string, lastName: string, avatar: string, rating: number, id: string, bio: string, services: string[] }[]> => await prisma.$queryRaw`
+//   SELECT u.*,p.bio,p.services,l.name as location, MAX(r.rating) as rating
+//   FROM "User" u
+//   LEFT JOIN "Review" r ON r."revieweeId" = u.id
+//   INNER JOIN "Profile" p ON p."userId" = u.id
+//   INNER JOIN "Location" l ON l."id" = p.locationId
+//   GROUP BY u.id,p.bio,p.services,l.name
+//   ORDER BY rating DESC NULLS LAST
+//   LIMIT 10
+// `;
+
+export const getAllProviders = async () => {
+    const providers = await prisma.user.findMany({
+        where: {
+            role: 'PROFESSIONAL',
+        },
+        include: {
+            profile: {
+                include: {
+                    location: true,
+                },
+            },
+            receivedReviews: {
+                select: {
+                    rating: true,
+                },
+            },
+        },
+        take: 10,
+    });
+
+    return providers.map(provider => {
+        const avgRating = provider.receivedReviews.length > 0
+            ? provider.receivedReviews.reduce((sum, r) => sum + r.rating, 0) / provider.receivedReviews.length
+            : 0;
+
+        return {
+            id: provider.id,
+            firstName: provider.firstName,
+            lastName: provider.lastName,
+            avatar: provider.avatar,
+            bio: provider.profile?.bio || '',
+            services: provider.profile?.services || [],
+            location: provider.profile?.location?.name || '',
+            rating: avgRating,
+        };
+    }).sort((a, b) => b.rating - a.rating);
+};
 
 export const getRecentReviews = async () => await prisma.review.findMany({
     where: {

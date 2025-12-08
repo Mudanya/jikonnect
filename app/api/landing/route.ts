@@ -16,6 +16,7 @@ export const GET = async (request: NextRequest) => {
 
         // Get top-rated providers with their services
         const topProviders = await getAllProviders()
+        console.error('top',topProviders)
 
         // Get recent reviews with booking and reviewer info
         const recentReviews = await getRecentReviews()
@@ -68,7 +69,7 @@ export const GET = async (request: NextRequest) => {
                     reviewerName: r.reviewer.firstName + " " + r.reviewer.lastName,
                     reviewerAvatar: r.reviewer.avatar,
                     providerTitle: r.reviewee.profile?.services[0],
-                    providerLocation: r.reviewee.profile?.location,
+                    providerLocation: r.reviewee.profile?.location?.name,
                     serviceDate: r.booking.scheduledDate
                 })),
                 serviceCategories: serviceCategories.slice(0, 12), // Top 12 categories,
@@ -78,6 +79,7 @@ export const GET = async (request: NextRequest) => {
 
     } catch (error) {
         logger.error('Failed to fetch landing page data: ' + (error as Error).message);
+        console.log(error)
         return NextResponse.json(
             { success: false, error: 'Failed to fetch landing page data' },
             { status: 500 }
