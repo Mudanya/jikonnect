@@ -329,7 +329,7 @@ const Services = () => {
                       </div>
                       <div className="flex items-center space-x-1 text-sm text-gray-600">
                         <MapPin size={14} />
-                        <span>{provider.location.name || "Location not set"}</span>
+                        <span>{provider?.location?.name || "Location not set"}</span>
                       </div>
                     </div>
                   </div>
