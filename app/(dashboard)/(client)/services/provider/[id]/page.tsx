@@ -201,12 +201,12 @@ const SvcProvider = () => {
             <div className="bg-white rounded-2xl shadow-sm border p-6">
               <h2 className="text-xl font-bold mb-4">Services Offered</h2>
               <div className="flex flex-wrap gap-3">
-                {profile.services.map((service: string) => (
+                {profile.services.map((service: {name:string}) => (
                   <span
-                    key={service}
+                    key={service.name}
                     className="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl font-medium"
                   >
-                    {service}
+                    {service.name}
                   </span>
                 ))}
               </div>

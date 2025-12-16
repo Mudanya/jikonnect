@@ -99,6 +99,7 @@ export const getAllProviders = async () => {
             profile: {
                 include: {
                     location: true,
+                    services:true
                 },
             },
             receivedReviews: {
@@ -159,9 +160,26 @@ export const getProviderServices = async () =>
     await prisma.user.findMany({
         where: {
             role: 'PROFESSIONAL',
-            profile: { verifiedAt: { not: null }, }
+            profile: {
+                verifiedAt: { not: null }
+            }
         },
         include: {
-            profile: { select: { services: true } }
+            profile: {
+                select: {
+                    services: {
+                        select: {
+                            name: true,
+                            description: true,
+                            category: {
+                                select: {
+                                    name: true,
+                                    icon: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     });

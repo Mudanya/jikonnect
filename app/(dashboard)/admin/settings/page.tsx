@@ -4,8 +4,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, Settings, DollarSign, Bell, Shield, 
-  Mail, Database, Save, AlertCircle, CheckCircle 
+  Mail, Database, Save, AlertCircle, CheckCircle, 
+  Map,
+  BriefcaseBusiness
 } from 'lucide-react';
+import AdminServicesPage from '@/components/dashboard/AdminServicesPage';
+import AdminLocationsPage from '@/components/locations/AdminLocationsPage';
 
 interface SystemConfig {
   platform: {
@@ -38,11 +42,7 @@ interface SystemConfig {
     requirePhoneVerification: boolean;
     twoFactorEnabled: boolean;
   };
-  verification: {
-    autoApproval: boolean;
-    requiredDocuments: string[];
-    verificationTimeout: number;
-  };
+
 }
 
 export default function SystemConfigPage() {
@@ -50,7 +50,7 @@ export default function SystemConfigPage() {
   const [config, setConfig] = useState<SystemConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<'platform' | 'payments' | 'notifications' | 'security' | 'verification'>('platform');
+  const [activeTab, setActiveTab] = useState<'platform' | 'payments' | 'notifications' | 'security' | 'services' |'locations'>('platform');
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
@@ -128,7 +128,8 @@ export default function SystemConfigPage() {
     { id: 'payments', label: 'Payments', icon: DollarSign },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'security', label: 'Security', icon: Shield },
-    { id: 'verification', label: 'Verification', icon: CheckCircle },
+    { id: 'services', label: 'Services', icon: BriefcaseBusiness },
+    { id: 'locations', label: 'Locations', icon: Map },
   ];
 
   return (
@@ -535,66 +536,14 @@ export default function SystemConfigPage() {
             )}
 
             {/* Verification Settings */}
-            {activeTab === 'verification' && (
+            {activeTab === 'services' && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Verification Settings</h2>
-                
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                  <div>
-                    <p className="font-semibold text-gray-900">Auto-Approval</p>
-                    <p className="text-sm text-gray-600">Automatically approve provider registrations</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={config.verification.autoApproval}
-                      onChange={(e) => updateConfig('verification', 'autoApproval', e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-jiko-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-jiko-primary/90"></div>
-                  </label>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Verification Timeout (days)
-                  </label>
-                  <input
-                    type="number"
-                    value={config.verification.verificationTimeout}
-                    onChange={(e) => updateConfig('verification', 'verificationTimeout', parseInt(e.target.value))}
-                    min="1"
-                    max="30"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-jiko-primary"
-                  />
-                  <p className="text-sm text-gray-600 mt-1">
-                    Time before verification request expires
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    Required Documents
-                  </label>
-                  <div className="space-y-2">
-                    {['National ID', 'Passport', "Driver's License", 'Proof of Address', 'Professional Certificates'].map((doc) => (
-                      <div key={doc} className="flex items-center space-x-3">
-                        <input
-                          type="checkbox"
-                          checked={config.verification.requiredDocuments.includes(doc)}
-                          onChange={(e) => {
-                            const docs = e.target.checked
-                              ? [...config.verification.requiredDocuments, doc]
-                              : config.verification.requiredDocuments.filter(d => d !== doc);
-                            updateConfig('verification', 'requiredDocuments', docs);
-                          }}
-                          className="w-5 h-5 text-jiko-primary/90 rounded focus:ring-2 focus:ring-jiko-primary"
-                        />
-                        <span className="text-sm text-gray-700">{doc}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <AdminServicesPage />
+              </div>
+            )}
+            {activeTab === 'locations' && (
+              <div className="space-y-6">
+                <AdminLocationsPage />
               </div>
             )}
           </div>

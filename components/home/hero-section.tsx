@@ -123,7 +123,7 @@ const HeroSection = ({ data }: { data: LandingPageData | null }) => {
                 <div className="grid grid-cols-2 gap-3">
                   {data?.serviceCategories &&
                     data?.serviceCategories.map((service, i) => {
-                      const { icon: Icon, color } = services[i];
+                      
                       return (
                         <div
                           onClick={() =>
@@ -138,9 +138,10 @@ const HeroSection = ({ data }: { data: LandingPageData | null }) => {
                           }}
                         >
                           <div
-                            className={`w-10 h-10 bg-linear-to-br ${color} rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition`}
+                            className={`w-10 h-10 bg-linear-to-br  rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition`}
                           >
-                            <Icon className="text-white" size={20} />
+                            <span className="text-2xl">{service.category.icon}</span>
+                            {/* <service.category.icon className="text-white" size={20} /> */}
                           </div>
                           <h3 className="font-semibold text-gray-800 text-sm mb-1">
                             {service.name}

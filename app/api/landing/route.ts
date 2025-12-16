@@ -16,7 +16,7 @@ export const GET = async (request: NextRequest) => {
 
         // Get top-rated providers with their services
         const topProviders = await getAllProviders()
-        console.error('top',topProviders)
+        console.error('top', topProviders)
 
         // Get recent reviews with booking and reviewer info
         const recentReviews = await getRecentReviews()
@@ -27,18 +27,18 @@ export const GET = async (request: NextRequest) => {
         const platformDetails = await getSettingsByKey('platform')
 
         // Count providers by category
-        const categoryMap = new Map<string, number>();
-        allProviders.forEach(provider => {
-            provider.profile?.services.forEach(category => {
-                categoryMap.set(category, (categoryMap.get(category) || 0) + 1);
-            });
-        });
+        // const categoryMap = new Map<string, number, string>();
+        // allProviders.forEach(provider => {
+        //     provider.profile?.services.forEach(category => {
+        //         categoryMap.set(category.name, (categoryMap.get(category.name) || 0) + 1, category.description!);
+        //     });
+        // });
 
-        const serviceCategories = Array.from(categoryMap.entries()).map(([name, count]) => ({
-            name,
-            count,
-            description: getCategoryDescription(name)
-        })).sort((a, b) => b.count - a.count);
+        // const serviceCategories = Array.from(categoryMap.entries()).map(([name, count]) => ({
+        //     name,
+        //     count,
+        //     description: getCategoryDescription(name)
+        // })).sort((a, b) => b.count - a.count);
 
         return NextResponse.json({
             success: true,
@@ -54,7 +54,7 @@ export const GET = async (request: NextRequest) => {
                 topProviders: topProviders.map(p => ({
                     id: p.id,
                     title: p.services[0],
-                    name: p.firstName + p.lastName,
+                    name: p.firstName + " " + p.lastName,
                     avatar: p.avatar,
                     rating: p.rating,
                     location: p.location,
@@ -72,7 +72,7 @@ export const GET = async (request: NextRequest) => {
                     providerLocation: r.reviewee.profile?.location?.name,
                     serviceDate: r.booking.scheduledDate
                 })),
-                serviceCategories: serviceCategories.slice(0, 12), // Top 12 categories,
+                serviceCategories: allProviders.map(provider => provider.profile?.services || []).flat().slice(0, 12), // Top 12 categories,
                 platform: { name: platformDetails?.platformName, phone: platformDetails?.supportPhone, email: platformDetails?.supportEmail }
             }
         });

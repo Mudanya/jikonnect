@@ -219,7 +219,7 @@ const Services = () => {
                   <SelectGroup>
                     <SelectLabel>Min Rating</SelectLabel>
 
-                    <SelectItem value="any">Any</SelectItem>
+                    <SelectItem value="0">Any</SelectItem>
                     <SelectItem value="4">4+ Stars</SelectItem>
                     <SelectItem value="4.5">4.5+ Stars</SelectItem>
                   </SelectGroup>
@@ -336,17 +336,17 @@ const Services = () => {
 
                   {/* Services */}
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {provider.services.slice(0, 3).map((service: string) => (
+                    {provider?.services?.slice(0, 3).map((service: {name:string}) => (
                       <span
-                        key={service}
+                        key={service.name}
                         className="px-3 py-1 bg-blue-50 text-jiko-primary rounded-full text-xs font-medium"
                       >
-                        {service}
+                        {service.name}
                       </span>
                     ))}
-                    {provider.services.length > 3 && (
+                    {provider?.services?.length > 3 && (
                       <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
-                        +{provider.services.length - 3} more
+                        +{provider?.services?.length - 3} more
                       </span>
                     )}
                   </div>

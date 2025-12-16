@@ -19,7 +19,7 @@ export const GET = withAuth(async (req: AuthenticatedRequest) => {
             idNumber: !!profile.idNumber,
             idDocument: !!profile.idDocument,
             certificates: (profile.certificates?.length || 0) > 0,
-            profileComplete: !!profile.bio && (profile.services?.length || 0) > 0 && !!profile.hourlyRate
+            profileComplete: !!profile.bio && (profile?.services?.length || 0) > 0 && !!profile.hourlyRate
         };
 
         const canSubmit = requirements.idNumber && requirements.idDocument;

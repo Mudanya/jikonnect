@@ -5,7 +5,7 @@ export const proxy = (req: NextRequest) => {
     const token = req.cookies.get('accessToken')?.value ||
         req.headers.get('authorization')?.replace('Bearer ', '');
     const { pathname } = req.nextUrl;
-    
+
     const publicRoutes = [
         '/api/auth/login',
         '/api/auth/register',
@@ -14,8 +14,9 @@ export const proxy = (req: NextRequest) => {
         '/api/auth/verify-email',
         '/api/landing',
         '/api/locations/zones',
-        '/api/locations/search',    
-        
+        '/api/locations/search',
+        '/api/services',
+
     ];
     const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
     if (isPublicRoute) return NextResponse.next();

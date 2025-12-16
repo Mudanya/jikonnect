@@ -99,18 +99,12 @@ model Location {
   @@index([slug])
   @@index([active])
 }
-model ServiceCategory {
-  id          String @id @default(cuid())
-  title       String
-  description String
-  icon        String
-}
 
 model Profile {
   id                 String             @id @default(cuid())
   userId             String             @unique
   bio                String?
-  services           String[]
+  services           Service []
   hourlyRate         Decimal            @db.Decimal(10, 2)
   yearsOfExperience  Int?
   languages          String[]
@@ -294,7 +288,7 @@ model Terms {
   user      User?          @relation(fields: [userId], references: [id])
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-}
+}  
 
 model Settings {
   id          String   @id @default(cuid())
@@ -304,6 +298,41 @@ model Settings {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model ServiceCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  icon        String?
+  description String?
+  order       Int       @default(0)
+
+  services    Service[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("service_categories")
+}
+
+model Service {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  skillLevels String[]  // Array of skill levels
+
+  categoryId  String
+  category    ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  profiles Profile[]  // Many-to-many (Prisma creates _ProfessionalToService table)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("services")
+}
+
 
 enum UserRole {
   CLIENT

@@ -10,14 +10,12 @@ import {
   CircleAlert,
   Star,
   TriangleAlert,
-  X,
 } from "lucide-react";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Loading from "../shared/Loading";
 import { Button } from "../ui/button";
-import { Combobox } from "../ui/combobox";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 
@@ -62,26 +60,7 @@ const GenProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
       );
     }
   };
-  const setService = async (val: string) => {
-    setUploading(true);
-    if (
-      profile?.profile &&
-      !profile?.profile?.services
-        ?.map((s) => s.toLowerCase())
-        .includes(val?.toLowerCase())
-    ) {
-      if (val && profile?.profile) {
-        setProfile({
-          profile: {
-            ...profile!.profile,
-            services: [...(profile?.profile?.services || []), val],
-          },
-        });
-        await updateProfile();
-      }
-    }
-    setUploading(false);
-  };
+
   useEffect(() => {
     setTimeout(async () => {
       if (user && user.role === "PROFESSIONAL") await loadProfile();
@@ -206,40 +185,6 @@ const GenProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
                 placeholder="Tell clients about yourself..."
                 disabled={uploading}
               />
-            </div>
-            <div className="w-full">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Skills
-              </label>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {profile?.profile?.services?.map((skill) => (
-                  <span
-                    key={skill}
-                    className="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium flex items-center space-x-2"
-                  >
-                    <span>{skill}</span>
-                    <X
-                      size={14}
-                      className="cursor-pointer hover:text-blue-900"
-                      onClick={async () => {
-                        setUploading(true);
-                        setProfile({
-                          profile: {
-                            ...profile.profile!,
-                            services: profile.profile?.services?.filter(
-                              (val) =>
-                                val?.toLowerCase() !== skill.toLowerCase()
-                            ),
-                          },
-                        });
-                        await updateProfile();
-                      }}
-                    />
-                  </span>
-                ))}
-              </div>
-
-              <Combobox onValueChange={setService} />
             </div>
           </div>
         )}
