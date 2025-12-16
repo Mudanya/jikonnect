@@ -9,7 +9,6 @@ export const clientSchema = z.object({
 });
 export const profileSchema = z.object({
     bio: z.string().min(1, 'Bio is required'),
-    services: z.array(z.string()).min(1, 'Services are required'),
     hourlyRate: z.number().min(0, 'Hourly rate must be a positive number'),
     yearsOfExperience: z.number().optional(),
     location: z.string().optional(),

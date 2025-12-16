@@ -28,7 +28,7 @@ export const createUser = async (data: RegisterFormData) => {
         fullName,
         role,
         location,
-        category,
+       
         experience,
         hourlyRate,
         bio, acceptTerms } = data
@@ -49,7 +49,6 @@ export const createUser = async (data: RegisterFormData) => {
                 profile: {
                     create: {
                         bio: bio || null,
-                        services: category ? [category] : [],
                         hourlyRate: parseFloat(hourlyRate!),
                         yearsOfExperience: experience ? parseInt(experience) : null,
                         ...(location && { locationId: location }),

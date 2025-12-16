@@ -35,7 +35,7 @@ export const submitProfile = async (formData: EditProfileFormData) => {
                 },
                 body: JSON.stringify({
                     bio: formData.bio,
-                    services: formData.services,
+                    // services: formData.services,
                     hourlyRate: formData.hourlyRate,
                     yearsOfExperience: formData.yearsOfExperience,
                     location: formData.location,

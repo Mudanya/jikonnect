@@ -47,10 +47,11 @@ export interface LandingPageData {
     }>;
     serviceCategories: Array<{
         name: string;
-        count: number;
+        count?: number;
         description: string;
+        category: { icon: string }
     }>;
-    platform?:{
+    platform?: {
         phone: string,
         email: string,
         name: string

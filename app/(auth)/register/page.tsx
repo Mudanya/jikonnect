@@ -64,18 +64,7 @@ const Register = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [isClient, setIsClient] = useState<boolean>(true);
-  const [locationId, setLocationId] = useState("");
-  const [locationName, setLocationName] = useState("");
-  const categories = [
-    "Cleaning",
-    "Plumbing",
-    "Electrical",
-    "Carpentry",
-    "Painting",
-    "Home Care",
-    "Gardening",
-    "Other",
-  ]; // todo: retrieve from db
+
   const { setHeaderDesc } = useContext(AuthLayoutContext);
 
   useEffect(() => {
@@ -227,16 +216,7 @@ const Register = () => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Location
                 </label>
-                {/* <LocationSelector
-                  value={locationId}
-                  onChange={(id, name) => {
-                    setLocationId(id);
-                    setLocationName(name);
-                    setValue('location',id,{shouldDirty:true,shouldTouch:true,shouldValidate:true})
-                  }}
-                  placeholder="Where do you live?"
-                  
-                /> */}
+               
                 <LocationDropdown
                   value={getValues("location")}
                   onChange={(locId) => {
@@ -248,20 +228,7 @@ const Register = () => {
                   }}
                   required={errors.location !== undefined}
                 />
-                {/* <div className="relative">
-                  <MapPin
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    size={20}
-                  />
-                  <Input
-                    type="text"
-                    {...register("location")}
-                    placeholder="Nairobi, Kenya"
-                    className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.location && "border-red-300"
-                    }`}
-                  />
-                </div> */}
+              
                 {errors.location && (
                   <small className="text-xs text-red-300">
                     {errors.location.message}
@@ -334,50 +301,6 @@ const Register = () => {
               <h3 className="font-bold text-lg">Professional Details</h3>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Service Category
-                  </label>
-                  <div className="relative">
-                    <Briefcase
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
-                    <Select
-                      {...register("category")}
-                      onValueChange={(value) =>
-                        setValue("category", value, {
-                          shouldDirty: true,
-                          shouldTouch: true,
-                          shouldValidate: true,
-                        })
-                      }
-                    >
-                      <SelectTrigger
-                        className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                          errors.category && "border-red-300"
-                        }`}
-                      >
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Select category</SelectLabel>
-                          {categories.map((cat) => (
-                            <SelectItem key={cat} value={cat}>
-                              {cat}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {errors.category && (
-                    <small className="text-xs text-red-300">
-                      {errors.category.message}
-                    </small>
-                  )}
-                </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">

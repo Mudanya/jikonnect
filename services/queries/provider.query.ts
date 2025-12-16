@@ -3,7 +3,7 @@ import { prisma } from "@/prisma/prisma.init"
 import { serviceSearchParams } from "@/types/service.type"
 import { ProfileFormData } from "@/validators/profile.validator"
 import { Decimal, InputJsonValue } from "@prisma/client/runtime/client"
-import { use } from "react"
+
 
 export const getUserByUserId = async (userId: string) => {
     return await prisma.user.findUnique({
@@ -14,6 +14,7 @@ export const getUserByUserId = async (userId: string) => {
 export const getUserProfileById = async (userId: string) => {
     return await prisma.profile.findUnique({
         where: { userId },
+        include:{services:true}
     })
 }
 
@@ -24,17 +25,17 @@ export const updateUserProfile = async (userId: string, data: Partial<ProfileFor
             profile: {
                 update: {
                     bio: data.bio,
-                    services: data.services,
                     hourlyRate: data.hourlyRate,
                     yearsOfExperience: data.yearsOfExperience,
                     locationId: data.location,
                     languages: data.languages,
                     idNumber: data.idNumber,
+                    // services:{}
                 }
             }
 
         },
-        include: { profile: true }
+        include: { profile: { include: { services: true } } }
     })
 }
 
@@ -76,9 +77,9 @@ export const getUserProfiles = async ({ location, minRate, maxRate, minRating, c
     return await prisma.profile.findMany({
         where: {
             verificationStatus: 'VERIFIED',
-            ...(category && {
-                services: { has: category }
-            }),
+            // ...(category && {
+            //     services: {has:{contains:category}}
+            // }),
             ...(location && {
                 location: {
                     name: {
@@ -112,7 +113,8 @@ export const getUserProfiles = async ({ location, minRate, maxRate, minRating, c
                 take: 3,
                 orderBy: { createdAt: 'desc' }
             },
-            location: { select: { name: true } }
+            location: { select: { name: true } },
+            services: { select: { name: true } }
         },
         orderBy: {
             averageRating: 'desc'
@@ -138,7 +140,9 @@ export const getProviderbyId = async (id: string) => {
             },
             portfolios: {
                 orderBy: { createdAt: 'desc' }
-            }
+            },
+            services: { select: { name: true } }
+
         }
     });
 
@@ -301,8 +305,11 @@ export const findUserWithPortfolio = async (id: string) => {
         include: {
             profile: {
                 include: {
-                    portfolios: true
-                }
+                    portfolios: true,
+                    location: true,
+                    services: true
+                },
+
             }
         }
     })

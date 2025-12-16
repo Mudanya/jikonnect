@@ -18,35 +18,34 @@ import {
   DollarSign,
   FileText,
   Mail,
-  MapPin,
   Phone,
   Save,
   Upload,
-  User,
+  User
 } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { LocationDropdown } from "../locations/LocationDropdown";
 import Loading from "../shared/Loading";
+import ServicesModal from "../shared/ServicesModal";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { LocationDropdown } from "../locations/LocationDropdown";
 
 const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
   const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   const [uploading, setUploading] = useState(false);
-  const isProvider = user?.role === "PROFESSIONAL";
   const {
     register,
     handleSubmit,
     formState: { errors, isValid, isSubmitting },
-    setValue,
+ 
     getValues,
     reset,
-    watch,
+ 
     control,
   } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
@@ -57,7 +56,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
       phone: "",
       avatar: "",
       bio: "",
-      services: [],
+      
       hourlyRate: undefined,
       yearsOfExperience: undefined,
       location: "",
@@ -72,21 +71,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
     certificates: [] as string[],
   });
 
-  const categories = [
-    "CLEANING",
-    "PLUMBING",
-    "ELECTRICAL",
-    "CARPENTRY",
-    "PAINTING",
-    "DECOR",
-    "HOME_CARE",
-    "BABYSITTING",
-    "NURSING",
-    "ELDERLY_CARE",
-    "GARDENING",
-    "SECURITY",
-    "OTHER",
-  ];
+
 
   const onSubmit = async (data: EditProfileFormData) => {
     try {
@@ -97,7 +82,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
       toast.error((err as Error).message);
     }
   };
-  const locationId = watch("location");
+
 
   useEffect(() => {
     setTimeout(async () => {
@@ -116,7 +101,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
                 phone: data.data.phone || "",
                 avatar: data.data?.avatar || "",
                 bio: data.data?.profile?.bio || "",
-                services: data.data?.profile?.services || [],
+              
                 hourlyRate: data.data?.profile?.hourlyRate || 0,
                 yearsOfExperience: data.data?.profile?.yearsOfExperience || 0,
                 languages: data.data?.profile?.languages || [],
@@ -299,40 +284,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Services Offered
                 </label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {categories.map((service) => (
-                    <Button
-                      onClick={() => {
-                        let newServices = getValues("services");
-                        if (
-                          newServices
-                            ?.map((s) => s.toLowerCase())
-                            .includes(service.toLowerCase())
-                        )
-                          newServices = newServices.filter(
-                            (s) => s.toLowerCase() !== service.toLowerCase()
-                          );
-                        else newServices = [...newServices!, service];
-                        setValue("services", newServices, {
-                          shouldDirty: true,
-                          shouldTouch: true,
-                          shouldValidate: true,
-                        });
-                      }}
-                      key={service}
-                      type="button"
-                      className={`px-4 py-2 rounded-lg border-2 transition text-sm cursor-pointer font-medium ${
-                        getValues("services")
-                          ?.map((s) => s.toLowerCase())
-                          .includes(service.toLowerCase())
-                          ? "border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-50"
-                          : "border-gray-300 hover:border-blue-300 hover:bg-blue-50 text-gray-700 bg-transparent"
-                      }`}
-                    >
-                      {service}
-                    </Button>
-                  ))}
-                </div>
+                <ServicesModal />
               </div>
 
               <div className="grid md:grid-cols-3 gap-6">

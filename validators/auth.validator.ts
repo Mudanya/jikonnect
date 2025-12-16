@@ -17,7 +17,7 @@ export const registerSchema = z.object({
     ),
     // firstName: z.string().min(2, 'First name must be atleast 2 characters'),
     // lastName: z.string().min(2, 'Last name must be atleast 2 characters'),
-    category: z.string().optional(),
+
     experience: z.string().optional(),
     hourlyRate: z.string().optional(),
     location: z.string().optional(),
@@ -28,13 +28,7 @@ export const registerSchema = z.object({
     .superRefine((data, ctx) => {
         if (data.role && data.role === 'PROFESSIONAL') {
 
-            if (!data.category) {
-                ctx.addIssue({
-                    code: "custom",
-                    path: ["category"],
-                    message: 'Category is required'
-                })
-            }
+
             if (!data.experience) {
                 ctx.addIssue({
                     code: "custom",
