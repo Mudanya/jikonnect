@@ -102,7 +102,7 @@ const VerificationPage = () => {
           </div>
         ) : (
           <div className="grid gap-6">
-            {verifications.map((profile: any) => (
+            {verifications?.map((profile: any) => (
               <div
                 key={profile.id}
                 className="bg-white rounded-2xl shadow-sm border p-6"
@@ -166,12 +166,12 @@ const VerificationPage = () => {
                 <div className="mb-4">
                   <p className="text-sm text-gray-500 mb-2">Services</p>
                   <div className="flex flex-wrap gap-2">
-                    {profile.services.map((service: string) => (
+                    {profile?.services?.map((service: {name:string,id:string}) => (
                       <span
-                        key={service}
+                        key={service.id}
                         className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
                       >
-                        {service}
+                        {service.name}
                       </span>
                     ))}
                   </div>
