@@ -131,26 +131,26 @@ const SvcProvider = () => {
       </div>
 
       <div className=" px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Provider Info */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="col-span-1 lg:col-span-2 space-y-6">
             {/* Provider Header */}
             <div className="bg-white rounded-2xl shadow-sm border p-6">
-              <div className="flex items-start space-x-6">
-                <div className="w-24 h-24 bg-linear-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-white text-3xl font-bold flex-shrink-0">
+              <div className="flex items-start space-x-2 md:space-x-6">
+                <div className="w-16 h-16 md:w-24 md:h-24 bg-linear-to-br from-jiko-primary to-jiko-secondary rounded-full flex items-center justify-center text-white text-xl md:text-3xl font-bold shrink-0">
                   {profile.user.firstName[0]}
                   {profile.user.lastName[0]}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
-                    <h1 className="text-3xl font-bold text-gray-900">
+                    <h1 className="text-xl md:text-3xl font-bold text-gray-900">
                       {profile.user.firstName} {profile.user.lastName}
                     </h1>
                     {profile.verificationStatus === "VERIFIED" && (
                       <CheckCircle className="text-blue-600" size={28} />
                     )}
                   </div>
-                  <div className="flex items-center space-x-4 text-gray-600 mb-4">
+                  <div className="flex flex-col md:flex-row md:items-center space-x-4 text-gray-600 mb-4">
                     <span className="flex items-center">
                       <MapPin size={18} className="mr-1" />
                       {profile.location || "Location not set"}
@@ -160,7 +160,7 @@ const SvcProvider = () => {
                       {profile.yearsExperience || 0} years experience
                     </span>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-col md:items-center space-x-4">
                     <div className="flex items-center space-x-1">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -201,7 +201,7 @@ const SvcProvider = () => {
             <div className="bg-white rounded-2xl shadow-sm border p-6">
               <h2 className="text-xl font-bold mb-4">Services Offered</h2>
               <div className="flex flex-wrap gap-3">
-                {profile.services.map((service: {name:string}) => (
+                {profile.services.map((service: { name: string }) => (
                   <span
                     key={service.name}
                     className="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl font-medium"
