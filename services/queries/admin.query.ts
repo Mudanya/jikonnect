@@ -23,6 +23,8 @@ export const getAllPendingProfiles = async () => {
                     createdAt: true
                 }
             }
+            ,
+            services: { select: { name: true, id: true } }
         },
         orderBy: {
             updatedAt: 'desc'
