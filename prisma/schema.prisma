@@ -302,7 +302,7 @@ model Settings {
 model ServiceCategory {
   id          String    @id @default(cuid())
   name        String    @unique
-  slug        String    @unique
+  slug        String?    @unique
   icon        String?
   description String?
   order       Int       @default(0)
@@ -318,7 +318,7 @@ model ServiceCategory {
 model Service {
   id          String    @id @default(cuid())
   name        String
-  slug        String    @unique
+  slug        String?    @unique
   description String?
   skillLevels String[]  // Array of skill levels
 
