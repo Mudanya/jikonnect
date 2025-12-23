@@ -222,7 +222,7 @@ const SvcProvider = () => {
                       key={item.id}
                       className="rounded-xl overflow-hidden border"
                     >
-                      <Image
+                      <img
                         src={item.images[0]}
                         alt={item.title}
                         className="w-full h-48 object-cover"
@@ -340,9 +340,9 @@ const SvcProvider = () => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Choose a service</option>
-                      {profile.services.map((service: string) => (
-                        <option key={service} value={service}>
-                          {service}
+                      {profile.services.map((service:{name: string}) => (
+                        <option key={service.name} value={service.name}>
+                          {service.name}
                         </option>
                       ))}
                     </select>

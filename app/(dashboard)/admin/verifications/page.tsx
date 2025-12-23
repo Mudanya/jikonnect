@@ -67,6 +67,7 @@ const VerificationPage = () => {
   ) => {
     if (action === "reject" && !rejectionReason) {
       alert("Please provide a rejection reason");
+      router.push("/admin/users")
       return;
     }
 

@@ -293,7 +293,7 @@ const Services = () => {
                 {/* Portfolio Images */}
                 {provider.portfolios.length > 0 && (
                   <div className="h-48 bg-gray-200 relative overflow-hidden">
-                    <Image
+                    <img
                       src={provider?.portfolios[0]?.images[0]}
                       alt={provider.user.firstName}
                       className="w-full h-full object-cover"

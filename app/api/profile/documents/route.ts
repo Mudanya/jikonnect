@@ -44,7 +44,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
             }, { status: 400 });
         }
 
-        const uploadDir = join(process.cwd(), 'public', 'uploads', 'documents', isAvatar ? 'avatars' : '');
+        const uploadDir = join( 'documents', isAvatar ? 'avatars' : '');
         if (!existsSync(uploadDir)) {
             await mkdir(uploadDir, { recursive: true });
         }

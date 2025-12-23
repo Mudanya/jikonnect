@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner";
 import Loading from "@/components/shared/Loading";
 import { Button } from "@/components/ui/button";
+import { startConversation } from "@/services/apis/chat.api";
 const Bookings = () => {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -37,6 +38,9 @@ const Bookings = () => {
     rating: 5,
     comment: "",
   });
+  const [messagingProvider, setMessagingProvider] = useState<string | null>(
+    null
+  );
 
   const statusFilters = [
     { value: "all", label: "All", color: "gray" },
@@ -60,6 +64,24 @@ const Bookings = () => {
       toast.error((error as Error).message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMessageProvider = async (booking: any) => {
+    try {
+      setMessagingProvider(booking.id); // Show loading state
+      console.log("Starting conversation with provider:", booking);
+      await startConversation(
+        booking.provider.id,
+        `${booking.provider.firstName} ${booking.provider.lastName}`,
+        router,
+        localStorage.getItem("accessToken") || undefined
+      );
+    } catch (error) {
+      console.error("Failed to start conversation:", error);
+      toast.error("Failed to open chat. Please try again.");
+    } finally {
+      setMessagingProvider(null);
     }
   };
 
@@ -118,7 +140,7 @@ const Bookings = () => {
 
   const filteredBookings =
     selectedStatus === "all"
-      ? bookings 
+      ? bookings
       : bookings?.filter((b) => b.status === selectedStatus);
 
   if (!mounted || loading) return <Loading />;
@@ -129,7 +151,6 @@ const Bookings = () => {
       <div className="mx-4 border-b">
         <div className="px-4 py-4">
           <div className="flex items-center justify-end">
-            
             <Button
               onClick={() => router.push("/services")}
               className="px-4 py-2 bg-jiko-primary text-white rounded-lg font-semibold hover:bg-jiko-primary/90"
@@ -261,9 +282,28 @@ const Bookings = () => {
                         <span className="text-sm font-medium">Call</span>
                       </a>
                     )}
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition">
+                    {/* <button className="flex items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition">
                       <MessageCircle size={16} />
                       <span className="text-sm font-medium">Message</span>
+                    </button> */}
+                    <button
+                      onClick={() => handleMessageProvider(booking)}
+                      disabled={messagingProvider === booking.id}
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <MessageCircle
+                        size={16}
+                        className={
+                          messagingProvider === booking.id
+                            ? "animate-pulse"
+                            : ""
+                        }
+                      />
+                      <span className="text-sm font-medium">
+                        {messagingProvider === booking.id
+                          ? "Opening..."
+                          : "Message"}
+                      </span>
                     </button>
                   </div>
 

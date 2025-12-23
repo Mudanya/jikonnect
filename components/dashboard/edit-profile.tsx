@@ -363,7 +363,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
           </div>
 
           {/* ID & Document Upload */}
-          <div className="bg-white rounded-2xl shadow-md p-6 mt-4">
+          <div id="verification" className="bg-white rounded-2xl shadow-md p-6 mt-4">
             <h2 className="text-xl font-bold mb-6">
               ID & Document Verification
             </h2>

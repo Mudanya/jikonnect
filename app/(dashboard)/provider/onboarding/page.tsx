@@ -306,7 +306,7 @@ export default function ProviderOnboardingPage() {
               </p>
 
               <button
-                onClick={() => router.push("/profile/edit#verification")}
+                onClick={() => router.push("/profile#verification")}
                 className="w-full py-12 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 transition flex flex-col items-center justify-center"
               >
                 <Upload className="text-gray-400 mb-2" size={48} />
