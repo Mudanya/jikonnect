@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Upload, Loader, Image as ImageIcon } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Plus, Trash2, Upload, Loader, Image as ImageIcon } from "lucide-react";
+import { ServiceCategory } from "@/lib/generated/prisma/client";
 
 interface PortfolioItem {
   id: string;
@@ -25,9 +26,9 @@ export default function PortfolioPage() {
 
   const loadPortfolio = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch('/api/provider/portfolio', {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch("/api/provider/portfolio", {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
@@ -35,27 +36,28 @@ export default function PortfolioPage() {
         setPortfolio(result.data);
       }
     } catch (error) {
-      console.error('Failed to load portfolio:', error);
+      console.error("Failed to load portfolio:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this portfolio item?')) return;
+    if (!confirm("Are you sure you want to delete this portfolio item?"))
+      return;
 
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem("accessToken");
       const response = await fetch(`/api/provider/portfolio/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
-        setPortfolio(portfolio.filter(item => item.id !== id));
+        setPortfolio(portfolio.filter((item) => item.id !== id));
       }
     } catch (error) {
-      console.error('Failed to delete portfolio item:', error);
+      console.error("Failed to delete portfolio item:", error);
     }
   };
 
@@ -72,7 +74,6 @@ export default function PortfolioPage() {
       <div className="px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-           
             <p className="text-gray-600 mt-1">Showcase your best work</p>
           </div>
           <button
@@ -87,9 +88,12 @@ export default function PortfolioPage() {
         {portfolio.length === 0 ? (
           <div className="bg-white rounded-xl shadow-sm border p-12 text-center">
             <ImageIcon className="mx-auto text-gray-400 mb-4" size={64} />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No portfolio items yet</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              No portfolio items yet
+            </h3>
             <p className="text-gray-600 mb-6">
-              Start building your portfolio to showcase your work to potential clients
+              Start building your portfolio to showcase your work to potential
+              clients
             </p>
             <button
               onClick={() => setShowAddModal(true)}
@@ -121,7 +125,9 @@ export default function PortfolioPage() {
                 )}
                 <div className="p-4">
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-bold text-lg text-gray-900">{item.title}</h3>
+                    <h3 className="font-bold text-lg text-gray-900">
+                      {item.title}
+                    </h3>
                     <button
                       onClick={() => handleDelete(item.id)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
@@ -133,7 +139,9 @@ export default function PortfolioPage() {
                     {item.category}
                   </span>
                   {item.description && (
-                    <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {item.description}
+                    </p>
                   )}
                   <p className="text-xs text-gray-500 mt-2">
                     Added {new Date(item.createdAt).toLocaleDateString()}
@@ -159,26 +167,42 @@ export default function PortfolioPage() {
   );
 }
 
-function AddPortfolioModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
+function AddPortfolioModal({
+  onClose,
+  onSuccess,
+}: {
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
 
-  const categories = [
-    'CLEANING', 'PLUMBING', 'ELECTRICAL', 'CARPENTRY', 'PAINTING',
-    'DECOR', 'HOME_CARE', 'BABYSITTING', 'NURSING', 'ELDERLY_CARE',
-    'GARDENING', 'SECURITY', 'OTHER'
-  ];
-
+  useEffect(() => {
+    setTimeout(async () => {
+      const token = localStorage.getItem("accessToken");
+      const categoriesRes = await fetch("/api/provider/services", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const categoriesData = await categoriesRes.json();
+      if (categoriesData.success) {
+        setCategories(categoriesData.data);
+      }
+    }, 0);
+  }, []);
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setImages(files);
 
     // Create previews
-    const newPreviews = files.map(file => URL.createObjectURL(file));
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
     setPreviews(newPreviews);
   };
 
@@ -186,7 +210,7 @@ function AddPortfolioModal({ onClose, onSuccess }: { onClose: () => void; onSucc
     e.preventDefault();
 
     if (!title || !category) {
-      alert('Please fill in required fields');
+      alert("Please fill in required fields");
       return;
     }
 
@@ -194,26 +218,26 @@ function AddPortfolioModal({ onClose, onSuccess }: { onClose: () => void; onSucc
 
     try {
       const formData = new FormData();
-      formData.append('title', title);
-      formData.append('description', description);
-      formData.append('category', category);
-      images.forEach(image => formData.append('images', image));
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("category", category);
+      images.forEach((image) => formData.append("images", image));
 
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch('/api/provider/portfolio', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch("/api/provider/portfolio", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       });
 
       if (response.ok) {
         onSuccess();
       } else {
-        alert('Failed to add portfolio item');
+        alert("Failed to add portfolio item");
       }
     } catch (error) {
-      console.error('Failed to add portfolio item:', error);
-      alert('Failed to add portfolio item');
+      console.error("Failed to add portfolio item:", error);
+      alert("Failed to add portfolio item");
     } finally {
       setUploading(false);
     }
@@ -229,7 +253,9 @@ function AddPortfolioModal({ onClose, onSuccess }: { onClose: () => void; onSucc
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 border-b">
-          <h2 className="text-2xl font-bold text-gray-900">Add Portfolio Item</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Add Portfolio Item
+          </h2>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -258,8 +284,10 @@ function AddPortfolioModal({ onClose, onSuccess }: { onClose: () => void; onSucc
               required
             >
               <option value="">Select a category</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.name}>
+                  {cat.name}
+                </option>
               ))}
             </select>
           </div>
@@ -292,7 +320,9 @@ function AddPortfolioModal({ onClose, onSuccess }: { onClose: () => void; onSucc
               />
               <label htmlFor="portfolio-images" className="cursor-pointer">
                 <Upload className="mx-auto text-gray-400 mb-2" size={48} />
-                <p className="text-gray-600 font-medium mb-1">Click to upload images</p>
+                <p className="text-gray-600 font-medium mb-1">
+                  Click to upload images
+                </p>
                 <p className="text-sm text-gray-500">PNG, JPG up to 5MB each</p>
               </label>
             </div>
@@ -325,7 +355,7 @@ function AddPortfolioModal({ onClose, onSuccess }: { onClose: () => void; onSucc
               className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50 transition"
               disabled={uploading}
             >
-              {uploading ? 'Uploading...' : 'Add to Portfolio'}
+              {uploading ? "Uploading..." : "Add to Portfolio"}
             </button>
           </div>
         </form>

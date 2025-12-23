@@ -33,6 +33,12 @@ model User {
   terms             Terms?
   receivedReviews   Review[]          @relation("ReviewReceiver") 
   reviews           Review[]
+
+  clientConversations   Conversation[] @relation("ClientConversations")
+  providerConversations Conversation[] @relation("ProviderConversations")
+  messagesSent        Message[]       @relation("MessagesSent")
+  messagesReceived    Message[]       @relation("MessagesReceived")
+
   
   @@index([email])
   @@index([phone])
@@ -331,6 +337,57 @@ model Service {
   updatedAt   DateTime  @updatedAt
 
   @@map("services")
+}
+
+model Conversation {
+  id            String   @id @default(cuid())
+  clientId      String   // Person booking service
+  providerId    String   // Service provider
+  lastMessage   String?  @db.Text
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  client   User      @relation("ClientConversations", fields: [clientId], references: [id], onDelete: Cascade)
+  provider User      @relation("ProviderConversations", fields: [providerId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([clientId, providerId])
+  @@index([clientId])
+  @@index([providerId])
+  @@index([lastMessageAt])
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String        @id @default(cuid())
+  conversationId String
+  senderId       String
+  recipientId    String
+  content        String        @db.Text
+  status         MessageStatus @default(SENT)
+  blocked        Boolean       @default(false)
+  blockReason    String?
+  readAt         DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User          @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient      User          @relation("MessagesReceived", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([recipientId])
+  @@index([createdAt])
+}
+    
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  BLOCKED
 }
 
 

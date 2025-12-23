@@ -4,7 +4,7 @@ import { NotificationService } from "@/lib/notifications/notificationService";
 import { AuthenticatedRequest } from "@/types/auth";
 import { NextResponse } from "next/server";
 
-export const PATCH = withAuth(async (req: AuthenticatedRequest) => {
+export const GET = withAuth(async (req: AuthenticatedRequest) => {
     try {
         const searchParams = req.nextUrl.searchParams;
         const page = parseInt(searchParams.get('page') || '1');

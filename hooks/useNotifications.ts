@@ -36,6 +36,7 @@ export function useNotifications(options?: {
     type?: string;
 }) {
     const data = localStorage.getItem('user')
+    const token = localStorage.getItem('accessToken')
     const user = JSON.parse(data!) as User
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -63,7 +64,11 @@ export function useNotifications(options?: {
                 ...(options?.type && { type: options.type }),
             });
 
-            const response = await fetch(`/api/notifications?${params}`);
+            const response = await fetch(`/api/notifications?${params}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             if (!response.ok) throw new Error('Failed to fetch notifications');
 
             const data: NotificationResponse = await response.json();
@@ -82,6 +87,9 @@ export function useNotifications(options?: {
         try {
             const response = await fetch(`/api/notifications/${notificationId}/read`, {
                 method: 'PATCH',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
 
             if (!response.ok) throw new Error('Failed to mark as read');
@@ -102,6 +110,9 @@ export function useNotifications(options?: {
         try {
             const response = await fetch('/api/notifications/read-all', {
                 method: 'PATCH',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
 
             if (!response.ok) throw new Error('Failed to mark all as read');

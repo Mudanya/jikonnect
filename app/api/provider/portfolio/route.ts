@@ -1,4 +1,5 @@
 import { withAuth } from "@/lib/api-auth";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import logger from "@/lib/logger";
 import { createPortfolio, findProfileWithPortfolio, getUserProfileById } from "@/services/queries/provider.query";
 import { AuthenticatedRequest } from "@/types/auth";
@@ -52,7 +53,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
                 { status: 404 }
             );
         }
-        const uploadsDir = join(process.cwd(), 'public', 'uploads', 'portfolio');
+        const uploadsDir = join('portfolio');
         if (!existsSync(uploadsDir)) {
             await mkdir(uploadsDir, { recursive: true });
         }
@@ -62,14 +63,20 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
             if (file.size > 0) {
                 const timestamp = Date.now();
                 const extension = file.name.split('.').pop();
-                const filename = `${req.user.userId}_${timestamp}_${Math.random().toString(36).substring(7)}.${extension}`;
+                const filename = `${req.user.userId}_${timestamp}_${Math.random().toString(36).substring(7)}`;
                 const filepath = join(uploadsDir, filename);
 
                 const bytes = await file.arrayBuffer();
                 const buffer = Buffer.from(bytes);
                 await writeFile(filepath, buffer);
+                const result = await uploadToCloudinary(
+                            buffer,
+                            uploadsDir, // folder name
+                            filename // filename without extension
+                        ) as any;
+                
 
-                imageUrls.push(`/uploads/portfolio/${filename}`);
+                imageUrls.push(result.secure_url);
             }
         }
         const portfolioItem = await createPortfolio(profile.id, title, description, category, imageUrls)

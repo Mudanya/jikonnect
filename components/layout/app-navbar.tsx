@@ -15,6 +15,8 @@ import { SidebarTrigger } from "../ui/sidebar";
 import { useEffect, useState } from "react";
 import { set } from "zod";
 import { User } from "@/types/auth";
+import { NotificationBell } from "../notifications/NotificationBell";
+import { ChatIcon } from "../chat/ChatIcon";
 
 const AppNavBar = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -48,7 +50,9 @@ const AppNavBar = () => {
             </p>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="relative p-2 rounded-lg">
+            <ChatIcon />
+            <NotificationBell />
+            {/* <div className="relative p-2 rounded-lg">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -70,7 +74,7 @@ const AppNavBar = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
+            </div> */}
             <Link
               href="/profile"
               className="w-10 h-10 bg-linear-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-2xl cursor-pointer"

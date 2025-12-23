@@ -15,6 +15,7 @@ const Profile = () => {
       if (edit && edit === "true") {
         setIsEditing(true);
       }
+      setIsEditing(!!window.location.hash)
     }, 0);
     return () => clearTimeout(timer);
   }, [edit]);
