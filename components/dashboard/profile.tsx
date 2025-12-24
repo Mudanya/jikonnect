@@ -108,7 +108,7 @@ const GenProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
               </div>
             )}
             {avatar && (
-              <Image
+              <img
                 src={avatar}
                 alt="Avatar"
                 width={128}

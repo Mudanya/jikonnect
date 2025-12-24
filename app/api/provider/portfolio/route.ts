@@ -53,10 +53,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
                 { status: 404 }
             );
         }
-        const uploadsDir = join('portfolio');
-        if (!existsSync(uploadsDir)) {
-            await mkdir(uploadsDir, { recursive: true });
-        }
+        const uploadsDir = 'portfolio'
 
         const imageUrls: string[] = [];
         for (const file of files) {
@@ -70,17 +67,17 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
                 const buffer = Buffer.from(bytes);
                 await writeFile(filepath, buffer);
                 const result = await uploadToCloudinary(
-                            buffer,
-                            uploadsDir, // folder name
-                            filename // filename without extension
-                        ) as any;
-                
+                    buffer,
+                    uploadsDir, // folder name
+                    filename // filename without extension
+                ) as any;
+
 
                 imageUrls.push(result.secure_url);
             }
         }
         const portfolioItem = await createPortfolio(profile.id, title, description, category, imageUrls)
-        
+
         return NextResponse.json({
             success: true,
             message: 'Portfolio item added successfully',
