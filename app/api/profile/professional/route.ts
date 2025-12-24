@@ -1,5 +1,7 @@
 import { withAuth } from "@/lib/api-auth";
+import { MessageFilter } from "@/lib/chat/messageFilter";
 import logger from "@/lib/logger";
+import { NotificationService } from "@/lib/notifications/notificationService";
 import { createAuditLog } from "@/services/queries/auth.query";
 import { getUserByUserId, getUserProfileById, updateUserProfile } from "@/services/queries/provider.query";
 import { AuthenticatedRequest } from "@/types/auth";
@@ -34,6 +36,29 @@ export const PUT = withAuth(async (req: AuthenticatedRequest) => {
                 success: false,
                 message: 'Professional profile not found'
             }, { status: 404 });
+        }
+
+        // 🛡️ FILTER MESSAGE FOR PROHIBITED CONTENT
+        const filterResult = await MessageFilter.filterMessage(validate.data.bio, user.id);
+        if (!filterResult.allowed) {
+
+            await NotificationService.create(
+                {
+                    userId: user.id,
+                    type: 'POLICY_VIOLATION',
+                    priority: 'HIGH',
+                    title: 'Policy Violation(Bio)',
+                    message: `${filterResult.reason}`,
+                    actionUrl: '/profile'
+                }
+            );
+            return NextResponse.json(
+                {
+                    error: 'Your profile bio contains prohibited contact information',
+                    reason: 'Profile contains prohibited information',
+                },
+                { status: 403 }
+            );
         }
         const profile = await updateUserProfile(req.user.userId, validate.data);
 

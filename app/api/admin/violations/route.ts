@@ -1,4 +1,4 @@
-// app/api/admin/violations/route.ts
+
 import { withRole } from '@/lib/api-auth';
 import logger from '@/lib/logger';
 import { prisma } from '@/prisma/prisma.init';

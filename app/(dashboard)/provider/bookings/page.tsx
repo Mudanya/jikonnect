@@ -1,3 +1,4 @@
+// app/provider/bookings/page.tsx - UPDATED with Confirm/Reject
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,19 +7,19 @@ import {
   Calendar,
   Clock,
   DollarSign,
-  User,
   MapPin,
   Phone,
   Mail,
   CheckCircle,
   XCircle,
-  AlertCircle,
   Loader,
   MessageSquare,
   Star,
-  Filter,
   Search,
+  ThumbsUp,
+  ThumbsDown,
 } from "lucide-react";
+import { toast } from "sonner";
 
 interface Booking {
   id: string;
@@ -61,6 +62,9 @@ export default function ProviderBookingsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [confirmingBooking, setConfirmingBooking] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     loadBookings();
@@ -91,12 +95,10 @@ export default function ProviderBookingsPage() {
   const filterBookings = () => {
     let filtered = [...bookings];
 
-    // Filter by status
     if (statusFilter !== "all") {
       filtered = filtered.filter((b) => b.status === statusFilter);
     }
 
-    // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -109,6 +111,49 @@ export default function ProviderBookingsPage() {
     }
 
     setFilteredBookings(filtered);
+  };
+
+  const handleConfirmBooking = async (
+    bookingId: string,
+    action: "confirm" | "reject"
+  ) => {
+    const confirmMessage =
+      action === "confirm"
+        ? "Are you sure you want to confirm this booking?"
+        : "Are you sure you want to reject this booking?";
+
+    if (!confirm(confirmMessage)) return;
+
+    try {
+      setConfirmingBooking(bookingId);
+      const token = localStorage.getItem("accessToken");
+
+      const response = await fetch(
+        `/api/provider/bookings/${bookingId}/confirm`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ action }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(data.message);
+        loadBookings(); // Reload bookings
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("Booking action error:", error);
+      toast.error("Failed to update booking");
+    } finally {
+      setConfirmingBooking(null);
+    }
   };
 
   const getStatusConfig = (status: string) => {
@@ -169,9 +214,10 @@ export default function ProviderBookingsPage() {
   const stats = getStats();
 
   return (
-    <div className="min-h-screen ">
-      <div className=" px-4 py-8">
+    <div className="min-h-screen">
+      <div className="px-4 py-8">
         <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">My Bookings</h1>
           <p className="text-gray-600 mt-1">
             Manage your bookings and track progress
           </p>
@@ -194,7 +240,6 @@ export default function ProviderBookingsPage() {
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
             <div className="flex-1">
               <div className="relative">
                 <Search
@@ -211,7 +256,6 @@ export default function ProviderBookingsPage() {
               </div>
             </div>
 
-            {/* Status Filter */}
             <div className="md:w-64">
               <select
                 value={statusFilter}
@@ -251,6 +295,8 @@ export default function ProviderBookingsPage() {
                 key={booking.id}
                 booking={booking}
                 onClick={() => setSelectedBooking(booking)}
+                onConfirm={handleConfirmBooking}
+                isConfirming={confirmingBooking === booking.id}
               />
             ))}
           </div>
@@ -303,9 +349,13 @@ function StatCard({
 function BookingCard({
   booking,
   onClick,
+  onConfirm,
+  isConfirming,
 }: {
   booking: Booking;
   onClick: () => void;
+  onConfirm: (bookingId: string, action: "confirm" | "reject") => void;
+  isConfirming: boolean;
 }) {
   const statusConfig = {
     PENDING: { label: "Pending", color: "bg-yellow-100 text-yellow-700" },
@@ -322,12 +372,9 @@ function BookingCard({
   const config = statusConfig[booking.status];
 
   return (
-    <div
-      onClick={onClick}
-      className="bg-white rounded-xl shadow-md p-6 hover:shadow-md transition cursor-pointer"
-    >
+    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
       <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 flex-1">
           <img
             src={booking.client.avatar || "/images/avatar-placeholder.png"}
             alt={booking.client.firstName}
@@ -347,7 +394,7 @@ function BookingCard({
         </span>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
         <div className="flex items-center space-x-2 text-gray-600">
           <Calendar size={16} />
           <span>{new Date(booking.scheduledDate).toLocaleDateString()}</span>
@@ -369,6 +416,58 @@ function BookingCard({
           <DollarSign size={16} />
           <span>KSH {booking.providerPayout.toLocaleString()}</span>
         </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex items-center justify-between pt-4 border-t">
+        <button
+          onClick={onClick}
+          className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+        >
+          View Details
+        </button>
+
+        {booking.status === "PENDING" && (
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onConfirm(booking.id, "reject");
+              }}
+              disabled={isConfirming}
+              className="flex items-center space-x-1 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition disabled:opacity-50"
+            >
+              {isConfirming ? (
+                <Loader size={16} className="animate-spin" />
+              ) : (
+                <ThumbsDown size={16} />
+              )}
+              <span className="text-sm font-medium">Decline</span>
+            </button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onConfirm(booking.id, "confirm");
+              }}
+              disabled={isConfirming}
+              className="flex items-center space-x-1 px-4 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition disabled:opacity-50"
+            >
+              {isConfirming ? (
+                <Loader size={16} className="animate-spin" />
+              ) : (
+                <ThumbsUp size={16} />
+              )}
+              <span className="text-sm font-medium">Accept</span>
+            </button>
+          </div>
+        )}
+
+        {booking.status === "CONFIRMED" && (
+          <span className="text-sm text-blue-600 font-medium">
+            ⏳ Awaiting client payment
+          </span>
+        )}
       </div>
 
       {booking.review && (
@@ -457,14 +556,18 @@ function BookingDetailsModal({
                 <p className="font-medium text-gray-900">
                   {booking.client.firstName} {booking.client.lastName}
                 </p>
-                <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
-                  <Mail size={14} />
-                  <span>{booking.client.email}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
-                  <Phone size={14} />
-                  <span>{booking.client.phone}</span>
-                </div>
+                {booking.status === "IN_PROGRESS" && (
+                  <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
+                    <Mail size={14} />
+                    <span>{booking.client.email}</span>
+                  </div>
+                )}
+                {booking.status === "IN_PROGRESS" && (
+                  <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
+                    <Phone size={14} />
+                    <span>{booking.client.phone}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

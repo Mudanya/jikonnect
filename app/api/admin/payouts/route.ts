@@ -1,5 +1,6 @@
-import { withRole} from '@/lib/api-auth';
+import { withRole } from '@/lib/api-auth';
 import { MpesaService } from '@/lib/mpesa';
+import { NotificationService } from '@/lib/notifications/notificationService';
 import { prisma } from '@/prisma/prisma.init';
 import { AuthenticatedRequest } from '@/types/auth';
 import { NextResponse } from 'next/server';
@@ -52,7 +53,7 @@ export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
       data: Object.values(payoutsByProvider)
     });
   } catch (error) {
-    console.error('Get payouts error:', error,req.user.userId);
+    console.error('Get payouts error:', error, req.user.userId);
     return NextResponse.json(
       { success: false, message: 'Failed to fetch payouts' },
       { status: 500 }
@@ -105,6 +106,19 @@ export const POST = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
         },
         ipAddress: req.headers.get('x-forwarded-for') || 'unknown',
         userAgent: req.headers.get('user-agent')
+      }
+    });
+
+    await NotificationService.create({
+      userId: providerId,
+      type: 'PAYMENT',
+      priority: 'HIGH',
+      title: 'Payout Processed 💸',
+      message: `KES ${totalPayout.toFixed(2)} has been sent to your M-Pesa account.`,
+      actionUrl: '/dashboard/earnings',
+      data: {
+        amount: totalPayout,
+        // platformFee: 0,
       }
     });
 

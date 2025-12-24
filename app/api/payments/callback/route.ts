@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
           userId: payment.booking.providerId,
           title: 'New Booking Confirmed',
           message: `You have a new confirmed booking for ${payment.booking.service}.`,
-        //   type: 'BOOKING',
+          type: 'PAYMENT',
           data: {
             bookingId: payment.bookingId
           }

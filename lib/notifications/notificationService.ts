@@ -1,5 +1,5 @@
 import { prisma } from "@/prisma/prisma.init";
-import { NotificationType } from "../generated/prisma/enums";
+import { NotificationPriority, NotificationType } from "../generated/prisma/enums";
 
 
 export type CreateNotificationInput = {
@@ -7,7 +7,7 @@ export type CreateNotificationInput = {
     title: string;
     message: string;
     type?: NotificationType;
-
+    priority?: NotificationPriority;
     data?: Record<string, any>;
     actionUrl?: string;
     expiresAt?: Date;
@@ -26,6 +26,7 @@ export class NotificationService {
                 data: input.data || {},
                 actionUrl: input.actionUrl,
                 expiresAt: input.expiresAt,
+                priority:input.priority
             },
             include: {
                 user: {
@@ -74,7 +75,7 @@ export class NotificationService {
                 strikeNumber,
                 timestamp: new Date(),
             },
-            actionUrl: '/help/community-guidelines',
+            actionUrl: '/notifications',
         });
     }
 
@@ -91,7 +92,7 @@ export class NotificationService {
                 violationType: 'PHONE_NUMBER',
                 blockedAt: new Date(),
             },
-            actionUrl: '/help/why-stay-on-platform',
+            actionUrl: '/notifications',
         });
     }
 
@@ -112,7 +113,7 @@ export class NotificationService {
                 jobId,
                 currency: 'KES',
             },
-            actionUrl: `/jobs/${jobId}`,
+            actionUrl: `/provider/my-jobs`,
         });
     }
 

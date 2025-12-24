@@ -24,7 +24,7 @@ export const GET = withAuth(
         where: {
           OR: [
             { clientId: user.id },
-            { providerId: user.id },// app/api/chat/send/route.ts
+            { providerId: user.id }
 
           ],
         },
