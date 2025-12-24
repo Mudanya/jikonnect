@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { MessageFilter } from '@/lib/chat/messageFilter';
 import { withAuth } from '@/lib/api-auth';
-import { pusherServer } from '@/lib/pusher';
 import { prisma } from '@/prisma/prisma.init';
 import { AuthenticatedRequest } from '@/types/auth';
 
@@ -132,27 +131,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
       },
     });
 
-    // Send real-time message via Pusher
-    try {
-      await pusherServer.trigger(`chat-${conversation.id}`, 'new-message', {
-        id: chatMessage.id,
-        content: chatMessage.content,
-        senderId: chatMessage.senderId,
-        sender: {
-          id: chatMessage.sender.id,
-          firstName: chatMessage.sender.firstName,
-          lastName: chatMessage.sender.lastName,
-          avatar: chatMessage.sender.avatar,
-          role: chatMessage.sender.role,
-        },
-        conversationId: chatMessage.conversationId,
-        createdAt: chatMessage.createdAt,
-        status: chatMessage.status,
-        // recipientId removed - not needed
-      });
-    } catch (error) {
-      console.warn('Pusher not configured or failed:', error);
-    }
+   
 
     return NextResponse.json({
       success: true,

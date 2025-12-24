@@ -1,6 +1,6 @@
 import { prisma } from "@/prisma/prisma.init";
 import { NotificationType } from "../generated/prisma/enums";
-import { pusherServer } from "../pusher";
+
 
 export type CreateNotificationInput = {
     userId: string;
@@ -39,8 +39,7 @@ export class NotificationService {
             },
         });
 
-        // Send real-time notification via Pusher
-        await this.sendRealTimeNotification(notification);
+       
 
         return notification;
     }
@@ -311,25 +310,7 @@ export class NotificationService {
     }
 
     // Send real-time notification via Pusher
-    private static async sendRealTimeNotification(notification: any) {
-        try {
-            await pusherServer.trigger(
-                `user-${notification.userId}`,
-                'new-notification',
-                {
-                    id: notification.id,
-                    title: notification.title,
-                    message: notification.message,
-                    type: notification.type,
-                    priority: notification.priority,
-                    createdAt: notification.createdAt,
-                    actionUrl: notification.actionUrl,
-                }
-            );
-        } catch (error) {
-            console.error('Failed to send real-time notification:', error);
-        }
-    }
+   
 
     // Clean up expired notifications
     static async cleanupExpired() {
