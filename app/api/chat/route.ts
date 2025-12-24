@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 
-import { pusherServer } from '@/lib/pusher';
 import { prisma } from '@/prisma/prisma.init';
 import { withAuth } from '@/lib/api-auth';
 import { AuthenticatedRequest } from '@/types/auth';
