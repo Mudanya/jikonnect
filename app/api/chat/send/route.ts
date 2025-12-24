@@ -3,6 +3,7 @@ import { MessageFilter } from '@/lib/chat/messageFilter';
 import { withAuth } from '@/lib/api-auth';
 import { prisma } from '@/prisma/prisma.init';
 import { AuthenticatedRequest } from '@/types/auth';
+import { NotificationService } from '@/lib/notifications/notificationService';
 
 export const POST = withAuth(async (request: AuthenticatedRequest) => {
   try {
@@ -40,6 +41,17 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
     // 🛡️ FILTER MESSAGE FOR PROHIBITED CONTENT
     const filterResult = await MessageFilter.filterMessage(message, user.id);
     if (!filterResult.allowed) {
+
+      await NotificationService.create(
+        {
+          userId: user.id,
+          type: 'POLICY_VIOLATION',
+          priority: 'HIGH',
+          title: 'Policy Violation',
+          message: `${filterResult.reason}`,
+
+        }
+      );
       return NextResponse.json(
         {
           error: 'Message blocked',
@@ -131,7 +143,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
       },
     });
 
-   
+
 
     return NextResponse.json({
       success: true,

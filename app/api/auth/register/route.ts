@@ -3,6 +3,8 @@ import { hashPassword } from "@/lib/auth";
 import { sendVerificationEmail } from "@/lib/email";
 import { generateTokens } from "@/lib/jwt";
 import logger from "@/lib/logger";
+import { NotificationService } from "@/lib/notifications/notificationService";
+import { prisma } from "@/prisma/prisma.init";
 import { createAuditLog, createUser, createVerificationTokenSettings, findUserbyEmailOrPhone } from "@/services/queries/auth.query";
 import { registerSchema } from "@/validators/auth.validator";
 
@@ -43,9 +45,39 @@ export const POST = async (req: NextRequest) => {
             userId: createdUser.id,
             role: createdUser.role,
             email: createdUser.email
-        },false);
+        }, false);
 
         logger.info(`${createdUser.email} registered`);
+        // Send welcome notification
+        await NotificationService.create({
+            userId: createdUser.id,
+            type: 'INFO',
+            priority: 'MEDIUM',
+            title: `Welcome to JiKonnect, ${createdUser.firstName}!`,
+            message: createdUser.role === 'PROFESSIONAL'
+                ? 'Complete your profile to start receiving booking requests.'
+                : 'Start browsing service providers and book your first service.',
+            actionUrl: createdUser.role === 'PROFESSIONAL'
+                ? '/dashboard/profile'
+                : '/services'
+        });
+        const admins = await prisma.user.findMany({
+            where: { role: 'ADMIN' },
+            select: { id: true }
+        });
+        await Promise.all(
+            admins.map(admin =>
+                NotificationService.create({
+                    userId: admin.id,
+                    type: 'SYSTEM',
+                    priority: 'LOWProfile',
+                    title: 'New User Registration',
+                    message: `${createdUser.firstName} ${createdUser.lastName} registered as a ${createdUser.role}.`,
+                    actionUrl: `/admin/users/${createdUser.id}`
+                })
+            )
+        );
+
         return Response.json({
 
             success: true,

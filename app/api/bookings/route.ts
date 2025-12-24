@@ -1,6 +1,7 @@
 import { withAuth } from "@/lib/api-auth";
 import { BookingStatus } from "@/lib/generated/prisma/enums";
 import logger from "@/lib/logger";
+import { NotificationService } from "@/lib/notifications/notificationService";
 import { createAuditLog } from "@/services/queries/auth.query";
 import { getBookingsById } from "@/services/queries/client.query";
 import { createBooking, getUserByUserId, getUserProfileById } from "@/services/queries/provider.query";
@@ -63,6 +64,8 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
                 { status: 404 }
             );
         }
+
+
         const booking = await createBooking({
             providerId,
             service,
@@ -73,7 +76,22 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
             location, userId: req.user.userId,
             hourlyRate: profile.hourlyRate
         })
-
+        await NotificationService.create({
+            userId: req.user.userId,
+            type: 'SUCCESS',
+            priority: 'MEDIUM',
+            title: 'Booking Request Sent',
+            message: `Your booking request for ${booking.service} on ${scheduledDate} at ${scheduledTime} has been sent to the provider.`,
+            actionUrl: `/bookings/${booking.id}`
+        });
+        await NotificationService.create({
+            userId: providerId,
+            type: 'SUCCESS',
+            priority: 'HIGH',
+            title: 'Booking Request Received',
+            message: `Booking request for ${booking.service} on ${scheduledDate} at ${scheduledTime} has been received.`,
+            actionUrl: `/provider/my-jobs`
+        });
         // log 
         await createAuditLog(req, req.user.userId, 'BOOKING_CREATED', 'Booking', { bookingNumber: booking.bookingNumber, providerId, service }, booking.id)
         return NextResponse.json({

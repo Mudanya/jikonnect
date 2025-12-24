@@ -8,7 +8,8 @@ interface Violation {
   id: string;
   userId: string;
   user: {
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
   };
   violationType: string;
@@ -37,7 +38,7 @@ export default function ViolationsPage() {
       if (severityFilter) params.append("severity", severityFilter);
       if (resolvedFilter) params.append("resolved", resolvedFilter);
 
-      const response = await fetch(`/api/admin/violations?${params}`);
+      const response = await fetch(`/api/admin/violations?${params}`, {headers:{"Authorization":"Bearer "+localStorage.getItem("accessToken")}});
       const data = await response.json();
       setViolations(data.violations);
     } catch (error) {
@@ -49,7 +50,8 @@ export default function ViolationsPage() {
 
   const filteredViolations = violations.filter(
     (v) =>
-      v.user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      v.user.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      v.user.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       v.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       v.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -82,10 +84,10 @@ export default function ViolationsPage() {
                 Monitor and manage platform violations
               </p>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            {/* <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               <Download className="w-4 h-4" />
               Export Report
-            </button>
+            </button> */}
           </div>
 
           {/* Stats */}
@@ -200,7 +202,7 @@ export default function ViolationsPage() {
                     <tr key={violation.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {violation.user.name || "Unknown"}
+                          {violation.user.firstName || ""} {violation.user.lastName || ""}
                         </div>
                         <div className="text-sm text-gray-500">
                           {violation.user.email}

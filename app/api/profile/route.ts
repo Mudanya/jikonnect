@@ -51,6 +51,8 @@ export const PUT = withAuth(async (req: AuthenticatedRequest) => {
             }, { status: 400 });
         }
 
+        
+
         const user = await updateUserProfile(req.user.userId, validate.data);
 
         await createAuditLog(req, req.user.userId, 'PROFILE_UPDATE', 'User', validate.data);

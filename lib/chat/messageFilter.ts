@@ -21,19 +21,50 @@ export class MessageFilter {
 
     // Contact sharing patterns
     private static contactPatterns = [
-        /whatsapp/gi,
+        // Platforms
+        /whatsapp|what's\s*app|watsap|watsup/gi,
         /wa\.me/gi,
+        /telegram|tg/gi,
+        /signal/gi,
+        /facebook|fb|messenger/gi,
+        /instagram|ig/gi,
+
+        // Phone / calling (English)
+        /\bcall\b/gi,
+        /\bphone\b/gi,
+        /\bmobile\b/gi,
+        /\bnumber\b/gi,
         /call\s+me/gi,
         /text\s+me/gi,
+        /sms\s+me/gi,
+        /ring\s+me/gi,
+        /reach\s+me/gi,
+        /contact\s+me/gi,
+
+        // Phone / calling (Swahili)
+        /\bpiga\b/gi,               // piga simu
+        /\bpiga\s+simu\b/gi,
+        /\bnipigie\b/gi,             // call me
+        /\bnipigie\s+simu\b/gi,
+        /\btuma\s+ujumbe\b/gi,       // send message
+        /\bnitumie\s+ujumbe\b/gi,
+        /\bnitumie\s+sms\b/gi,
+        /\bnambari\b/gi,             // number
+        /\bsimu\b/gi,                // phone
+        /\bwasiliana\b/gi,           // contact
+        /\bwasiliana\s+nami\b/gi,
+        /\bnipate\b/gi,              // reach me
+
+        // Direct contact phrases
         /dm\s+me/gi,
         /inbox\s+me/gi,
+        /pm\s+me/gi,
+
+        // Number sharing hints
         /my\s+number/gi,
+        /here\s+is\s+my\s+number/gi,
         /phone\s+number/gi,
         /mobile\s+number/gi,
-        /reach\s+me\s+on/gi,
-        /contact\s+me\s+on/gi,
-        /telegram/gi,
-        /signal/gi,
     ];
 
     // Email patterns
@@ -156,6 +187,34 @@ export class MessageFilter {
             if (strikeNumber === 3) {
                 await this.suspendAccount(userId);
             }
+        }
+
+        if (strikeNumber >= 1) {
+            // Get admins
+            const admins = await prisma.user.findMany({
+                where: { role: 'ADMIN' },
+                select: { id: true }
+            });
+
+            // Alert admins immediately
+            await Promise.all(
+                admins.map(admin =>
+                    NotificationService.create({
+                        userId: admin.id,
+                        type: 'STRIKE_WARNING',
+                        priority: 'URGENT',
+                        title: '⚠️ High-Severity Policy Violation',
+                        message: `User ${userId} attempted to share contact information. Strike ${strikeNumber}/3.`,
+                        actionUrl: `/admin/violations`,
+                        data: {
+                            userId,
+                            violationType: detectedPatterns[0].toUpperCase(),
+                            strikeNumber,
+                            detectedPatterns
+                        }
+                    })
+                )
+            );
         }
 
         return strikeNumber;

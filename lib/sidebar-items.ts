@@ -1,4 +1,4 @@
-import { Home, Inbox, Calendar, Search, Settings, Briefcase, DollarSign, Star, User, UserRoundCheck, ListTodo, NotebookPen, HandFist, HandCoins, Logs, GalleryVerticalEnd, BookCheck, StepForward, Calendar1, BriefcaseBusiness, Users } from "lucide-react";
+import { Home, Inbox, Calendar, Search, Settings, Briefcase, DollarSign, Star, User, UserRoundCheck, ListTodo, NotebookPen, HandFist, HandCoins, Logs, GalleryVerticalEnd, BookCheck, StepForward, Calendar1, BriefcaseBusiness, Users, Shield } from "lucide-react";
 
 export const SidebarClientItems = [
   {
@@ -44,6 +44,12 @@ export const SidebarAdminItems = [
     title: "Bookings",
     url: "/admin/bookings",
     icon: NotebookPen,
+    role: ''
+  },
+  {
+    title: "Violations",
+    url: "/admin/violations",
+    icon: Shield,
     role: ''
   },
   {
@@ -109,8 +115,8 @@ export const SidebarProviderItems = [
     role: ''
   },
   {
-    title: "My Jobs",
-    url: "/provider/my-jobs",
+    title: "Bookings",
+    url: "/provider/bookings",
     icon: BriefcaseBusiness,
     role: ''
   },

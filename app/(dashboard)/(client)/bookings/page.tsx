@@ -1,3 +1,4 @@
+// app/bookings/page.tsx - UPDATED with Payment
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,13 +9,11 @@ import {
   Clock,
   MapPin,
   DollarSign,
-  User,
   Star,
   X,
-  CheckCircle,
-  AlertCircle,
   MessageCircle,
   Phone,
+  CreditCard,
 } from "lucide-react";
 import {
   fetchBookings,
@@ -25,6 +24,8 @@ import { toast } from "sonner";
 import Loading from "@/components/shared/Loading";
 import { Button } from "@/components/ui/button";
 import { startConversation } from "@/services/apis/chat.api";
+import { PaymentModal } from "@/components/payments/PaymentModal";
+
 const Bookings = () => {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -34,6 +35,8 @@ const Bookings = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentBooking, setPaymentBooking] = useState<any>(null);
   const [reviewForm, setReviewForm] = useState({
     rating: 5,
     comment: "",
@@ -69,8 +72,7 @@ const Bookings = () => {
 
   const handleMessageProvider = async (booking: any) => {
     try {
-      setMessagingProvider(booking.id); // Show loading state
-      console.log("Starting conversation with provider:", booking);
+      setMessagingProvider(booking.id);
       await startConversation(
         booking.provider.id,
         `${booking.provider.firstName} ${booking.provider.lastName}`,
@@ -83,6 +85,17 @@ const Bookings = () => {
     } finally {
       setMessagingProvider(null);
     }
+  };
+
+  const handlePayNow = (booking: any) => {
+    setPaymentBooking(booking);
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentModal(false);
+    setPaymentBooking(null);
+    loadBookings(); // Reload to show updated status
   };
 
   const handleCancelBooking = async (bookingId: string) => {
@@ -146,7 +159,7 @@ const Bookings = () => {
   if (!mounted || loading) return <Loading />;
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="mx-4 border-b">
         <div className="px-4 py-4">
@@ -169,18 +182,13 @@ const Bookings = () => {
               <button
                 key={filter.value}
                 onClick={() => setSelectedStatus(filter.value)}
-                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition  ${
+                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
                   selectedStatus === filter.value
                     ? "bg-blue-600 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
                 {filter.label}
-                {filter.value !== "all" && (
-                  <span className="ml-2 px-2 py-0.5 bg-white bg-opacity-20 rounded-full text-xs">
-                    {/* {bookings && bookings?.filter((b) => b.status === filter.value).length} */}
-                  </span>
-                )}
               </button>
             ))}
           </div>
@@ -192,7 +200,7 @@ const Bookings = () => {
             {filteredBookings?.map((booking) => (
               <div
                 key={booking.id}
-                className="bg-white rounded-2xl shadow-md p-6 hover:shadow-md transition"
+                className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start space-x-4 flex-1">
@@ -273,7 +281,7 @@ const Bookings = () => {
                 {/* Actions */}
                 <div className="flex items-center justify-between pt-4 border-t">
                   <div className="flex items-center space-x-3">
-                    {booking.provider.phone && (
+                    {booking.provider.phone && booking.status === "IN_PROGRESS" && (
                       <a
                         href={`tel:${booking.provider.phone}`}
                         className="flex items-center space-x-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition"
@@ -282,10 +290,6 @@ const Bookings = () => {
                         <span className="text-sm font-medium">Call</span>
                       </a>
                     )}
-                    {/* <button className="flex items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition">
-                      <MessageCircle size={16} />
-                      <span className="text-sm font-medium">Message</span>
-                    </button> */}
                     <button
                       onClick={() => handleMessageProvider(booking)}
                       disabled={messagingProvider === booking.id}
@@ -308,6 +312,24 @@ const Bookings = () => {
                   </div>
 
                   <div className="flex items-center space-x-3">
+                    {/* Pay Now Button - Show when CONFIRMED */}
+                    {booking.status === "CONFIRMED" && (
+                      <button
+                        onClick={() => handlePayNow(booking)}
+                        className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-lg hover:shadow-lg transition"
+                      >
+                        <CreditCard size={16} />
+                        <span className="text-sm font-medium">Pay Now</span>
+                      </button>
+                    )}
+
+                    {/* Awaiting Confirmation - Show when PENDING */}
+                    {booking.status === "PENDING" && (
+                      <span className="text-sm text-yellow-600 font-medium">
+                        ⏳ Awaiting provider confirmation
+                      </span>
+                    )}
+
                     {booking.status === "COMPLETED" && !booking.review && (
                       <button
                         onClick={() => {
@@ -441,6 +463,18 @@ const Bookings = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && paymentBooking && (
+        <PaymentModal
+          booking={paymentBooking}
+          onClose={() => {
+            setShowPaymentModal(false);
+            setPaymentBooking(null);
+          }}
+          onSuccess={handlePaymentSuccess}
+        />
       )}
     </div>
   );

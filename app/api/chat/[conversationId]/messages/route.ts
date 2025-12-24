@@ -1,5 +1,7 @@
 // app/api/chat/[conversationId]/messages/route.ts
+import { MessageFilter } from '@/lib/chat/messageFilter';
 import { verifyAccessToken } from '@/lib/jwt';
+import { NotificationService } from '@/lib/notifications/notificationService';
 import { prisma } from '@/prisma/prisma.init';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -31,6 +33,7 @@ export async function GET(
         if (!user) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
+
 
         // Verify user is part of this conversation
         const conversation = await prisma.conversation.findUnique({
@@ -154,7 +157,7 @@ export async function POST(
 
         const body = await req.json();
 
-        const { content} = body;
+        const { content } = body;
 
         if (!content || content.trim().length === 0) {
             return NextResponse.json(
@@ -189,8 +192,42 @@ export async function POST(
                 { status: 403 }
             );
         }
+        // Check if user is suspended
+        const isSuspended = await MessageFilter.isUserSuspended(user.id);
+        if (isSuspended) {
+            return NextResponse.json(
+                {
+                    error: 'Your account is suspended',
+                    blocked: true,
+                    reason: 'Account suspended due to policy violations',
+                },
+                { status: 403 }
+            );
+        }
 
-        // Create message
+        // 🛡️ FILTER MESSAGE FOR PROHIBITED CONTENT
+        const filterResult = await MessageFilter.filterMessage(content, user.id);
+        if (!filterResult.allowed) {
+
+            await NotificationService.create(
+                {
+                    userId: user.id,
+                    type: 'POLICY_VIOLATION',
+                    priority: 'HIGH',
+                    title: 'Policy Violation',
+                    message: `${filterResult.reason}`,
+
+                }
+            );
+            return NextResponse.json(
+                {
+                    error: 'Your message was blocked due contact sharing violations',
+                    blocked: true,
+                    reason: 'Account suspended due to policy violations',
+                },
+                { status: 403 }
+            );
+        }
         const message = await prisma.message.create({
             data: {
                 conversationId,
@@ -201,7 +238,7 @@ export async function POST(
                     conversation.clientId === user.id
                         ? conversation.providerId
                         : conversation.clientId,
-                
+
             },
             include: {
                 sender: {
