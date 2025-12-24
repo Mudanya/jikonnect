@@ -10,6 +10,26 @@ import { createAuditLog } from "@/services/queries/auth.query";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+function extractPublicId(cloudinaryUrl: string): string | null {
+    try {
+        // Extract public_id from URL
+        // Format: https://res.cloudinary.com/{cloud_name}/{resource_type}/upload/v{version}/{public_id}.{format}
+        const urlParts = cloudinaryUrl.split('/upload/');
+        if (urlParts.length < 2) return null;
+
+        const pathWithVersion = urlParts[1];
+        // Remove version number (v1234567890/)
+        const pathWithoutVersion = pathWithVersion.replace(/^v\d+\//, '');
+        // Remove file extension
+        const publicId = pathWithoutVersion.replace(/\.[^.]+$/, '');
+
+        return publicId;
+    } catch (error) {
+        console.error('Error extracting public_id:', error);
+        return null;
+    }
+}
 export const POST = withAuth(async (req: AuthenticatedRequest) => {
     try {
         const formData = await req.formData();
@@ -44,10 +64,8 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
             }, { status: 400 });
         }
 
-        const uploadDir = join( 'documents', isAvatar ? 'avatars' : '');
-        if (!existsSync(uploadDir)) {
-            await mkdir(uploadDir, { recursive: true });
-        }
+        const uploadDir = isAvatar ? 'documents/avatars' : 'documents';
+
 
         const timestamp = Date.now();
         // const extension = file.name.split('.').pop();
@@ -64,7 +82,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
             fileName // filename without extension
         ) as any;
 
-        const fileUrl = `/uploads/documents/${isAvatar ? 'avatars/' : ''}${fileName}`;
+
 
         const profile = await getUserProfileById(req.user.userId);
         const user = await getUserByUserId(req.user.userId);
@@ -75,15 +93,19 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
             }, { status: 404 });
         }
         //delete old avatar file if exists
-        if (isAvatar && user && user.avatar) {
-            const oldAvatarPath = join(process.cwd(), 'public', user.avatar);
+        // if (isAvatar && user && user.avatar) {
+        //     // Extract public_id from Cloudinary URL
+        //     // Example URL: https://res.cloudinary.com/your-cloud/image/upload/v1234567890/documents/avatars/filename.jpg
+        //     const publicId = extractPublicId(user.avatar);
 
-            if (existsSync(oldAvatarPath)) {
-
-                await unlink(oldAvatarPath);
-
-            }
-        }
+        //     if (publicId) {
+        //         try {
+        //             await uploadToCloudinary.uploader.destroy(publicId);
+        //         } catch (error) {
+        //             console.error('Failed to delete old avatar from Cloudinary:', error);
+        //         }
+        //     }
+        // }
         // await updateDocument(req.user.userId, fileUrl, documentType as 'certificate' | 'idDocument' | 'avatar', profile.certificates);
         await updateDocument(req.user.userId, result.secure_url, documentType as 'certificate' | 'idDocument' | 'avatar', profile.certificates);
         // Audit Log
