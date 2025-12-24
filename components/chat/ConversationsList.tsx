@@ -1,13 +1,19 @@
-'use client';
+"use client";
 
-import { useChat } from '@/hooks/useChat';
-import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle, Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useChat } from "@/hooks/useChat";
+import { formatDistanceToNow } from "date-fns";
+import { MessageCircle, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export function ConversationsList() {
   const router = useRouter();
-  const { conversations, loading } = useChat();
+  const { conversations, loading, fetchConversations } = useChat();
+
+  useEffect(() => {
+    console.log("ChatPage mounted, fetching conversations...");
+    fetchConversations();
+  }, []);
 
   if (loading) {
     return (
@@ -17,7 +23,7 @@ export function ConversationsList() {
     );
   }
 
-  if (conversations.length === 0) {
+  if (!conversations || conversations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center bg-white rounded-lg shadow-md">
         <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
@@ -44,15 +50,17 @@ export function ConversationsList() {
           <div className="flex items-start gap-3">
             {/* Avatar */}
             <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-              {conversation.participant.image ? (
+              {conversation.otherParticipant.avatar ? (
                 <img
-                  src={conversation.participant.image}
-                  alt={conversation.participant.name || 'User'}
+                  src={conversation.otherParticipant.avatar}
+                  alt={conversation.otherParticipant.firstName || "User"}
                   className="w-12 h-12 rounded-full object-cover"
                 />
               ) : (
                 <span className="text-blue-600 font-semibold text-lg">
-                  {conversation.participant.name?.charAt(0)?.toUpperCase() || 'U'}
+                  {conversation.otherParticipant.firstName
+                    ?.charAt(0)
+                    ?.toUpperCase() || "U"}
                 </span>
               )}
             </div>
@@ -61,7 +69,7 @@ export function ConversationsList() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
                 <h3 className="text-sm font-semibold text-gray-900 truncate">
-                  {conversation.participant.name || 'Unknown User'}
+                  {conversation.otherParticipant.firstName || "Unknown User"}
                 </h3>
                 {conversation.lastMessage && (
                   <span className="text-xs text-gray-500 flex-shrink-0 ml-2">

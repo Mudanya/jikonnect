@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -37,7 +37,7 @@ type Conversation = {
   id: string;
   clientId: string;
   providerId: string;
-  lastMessage: string;
+  lastMessage: {id: string; content:  string} | null;
   lastMessageAt: string;
   client: {
     id: string;
@@ -56,7 +56,7 @@ type Conversation = {
 export default function ChatPage({
   params,
 }: {
-  params: { conversationId: string };
+  params: Promise<{ conversationId: string }>;
 }) {
   const router = useRouter();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -68,6 +68,7 @@ export default function ChatPage({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const { conversationId } = use(params);
   // Get current user
   useEffect(() => {
     setCurrentUserId(user?.id || null);
@@ -85,13 +86,13 @@ export default function ChatPage({
   useEffect(() => {
     if (!currentUserId) return;
     fetchConversation();
-  }, [params.conversationId, currentUserId]);
+  }, [conversationId, currentUserId]);
 
   // Fetch messages
   useEffect(() => {
     if (!currentUserId) return;
     fetchMessages();
-  }, [params.conversationId, currentUserId]);
+  }, [conversationId, currentUserId]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -107,7 +108,7 @@ export default function ChatPage({
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [params.conversationId, currentUserId]);
+  }, [conversationId, currentUserId]);
 
   const fetchConversation = async () => {
     try {
@@ -121,7 +122,7 @@ export default function ChatPage({
 
       if (data.success) {
         const conv = (data.data || []).find(
-          (c: Conversation) => c.id === params.conversationId
+          (c: Conversation) => c.id === conversationId
         );
         if (conv) {
           setConversation(conv);
@@ -141,7 +142,7 @@ export default function ChatPage({
       if (!silent) setLoading(true);
 
       const response = await fetch(
-        `/api/chat/${params.conversationId}/messages`,
+        `/api/chat/${conversationId}/messages`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -170,7 +171,7 @@ export default function ChatPage({
       setSending(true);
 
       const response = await fetch(
-        `/api/chat/${params.conversationId}/messages`,
+        `/api/chat/${conversationId}/messages`,
         {
           method: "POST",
           headers: {
@@ -328,7 +329,7 @@ export default function ChatPage({
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <button className="p-2 hover:bg-gray-100 rounded-full transition hidden md:block">
             <Phone size={20} className="text-gray-600" />
           </button>
@@ -338,7 +339,7 @@ export default function ChatPage({
           <button className="p-2 hover:bg-gray-100 rounded-full transition">
             <MoreVertical size={20} className="text-gray-600" />
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Messages */}
@@ -442,13 +443,13 @@ export default function ChatPage({
       {/* Input */}
       <div className="bg-white border-t px-4 py-3 shadow-lg">
         <form onSubmit={sendMessage} className="flex items-center gap-2">
-          <button
+          {/* <button
             type="button"
             className="p-2 hover:bg-gray-100 rounded-full transition hidden md:block"
             title="Attach file (coming soon)"
           >
             <ImageIcon size={20} className="text-gray-600" />
-          </button>
+          </button> */}
 
           <input
             type="text"
