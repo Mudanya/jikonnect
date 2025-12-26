@@ -77,7 +77,8 @@ const VerificationPage = () => {
       if (data.success) {
         setSelectedProfile(null);
         setRejectionReason("");
-        loadVerifications();
+        await loadVerifications();
+        toast.success("Verification updated successfully");
       } else toast.error(data.message);
     } catch (err) {
       console.error("Failed to update verification:", err);
