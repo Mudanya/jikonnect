@@ -6,6 +6,7 @@ import {
   AlertTriangle, ArrowLeft, MessageSquare, User, 
   CheckCircle, XCircle, Clock, Send, FileText 
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Dispute {
   id: string;
@@ -103,7 +104,7 @@ export default function DisputeResolutionPage() {
 
   const handleResolveDispute = async (resolution: 'CLIENT_FAVOR' | 'PROVIDER_FAVOR' | 'MUTUAL') => {
     if (!resolutionNote.trim()) {
-      alert('Please provide resolution notes');
+      toast.warning('Please provide resolution notes');
       return;
     }
 
@@ -128,11 +129,11 @@ export default function DisputeResolutionPage() {
         await loadDisputes();
         setSelectedDispute(null);
         setResolutionNote('');
-        alert('Dispute resolved successfully');
+        toast.success('Dispute resolved successfully');
       }
     } catch (error) {
       console.error('Failed to resolve dispute:', error);
-      alert('Failed to resolve dispute');
+      toast.error('Failed to resolve dispute');
     } finally {
       setProcessing(false);
     }
@@ -155,11 +156,11 @@ export default function DisputeResolutionPage() {
       if (response.ok) {
         await loadDisputes();
         setSelectedDispute(null);
-        alert('Dispute closed');
+        toast.success('Dispute closed');
       }
     } catch (error) {
       console.error('Failed to close dispute:', error);
-      alert('Failed to close dispute');
+      toast.error('Failed to close dispute');
     } finally {
       setProcessing(false);
     }

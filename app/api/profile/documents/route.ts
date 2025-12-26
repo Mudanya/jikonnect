@@ -1,13 +1,10 @@
 import { withAuth } from "@/lib/api-auth";
-import logger from "@/lib/logger";
-import { AuthenticatedRequest } from "@/types/auth";
-import { existsSync } from "fs";
-import { NextResponse } from "next/server";
-import { join } from "path";
-import { mkdir, unlink, writeFile } from "fs/promises";
-import { getUserByUserId, getUserProfileById, updateDocument } from "@/services/queries/provider.query";
-import { createAuditLog } from "@/services/queries/auth.query";
 import { uploadToCloudinary } from "@/lib/cloudinary";
+import logger from "@/lib/logger";
+import { createAuditLog } from "@/services/queries/auth.query";
+import { getUserByUserId, getUserProfileById, updateDocument } from "@/services/queries/provider.query";
+import { AuthenticatedRequest } from "@/types/auth";
+import { NextResponse } from "next/server";
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -68,14 +65,12 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
 
 
         const timestamp = Date.now();
-        // const extension = file.name.split('.').pop();
-        // const fileName = `${req.user.userId}_${documentType}_${timestamp}.${extension}`;
+      
         const fileName = `${req.user.userId}_${documentType}_${timestamp}`;
-        // const filePath = join(uploadDir, fileName);
+     
 
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
-        // await writeFile(filePath, buffer);
         const result = await uploadToCloudinary(
             buffer,
             uploadDir, // folder name

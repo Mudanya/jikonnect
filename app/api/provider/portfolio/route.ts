@@ -3,10 +3,7 @@ import { uploadToCloudinary } from "@/lib/cloudinary";
 import logger from "@/lib/logger";
 import { createPortfolio, findProfileWithPortfolio, getUserProfileById } from "@/services/queries/provider.query";
 import { AuthenticatedRequest } from "@/types/auth";
-import { existsSync } from "fs";
-import { mkdir, writeFile } from "fs/promises";
 import { NextResponse } from "next/server";
-import { join } from "path";
 
 export const GET = withAuth(async (req: AuthenticatedRequest) => {
     try {
@@ -59,13 +56,12 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
         for (const file of files) {
             if (file.size > 0) {
                 const timestamp = Date.now();
-                const extension = file.name.split('.').pop();
                 const filename = `${req.user.userId}_${timestamp}_${Math.random().toString(36).substring(7)}`;
-                const filepath = join(uploadsDir, filename);
+
 
                 const bytes = await file.arrayBuffer();
                 const buffer = Buffer.from(bytes);
-                await writeFile(filepath, buffer);
+
                 const result = await uploadToCloudinary(
                     buffer,
                     uploadsDir, // folder name

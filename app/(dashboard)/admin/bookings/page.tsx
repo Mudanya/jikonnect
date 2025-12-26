@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface Booking {
   id: string;
@@ -109,17 +110,17 @@ export default function BookingsOversightPage() {
       if (response.ok) {
         await loadBookings();
         setShowActionMenu(null);
-        alert("Booking cancelled successfully");
+        toast.success("Booking cancelled successfully");
       }
     } catch (error) {
       console.error("Failed to cancel booking:", error);
-      alert("Failed to cancel booking");
+      toast.error("Failed to cancel booking");
     }
   };
 
   const handleReschedule = (bookingId: string) => {
     // Implement reschedule modal
-    alert("Reschedule feature coming soon");
+    toast.info("Reschedule feature coming soon");
   };
 
   const getStatusColor = (status: string) => {

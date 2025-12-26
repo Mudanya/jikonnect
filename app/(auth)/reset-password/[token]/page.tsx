@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -75,7 +76,7 @@ export default function ResetPasswordPage() {
         throw new Error(data.message || "Failed to reset password");
       }
 
-      alert(
+      toast.success(
         "Password reset successful! You can now login with your new password."
       );
       router.push("/login");

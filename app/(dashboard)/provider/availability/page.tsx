@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Calendar, Clock, Save, Loader } from "lucide-react";
+import { toast } from "sonner";
 
 interface TimeSlot {
   start: string;
@@ -89,13 +90,13 @@ export default function AvailabilityPage() {
       });
 
       if (response.ok) {
-        alert("Availability saved successfully!");
+        toast.success("Availability saved successfully!");
       } else {
-        alert("Failed to save availability");
+        toast.error("Failed to save availability");
       }
     } catch (error) {
       console.error("Failed to save availability:", error);
-      alert("Failed to save availability");
+      toast.error("Failed to save availability");
     } finally {
       setSaving(false);
     }

@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft, Award, CheckCircle, MapPin, Send, Star } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function ProviderProfilePage() {
   const router = useRouter();
@@ -73,14 +74,14 @@ export default function ProviderProfilePage() {
       const data = await response.json();
 
       if (data.success) {
-        alert('Booking request sent successfully!');
+        toast.success('Booking request sent successfully!');
         router.push('/bookings');
       } else {
-        alert(data.message || 'Failed to create booking');
+        toast.error(data.message || 'Failed to create booking');
       }
     } catch (error) {
       console.error('Failed to create booking:', error);
-      alert('Failed to create booking');
+      toast.error('Failed to create booking');
     } finally {
       setBookingLoading(false);
     }
