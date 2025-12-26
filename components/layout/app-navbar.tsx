@@ -40,7 +40,14 @@ const AppNavBar = () => {
                 alt="Jikonnect logo"
                 width={800}
                 height={600}
-                className="w-auto h-12"
+                className="w-auto h-12 hidden md:block"
+              />
+              <Image
+                src={"/assets/images/jiko-logo-sm.png"}
+                alt="Jikonnect logo"
+                width={800}
+                height={600}
+                className="w-auto h-12 md:hidden"
               />
 
               <SidebarTrigger className="cursor-pointer" />
@@ -49,7 +56,7 @@ const AppNavBar = () => {
               Welcome back, {user?.firstName.toLowerCase()}!
             </p>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center md:space-x-4 space-x-1">
             <ChatIcon />
             <NotificationBell />
             {/* <div className="relative p-2 rounded-lg">
@@ -80,7 +87,7 @@ const AppNavBar = () => {
               className="w-10 h-10 bg-linear-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-2xl cursor-pointer"
             >
               {user?.avatar ? (
-                <Image
+                <img
                   src={user.avatar}
                   alt="User Avatar"
                   width={40}

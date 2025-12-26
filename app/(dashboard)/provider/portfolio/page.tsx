@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, Upload, Loader, Image as ImageIcon } from "lucide-react";
 import { ServiceCategory } from "@/lib/generated/prisma/client";
+import { toast } from "sonner";
 
 interface PortfolioItem {
   id: string;
@@ -210,7 +211,7 @@ function AddPortfolioModal({
     e.preventDefault();
 
     if (!title || !category) {
-      alert("Please fill in required fields");
+      toast.warning("Please fill in required fields");
       return;
     }
 
@@ -233,11 +234,11 @@ function AddPortfolioModal({
       if (response.ok) {
         onSuccess();
       } else {
-        alert("Failed to add portfolio item");
+        toast.error("Failed to add portfolio item");
       }
     } catch (error) {
       console.error("Failed to add portfolio item:", error);
-      alert("Failed to add portfolio item");
+      toast.error("Failed to add portfolio item");
     } finally {
       setUploading(false);
     }

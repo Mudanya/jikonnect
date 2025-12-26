@@ -66,8 +66,8 @@ const VerificationPage = () => {
     action: "approve" | "reject"
   ) => {
     if (action === "reject" && !rejectionReason) {
-      alert("Please provide a rejection reason");
-      router.push("/admin/users")
+      toast.warning("Please provide a rejection reason");
+      router.push("/admin/users");
       return;
     }
 
