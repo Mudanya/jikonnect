@@ -1,6 +1,6 @@
 import { withRole } from '@/lib/api-auth';
 import logger from '@/lib/logger';
-import { getCurrentMonthRevenue, getLastMonthRevenue, getMonthData, getRevenueByCategory, getTodayRevenueData, getTopProviders, getTotalRevenueData, getWeekyRevenueData } from '@/services/queries/admin.query';
+import { getCurrentMonthRevenue, getLastMonthRevenue, getMonthData, getRevenueByCategory, getSettingsByKey, getTodayRevenueData, getTopProviders, getTotalRevenueData, getWeekyRevenueData } from '@/services/queries/admin.query';
 import { AuthenticatedRequest } from '@/types/auth';
 import { NextResponse } from 'next/server';
 
@@ -48,7 +48,8 @@ export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
         const todayRevenue = todayRevenueData._sum.amount || 0;
 
         // Calculate commission (assume 10% platform fee)
-        const commissionRate = 0.10; //TODO: change commision from settings
+        const platformDetails = await getSettingsByKey('platform')
+        const commissionRate = (+platformDetails!.commissionRate) / 100 || 0.10;
         const totalCommission = +totalRevenue * commissionRate;
 
         // Calculate average booking value
@@ -74,9 +75,9 @@ export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
         const revenueByCategory = await getRevenueByCategory(startDate)
 
         const formattedRevenueByCategory = revenueByCategory.map(cat => ({
-            category: cat.categories[0] || 'Other',
-            revenue: parseFloat(cat.revenue),
-            bookings: parseInt(cat.bookings)
+            category: cat.category || 'Other',
+            revenue: cat.revenue,
+            bookings: cat.bookings
         }));
 
         // Monthly data for chart

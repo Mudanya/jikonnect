@@ -1,56 +1,138 @@
-import { withAuth } from "@/lib/api-auth";
-import logger from "@/lib/logger";
-import { getCompletedBookings } from "@/services/queries/provider.query";
-import { AuthenticatedRequest } from "@/types/auth";
-import { NextResponse } from "next/server";
+import { withAuth } from '@/lib/api-auth';
+import { prisma } from '@/prisma/prisma.init';
+import { AuthenticatedRequest } from '@/types/auth';
+import { NextResponse } from 'next/server';
 
-export const GET= withAuth(async (req: AuthenticatedRequest) => {
-    try {
-        const { searchParams } = new URL(req.url);
-        const period = searchParams.get('period') || 'all'; // all, month, week
+export const GET = withAuth(async (req: AuthenticatedRequest) => {
+  try {
+    const providerId = req.user.userId;
 
-        const bookings = await getCompletedBookings(req.user.userId)
+    // Get all completed bookings with payments AND payout info
+    const bookings = await prisma.booking.findMany({
+      where: {
+        providerId,
+        status: 'COMPLETED',
+        payment: {
+          status: 'PAID'
+        }
+      },
+      include: {
+        client: {
+          select: {
+            firstName: true,
+            lastName: true
+          }
+        },
+        payment: {
+          select: {
+            status: true,
+            mpesaCode: true
+          }
+        },
+        payout: {
+          select: {
+            mpesaCode: true,
+            status: true,
+            completedAt: true
+          }
+        }
+      },
+      orderBy: {
+        completedAt: 'desc'
+      }
+    });
 
-        // Filter by period
-        const now = new Date();
-        const filteredBookings = bookings.filter(b => {
-            if (period === 'all') return true;
-            const completedDate = new Date(b.completedAt || b.createdAt);
+    // Calculate summary
+    const totalEarnings = bookings.reduce((sum, b) => sum + Number(b.providerPayout), 0);
+    const completedJobs = bookings.length;
+    const averageJobValue = completedJobs > 0 ? totalEarnings / completedJobs : 0;
 
-            if (period === 'month') {
-                return completedDate.getMonth() === now.getMonth() &&
-                    completedDate.getFullYear() === now.getFullYear();
-            }
+    // Payout status breakdown
+    const pendingPayouts = bookings
+      .filter(b => b.payoutStatus === 'PENDING')
+      .reduce((sum, b) => sum + Number(b.providerPayout), 0);
+    
+    const completedPayouts = bookings
+      .filter(b => b.payoutStatus === 'COMPLETED')
+      .reduce((sum, b) => sum + Number(b.providerPayout), 0);
 
-            if (period === 'week') {
-                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                return completedDate >= weekAgo;
-            }
+    const processingPayouts = bookings
+      .filter(b => b.payoutStatus === 'PROCESSING')
+      .reduce((sum, b) => sum + Number(b.providerPayout), 0);
 
-            return true;
-        });
+    // This month earnings
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const thisMonthBookings = bookings.filter(
+      b => b.completedAt && new Date(b.completedAt) >= startOfMonth
+    );
+    const thisMonthEarnings = thisMonthBookings.reduce(
+      (sum, b) => sum + Number(b.providerPayout), 
+      0
+    );
 
-        const totalEarnings = filteredBookings.reduce((sum, b) => sum + Number(b.providerPayout), 0);
-        const totalCommission = filteredBookings.reduce((sum, b) => sum + Number(b.commission), 0);
-        const totalAmount = filteredBookings.reduce((sum, b) => sum + Number(b.amount), 0);
+    // Last month earnings
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+    const lastMonthBookings = bookings.filter(
+      b => b.completedAt && 
+           new Date(b.completedAt) >= startOfLastMonth && 
+           new Date(b.completedAt) <= endOfLastMonth
+    );
+    const lastMonthEarnings = lastMonthBookings.reduce(
+      (sum, b) => sum + Number(b.providerPayout), 
+      0
+    );
 
-        return NextResponse.json({
-            success: true,
-            data: {
-                summary: {
-                    totalEarnings,
-                    totalCommission,
-                    totalAmount,
-                    bookingsCount: filteredBookings.length
-                },
-                bookings: filteredBookings
-            }
-        });
-    } catch (error) {
-        logger.error((error as Error).message)
-        return NextResponse.json(
-            { success: false, message: 'Failed to fetch earnings' },
-            { status: 500 }
-        );
+    // Monthly data for chart (last 6 months)
+    const monthlyData = [];
+    for (let i = 5; i >= 0; i--) {
+      const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
+      
+      const monthBookings = bookings.filter(
+        b => b.completedAt && 
+             new Date(b.completedAt) >= monthStart && 
+             new Date(b.completedAt) <= monthEnd
+      );
+
+      monthlyData.push({
+        month: monthStart.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        earnings: monthBookings.reduce((sum, b) => sum + Number(b.providerPayout), 0),
+        jobs: monthBookings.length
+      });
     }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        bookings,
+        summary: {
+          totalEarnings,
+          completedJobs,
+          averageJobValue,
+          thisMonthEarnings,
+          lastMonthEarnings,
+          // NEW: Payout status breakdown
+          pendingPayouts,
+          completedPayouts,
+          processingPayouts,
+          payoutBreakdown: {
+            pending: bookings.filter(b => b.payoutStatus === 'PENDING').length,
+            processing: bookings.filter(b => b.payoutStatus === 'PROCESSING').length,
+            completed: bookings.filter(b => b.payoutStatus === 'COMPLETED').length,
+            failed: bookings.filter(b => b.payoutStatus === 'FAILED').length
+          }
+        },
+        monthlyData
+      }
+    });
+
+  } catch (error: any) {
+    console.error('Get earnings error:', error);
+    return NextResponse.json(
+      { success: false, message: error.message || 'Failed to fetch earnings' },
+      { status: 500 }
+    );
+  }
 });

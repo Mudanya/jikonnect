@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { LocationDropdown } from "@/components/locations/LocationDropdown";
 
 const Services = () => {
   const router = useRouter();
@@ -33,7 +34,7 @@ const Services = () => {
   const [loading, setLoading] = useState(true);
   const [providers, setProviders] = useState<any[]>([]);
   const [filteredProviders, setFilteredProviders] = useState<any[]>([]);
-
+  const [locationId, setLocationId] = useState<string>("");
   const [filters, setFilters] = useState({
     category: "",
     location: "",
@@ -80,9 +81,7 @@ const Services = () => {
     }
 
     if (filters.location) {
-      filtered = filtered.filter((p) =>
-        p.location?.toLowerCase().includes(filters.location.toLowerCase())
-      );
+      filtered = filtered.filter((p) => p.location.id === filters.location);
     }
 
     if (filters.minRating) {
@@ -134,7 +133,15 @@ const Services = () => {
 
           <div className="bg-white rounded-2xl p-4 flex items-center space-x-4 shadow-xl max-w-4xl">
             <Search className="text-gray-400" size={24} />
-            <Input
+            <LocationDropdown
+              value={locationId}
+              onChange={(locId) => {
+                setFilters({ ...filters, location: locId });
+                setLocationId(locId);
+              }}
+              className="w-full"
+            />
+            {/* <Input
               type="text"
               placeholder="Search by location..."
               value={filters.location}
@@ -142,7 +149,7 @@ const Services = () => {
                 setFilters({ ...filters, location: e.target.value })
               }
               className="flex-1 px-4 py-3 text-jiko-black focus:outline-none focus:outline-jiko-secondary outline-none! border-0 focus:shadow-none"
-            />
+            /> */}
             <Button
               onClick={loadProviders}
               className="px-8 py-3 bg-jiko-secondary shadow-md text-white rounded-xl font-semibold hover:bg-jiko-secondary/90 cursor-pointer transition"
@@ -324,26 +331,30 @@ const Services = () => {
                           <CheckCircle
                             className="text-jiko-primary"
                             size={18}
-                          />  
+                          />
                         )}
                       </div>
                       <div className="flex items-center space-x-1 text-sm text-gray-600">
                         <MapPin size={14} />
-                        <span>{provider?.location?.name || "Location not set"}</span>
+                        <span>
+                          {provider?.location?.name || "Location not set"}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Services */}
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {provider?.services?.slice(0, 3).map((service: {name:string}) => (
-                      <span
-                        key={service.name}
-                        className="px-3 py-1 bg-blue-50 text-jiko-primary rounded-full text-xs font-medium"
-                      >
-                        {service.name}
-                      </span>
-                    ))}
+                    {provider?.services
+                      ?.slice(0, 3)
+                      .map((service: { name: string }) => (
+                        <span
+                          key={service.name}
+                          className="px-3 py-1 bg-blue-50 text-jiko-primary rounded-full text-xs font-medium"
+                        >
+                          {service.name}
+                        </span>
+                      ))}
                     {provider?.services?.length > 3 && (
                       <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
                         +{provider?.services?.length - 3} more

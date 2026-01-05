@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, CreditCard, Phone, Loader, CheckCircle, XCircle } from "lucide-react";
+import {
+  X,
+  CreditCard,
+  Phone,
+  Loader,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface PaymentModalProps {
@@ -19,81 +26,91 @@ interface PaymentModalProps {
   onSuccess: () => void;
 }
 
-export function PaymentModal({ booking, onClose, onSuccess }: PaymentModalProps) {
+export function PaymentModal({
+  booking,
+  onClose,
+  onSuccess,
+}: PaymentModalProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
-  const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
-  const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<
+    "idle" | "pending" | "success" | "failed"
+  >("idle");
+  const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(
+    null
+  );
+  const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(
+    null
+  );
 
   // Format phone number
   const formatPhoneNumber = (value: string) => {
     // Remove non-digits
-    let cleaned = value.replace(/\D/g, '');
-    
+    let cleaned = value.replace(/\D/g, "");
+
     // Handle different formats
-    if (cleaned.startsWith('0')) {
-      cleaned = '254' + cleaned.substring(1);
-    } else if (!cleaned.startsWith('254')) {
-      cleaned = '254' + cleaned;
+    if (cleaned.startsWith("0")) {
+      cleaned = "254" + cleaned.substring(1);
+    } else if (!cleaned.startsWith("254")) {
+      cleaned = "254" + cleaned;
     }
-    
+
     return cleaned;
   };
 
   // Initiate payment
   const handlePayment = async () => {
     if (!phoneNumber || phoneNumber.length < 10) {
-      toast.error('Please enter a valid phone number');
+      toast.error("Please enter a valid phone number");
       return;
     }
 
     const formattedPhone = formatPhoneNumber(phoneNumber);
-    
+
     if (formattedPhone.length !== 12) {
-      toast.error('Phone number must be 10 digits (e.g., 0712345678)');
+      toast.error("Phone number must be 10 digits (e.g., 0712345678)");
       return;
     }
 
     try {
       setLoading(true);
-      setPaymentStatus('pending');
+      setPaymentStatus("pending");
 
-      const response = await fetch('/api/payments/initiate', {
-        method: 'POST',
+      const response = await fetch("/api/payments/initiate", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         body: JSON.stringify({
           bookingId: booking.id,
-          phoneNumber: formattedPhone
-        })
+          phoneNumber: formattedPhone,
+        }),
       });
 
       const data = await response.json();
 
       if (data.success) {
         setCheckoutRequestId(data.data.checkoutRequestId);
-        toast.success('Payment request sent! Please check your phone.');
-        
+        toast.success("Payment request sent! Please check your phone.");
+
         // Start polling for payment status
-        startPolling(data.data.checkoutRequestId);
+        startPolling(data.data.paymentId);
       } else {
-        toast.error(data.message || 'Failed to initiate payment');
-        setPaymentStatus('failed');
+        toast.error(data.message || "Failed to initiate payment");
+        setPaymentStatus("failed");
       }
     } catch (error) {
-      console.error('Payment error:', error);
-      toast.error('Failed to initiate payment. Please try again.');
-      setPaymentStatus('failed');
+      console.error("Payment error:", error);
+      toast.error("Failed to initiate payment. Please try again.");
+      setPaymentStatus("failed");
     } finally {
       setLoading(false);
     }
   };
 
   // Poll payment status
-  const startPolling = (requestId: string) => {
+  const startPolling = (paymentId: string) => {
     let attempts = 0;
     const maxAttempts = 60; // Poll for 2 minutes (60 * 2 seconds)
 
@@ -101,42 +118,46 @@ export function PaymentModal({ booking, onClose, onSuccess }: PaymentModalProps)
       attempts++;
 
       try {
-        const response = await fetch(`/api/payments/${booking.id}/status`, {
+        const response = await fetch(`/api/payments/${paymentId}/status`, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-          }
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
         });
 
-        const data = await response.json();
+      
+        const data = await response.json()
+      
 
         if (data.success) {
-          const status = data.data.status;
+          const status = data.data.status
+          
 
-          if (status === 'PAID') {
-            setPaymentStatus('success');
+          if (status === "PAID") {
+            setPaymentStatus("success");
             clearInterval(interval);
-            toast.success('Payment successful! 🎉');
-            
+            toast.success("Payment successful! 🎉");
+
             // Wait 2 seconds then call onSuccess
             setTimeout(() => {
               onSuccess();
             }, 2000);
-          } else if (status === 'FAILED') {
-            setPaymentStatus('failed');
+          } else if (status === "FAILED") {
+            setPaymentStatus("failed");
             clearInterval(interval);
-            toast.error('Payment failed. Please try again.');
+            toast.error("Payment failed. Please try again.");
           }
         }
 
         // Stop polling after max attempts
         if (attempts >= maxAttempts) {
           clearInterval(interval);
-          setPaymentStatus('failed');
-          toast.error('Payment verification timeout. Please check your M-Pesa messages.');
+          setPaymentStatus("failed");
+          toast.error(
+            "Payment verification timeout. Please check your M-Pesa messages."
+          );
         }
-
       } catch (error) {
-        console.error('Status check error:', error);
+        console.error("Status check error:", error);
       }
     }, 2000); // Check every 2 seconds
 
@@ -155,7 +176,7 @@ export function PaymentModal({ booking, onClose, onSuccess }: PaymentModalProps)
   return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      onClick={paymentStatus === 'pending' ? undefined : onClose}
+      onClick={paymentStatus === "pending" ? undefined : onClose}
     >
       <div
         className="bg-white rounded-2xl shadow-xl max-w-md w-full"
@@ -169,7 +190,7 @@ export function PaymentModal({ booking, onClose, onSuccess }: PaymentModalProps)
               Booking #{booking.bookingNumber}
             </p>
           </div>
-          {paymentStatus === 'idle' && (
+          {paymentStatus === "idle" && (
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
@@ -181,7 +202,7 @@ export function PaymentModal({ booking, onClose, onSuccess }: PaymentModalProps)
 
         <div className="p-6">
           {/* Success State */}
-          {paymentStatus === 'success' && (
+          {paymentStatus === "success" && (
             <div className="text-center py-8">
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-12 h-12 text-green-600" />
@@ -194,17 +215,19 @@ export function PaymentModal({ booking, onClose, onSuccess }: PaymentModalProps)
               </p>
               <div className="bg-green-50 rounded-lg p-4">
                 <p className="text-sm text-gray-700">
-                  <span className="font-semibold">Service:</span> {booking.service}
+                  <span className="font-semibold">Service:</span>{" "}
+                  {booking.service}
                 </p>
                 <p className="text-sm text-gray-700">
-                  <span className="font-semibold">Amount:</span> KES {booking.amount.toLocaleString()}
+                  <span className="font-semibold">Amount:</span> KES{" "}
+                  {booking.amount.toLocaleString()}
                 </p>
               </div>
             </div>
           )}
 
           {/* Failed State */}
-          {paymentStatus === 'failed' && (
+          {paymentStatus === "failed" && (
             <div className="text-center py-8">
               <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <XCircle className="w-12 h-12 text-red-600" />
@@ -217,8 +240,8 @@ export function PaymentModal({ booking, onClose, onSuccess }: PaymentModalProps)
               </p>
               <button
                 onClick={() => {
-                  setPaymentStatus('idle');
-                  setPhoneNumber('');
+                  setPaymentStatus("idle");
+                  setPhoneNumber("");
                 }}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
               >
@@ -228,7 +251,7 @@ export function PaymentModal({ booking, onClose, onSuccess }: PaymentModalProps)
           )}
 
           {/* Pending State */}
-          {paymentStatus === 'pending' && (
+          {paymentStatus === "pending" && (
             <div className="text-center py-8">
               <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                 <Phone className="w-12 h-12 text-blue-600" />
@@ -241,24 +264,31 @@ export function PaymentModal({ booking, onClose, onSuccess }: PaymentModalProps)
               </p>
               <div className="bg-blue-50 rounded-lg p-4 mb-4">
                 <p className="text-sm text-gray-700">
-                  Amount: <span className="font-bold">KES {booking.amount.toLocaleString()}</span>
+                  Amount:{" "}
+                  <span className="font-bold">
+                    KES {booking.amount.toLocaleString()}
+                  </span>
                 </p>
               </div>
               <div className="flex items-center justify-center space-x-2">
                 <Loader className="animate-spin text-blue-600" size={20} />
-                <span className="text-sm text-gray-600">Waiting for payment...</span>
+                <span className="text-sm text-gray-600">
+                  Waiting for payment...
+                </span>
               </div>
             </div>
           )}
 
           {/* Idle State - Payment Form */}
-          {paymentStatus === 'idle' && (
+          {paymentStatus === "idle" && (
             <>
               {/* Booking Summary */}
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Service</span>
-                  <span className="font-medium text-gray-900">{booking.service}</span>
+                  <span className="font-medium text-gray-900">
+                    {booking.service}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Provider</span>

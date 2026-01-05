@@ -1,6 +1,7 @@
-import {  withAuth } from '@/lib/api-auth';
+import { withAuth } from '@/lib/api-auth';
 import { MpesaService } from '@/lib/mpesa';
 import { prisma } from '@/prisma/prisma.init';
+import { getSettingsByKey } from '@/services/queries/admin.query';
 import { AuthenticatedRequest } from '@/types/auth';
 import { NextResponse } from 'next/server';
 
@@ -44,30 +45,48 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
     }
 
     // Initiate STK Push
-    const stkPushResponse = await mpesa.initiateSTKPush({
-      phoneNumber,
-      amount: Number(booking.amount),
-      accountReference: booking.bookingNumber,
-      transactionDesc: `Payment for ${booking.service}`
-    });
+    const payments = await getSettingsByKey('payments')
+    let checkoutRequestId = null, merchantRequestId = null, customerMessage = ""
+    if (payments?.mpesaEnabled) {
+      const stkPushResponse = await mpesa.initiateSTKPush({
+        phoneNumber,
+        amount: Number(booking.amount),
+        accountReference: booking.bookingNumber,
+        transactionDesc: `Payment for ${booking.service}`
+      });
+      checkoutRequestId = stkPushResponse.CheckoutRequestID;
+      merchantRequestId = stkPushResponse.MerchantRequestID;
+      customerMessage = stkPushResponse.CustomerMessage
+    }
 
     // Save payment record
     const payment = await prisma.payment.upsert({
       where: { bookingId: booking.id },
       update: {
-        checkoutRequestId: stkPushResponse.CheckoutRequestID,
-        merchantRequestId: stkPushResponse.MerchantRequestID,
+        checkoutRequestId,
+        merchantRequestId,
         phoneNumber,
-        status: 'PENDING'
+        status: payments?.mpesaEnabled ? 'PENDING' : 'PAID'
       },
       create: {
         bookingId: booking.id,
         userId: req.user.userId,
         amount: booking.amount,
         phoneNumber,
-        checkoutRequestId: stkPushResponse.CheckoutRequestID,
-        merchantRequestId: stkPushResponse.MerchantRequestID,
-        status: 'PENDING'
+        checkoutRequestId,
+        merchantRequestId,
+        status: payments?.mpesaEnabled ? 'PENDING' : 'PAID'
+      }
+    });
+
+    await prisma.booking.update({
+      where: { id: booking.id },
+      data: {
+        status: 'IN_PROGRESS',
+      },
+      include: {
+        client: true,
+        provider: true
       }
     });
 
@@ -81,7 +100,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
         details: {
           bookingId,
           amount: booking.amount,
-          checkoutRequestId: stkPushResponse.CheckoutRequestID
+          checkoutRequestId
         },
         ipAddress: req.headers.get('x-forwarded-for') || 'unknown',
         userAgent: req.headers.get('user-agent')
@@ -92,8 +111,9 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
       success: true,
       message: 'Payment initiated. Please check your phone.',
       data: {
-        checkoutRequestId: stkPushResponse.CheckoutRequestID,
-        customerMessage: stkPushResponse.CustomerMessage
+        checkoutRequestId,
+        customerMessage,
+        paymentId: payment.id
       }
     });
   } catch (error: any) {

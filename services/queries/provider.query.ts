@@ -3,6 +3,7 @@ import { prisma } from "@/prisma/prisma.init"
 import { serviceSearchParams } from "@/types/service.type"
 import { ProfileFormData } from "@/validators/profile.validator"
 import { Decimal, InputJsonValue } from "@prisma/client/runtime/client"
+import { getSettingsByKey } from "./admin.query"
 
 
 export const getUserByUserId = async (userId: string) => {
@@ -82,10 +83,7 @@ export const getUserProfiles = async ({ location, minRate, maxRate, minRating, c
             // }),
             ...(location && {
                 location: {
-                    name: {
-                        contains: location,
-                        mode: 'insensitive'
-                    }
+                    id: location
                 }
             }),
             ...(minRate && maxRate && {
@@ -113,7 +111,7 @@ export const getUserProfiles = async ({ location, minRate, maxRate, minRating, c
                 take: 3,
                 orderBy: { createdAt: 'desc' }
             },
-            location: { select: { name: true } },
+            location: { select: { name: true, id: true } },
             services: { select: { name: true } }
         },
         orderBy: {
@@ -204,7 +202,8 @@ export const createBooking = async ({
     const bookingNumber = `BK${Date.now()}${Math.random().toString(36).substring(7).toUpperCase()}`;
     const hours = duration || 1;
     const amount = Number(hourlyRate) * hours;
-    const commission = amount * 0.10; //TODO add to settings
+    const platformDetails = await getSettingsByKey('platform')
+    const commission = amount * (platformDetails?.commissionRate || 0.10); 
     const providerPayout = amount - commission;
     return await prisma.booking.create({
         data: {

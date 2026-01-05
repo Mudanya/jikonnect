@@ -1,4 +1,4 @@
-// app/bookings/page.tsx - UPDATED with Payment
+// app/bookings/page.tsx - FINAL with Payment & IN_PROGRESS UI
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,6 +14,8 @@ import {
   MessageCircle,
   Phone,
   CreditCard,
+  CheckCircle,
+  AlertTriangle,
 } from "lucide-react";
 import {
   fetchBookings,
@@ -25,9 +27,13 @@ import Loading from "@/components/shared/Loading";
 import { Button } from "@/components/ui/button";
 import { startConversation } from "@/services/apis/chat.api";
 import { PaymentModal } from "@/components/payments/PaymentModal";
+import DisputeStatusBadge from "@/components/bookings/DisputeStatusBadge";
+import DisputeModal from "@/components/bookings/DisputeModal";
+import Link from "next/link";
 
 const Bookings = () => {
   const { user, isAuthenticated } = useAuth();
+  const [showDisputeModal, setShowDisputeModal] = useState(false);
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -202,7 +208,7 @@ const Bookings = () => {
                 key={booking.id}
                 className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition"
               >
-                <div className="flex items-start justify-between mb-4">
+                <Link href={`/bookings/${booking.id}`} className="flex items-start justify-between mb-4">
                   <div className="flex items-start space-x-4 flex-1">
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                       {booking.provider.firstName[0]}
@@ -268,7 +274,7 @@ const Bookings = () => {
                       Booking #{booking.bookingNumber}
                     </div>
                   </div>
-                </div>
+                </Link>
 
                 {booking.description && (
                   <div className="mb-4 p-3 bg-gray-50 rounded-lg">
@@ -278,18 +284,35 @@ const Bookings = () => {
                   </div>
                 )}
 
+                {/* Payment Success Info - Show when IN_PROGRESS */}
+                {booking.status === "IN_PROGRESS" && (
+                  <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <CheckCircle className="text-green-600" size={20} />
+                      <span className="font-semibold text-green-900">
+                        Payment Successful
+                      </span>
+                    </div>
+                    <p className="text-sm text-green-700">
+                      Your payment has been confirmed. The provider will deliver
+                      the service shortly.
+                    </p>
+                  </div>
+                )}
+
                 {/* Actions */}
                 <div className="flex items-center justify-between pt-4 border-t">
                   <div className="flex items-center space-x-3">
-                    {booking.provider.phone && booking.status === "IN_PROGRESS" && (
-                      <a
-                        href={`tel:${booking.provider.phone}`}
-                        className="flex items-center space-x-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition"
-                      >
-                        <Phone size={16} />
-                        <span className="text-sm font-medium">Call</span>
-                      </a>
-                    )}
+                    {booking.provider.phone &&
+                      booking.status === "IN_PROGRESS" && (
+                        <a
+                          href={`tel:${booking.provider.phone}`}
+                          className="flex items-center space-x-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition"
+                        >
+                          <Phone size={16} />
+                          <span className="text-sm font-medium">Call</span>
+                        </a>
+                      )}
                     <button
                       onClick={() => handleMessageProvider(booking)}
                       disabled={messagingProvider === booking.id}
@@ -330,6 +353,18 @@ const Bookings = () => {
                       </span>
                     )}
 
+                    {/* Service In Progress - Show when IN_PROGRESS */}
+                    {booking.status === "IN_PROGRESS" && (
+                      <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-1 text-purple-600">
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"></div>
+                          <span className="text-sm font-medium">
+                            Service in progress
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
                     {booking.status === "COMPLETED" && !booking.review && (
                       <button
                         onClick={() => {
@@ -343,6 +378,42 @@ const Bookings = () => {
                           Write Review
                         </span>
                       </button>
+                    )}
+
+                    {booking.status === "COMPLETED" && !booking.dispute && (
+                      <button
+                        onClick={() => {
+                          setSelectedBooking(booking);
+                          setShowDisputeModal(true);
+                        }}
+                        className="flex items-center cursor-pointer space-x-2 text-red-600 hover:text-red-700"
+                      >
+                        <AlertTriangle size={16} />
+                        <span>Raise Dispute</span>
+                      </button>
+                    )}
+                    {booking.status === "DISPUTED" && booking.dispute && (
+                      <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-red-900">
+                            Dispute Status:
+                          </span>
+                          <DisputeStatusBadge status={booking.dispute.status} />
+                        </div>
+                        <p className="text-sm text-red-800">
+                          {booking.dispute.reason}
+                        </p>
+                        {booking.dispute.resolution && (
+                          <div className="mt-2">
+                            <p className="text-xs font-medium text-red-900">
+                              Admin Resolution:
+                            </p>
+                            <p className="text-sm text-red-800">
+                              {booking.dispute.resolution}
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     )}
 
                     {booking.status === "COMPLETED" && booking.review && (
@@ -476,6 +547,17 @@ const Bookings = () => {
           onSuccess={handlePaymentSuccess}
         />
       )}
+
+      <DisputeModal
+        isOpen={showDisputeModal}
+        onClose={() => setShowDisputeModal(false)}
+        bookingId={selectedBooking?.id || ""}
+        bookingNumber={selectedBooking?.bookingNumber || ""}
+        userType="client"
+        onSuccess={() => {
+          loadBookings(); // Reload bookings after dispute raised
+        }}
+      />
     </div>
   );
 };
