@@ -1,96 +1,48 @@
-import logger from "@/lib/logger";
-import { prisma } from "@/prisma/prisma.init";
-import { getBookingById, updateBookingStatus, updateProfileStats } from "@/services/queries/provider.query";
-import { NextRequest, NextResponse } from "next/server";
-const { verifyAccessToken } = await import('@/lib/jwt');
+// app/api/provider/bookings/[bookingId]/route.ts
+import { withAuth } from '@/lib/api-auth';
+import { verifyAccessToken } from '@/lib/jwt';
+import { prisma } from '@/prisma/prisma.init';
+import { AuthenticatedRequest } from '@/types/auth';
+import { NextRequest, NextResponse } from 'next/server';
 
-export const PUT = async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    try {
-        const authHeader = req.headers.get('authorization');
-        if (!authHeader) {
-            return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
-        }
-
-        const token = authHeader.substring(7);
-
-        const user = verifyAccessToken(token);
-
-        if (!user) {
-            return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 401 });
-        }
-        const { id } = await params
-        const body = await req.json();
-        const { status, cancellationReason } = body;
-
-        const existingBooking = await getBookingById(id)
-
-        if (!existingBooking) {
-            return NextResponse.json(
-                { success: false, message: 'Booking not found' },
-                { status: 404 }
-            );
-        }
-
-        if (existingBooking.clientId !== user.userId && existingBooking.providerId !== user.userId) {
-            return NextResponse.json(
-                { success: false, message: 'Not authorized to update this booking' },
-                { status: 403 }
-            );
-        }
-
-        const booking = await updateBookingStatus(id, status, cancellationReason);
-        await updateProfileStats(existingBooking.providerId, `${existingBooking.providerPayout}`, status)
-        return NextResponse.json({
-            success: true,
-            message: 'Booking updated successfully',
-            data: booking
-        });
-    }
-    catch (err) {
-        logger.error((err as Error).message)
-        return NextResponse.json(
-            { success: false, message: 'Failed to update booking' },
-            { status: 500 }
-        );
-    }
-}
-
+// GET - Get booking details (Provider only sees their own bookings)
 export const GET = async (
     req: NextRequest,
-    {params}: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ bookingId: string }> }
 ) => {
     try {
+        const { bookingId } = await params;
         const authHeader = req.headers.get('authorization');
         if (!authHeader) {
             return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
         }
 
         const token = authHeader.substring(7);
-        const { verifyAccessToken } = await import('@/lib/jwt');
+
         const user = verifyAccessToken(token);
 
         if (!user) {
             return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 401 });
         }
-        const { id:bookingId } = await params;
-
-        const clientId = user.userId;
+        if (user.role !== 'PROFESSIONAL') {
+            return NextResponse.json({ success: false, message: 'Forbidden' }, { status: 403 });
+        }
+        const providerId = user.userId;
 
         const booking = await prisma.booking.findFirst({
             where: {
                 id: bookingId,
-                clientId  // Ensure client can only see their own bookings
+                providerId  // Ensure provider can only see their own bookings
             },
             include: {
-                provider: {
+                client: {
                     select: {
                         id: true,
                         firstName: true,
                         lastName: true,
                         email: true,
                         phone: true,
-                        avatar: true,
-                        
+                        avatar: true
                     }
                 },
                 payment: true,

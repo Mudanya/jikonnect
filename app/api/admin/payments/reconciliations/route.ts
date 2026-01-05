@@ -1,4 +1,5 @@
 import { withRole } from "@/lib/api-auth";
+import logger from "@/lib/logger";
 import { prisma } from "@/prisma/prisma.init";
 import { AuthenticatedRequest } from "@/types/auth";
 import { NextResponse } from "next/server";
@@ -16,7 +17,6 @@ export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
         lte: new Date(endDate)
       };
     }
-
     const payments = await prisma.payment.findMany({
       where: whereClause,
       include: {
@@ -41,6 +41,9 @@ export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
         createdAt: 'desc'
       }
     });
+
+    logger.warn(`Payments: ${JSON.stringify(payments)}`);
+
 
     const summary = {
       totalPayments: payments.length,

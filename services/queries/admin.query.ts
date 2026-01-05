@@ -152,15 +152,32 @@ export const cancelBooking = async (bookingId: string) => {
 
 export const getAllDisputes = async (status?: DisputeStatus) => {
     return await prisma.dispute.findMany({
-        where: !status ? {} : { status },
+        where: status ? { status } : {},
         include: {
             booking: {
                 select: {
                     id: true,
-                    // scheduledFor: true,
-                    amount: true
-                },
-                include: {
+                    bookingNumber: true,
+                    service: true,
+                    amount: true,
+                    status: true,
+                    scheduledDate: true,
+                    scheduledTime: true,
+
+                    // Get CLIENT info ✅
+                    client: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            phone: true,
+                            avatar: true
+                        }
+                    },
+
+
+                    // Get PROVIDER info ✅
                     provider: {
                         select: {
                             id: true,
@@ -173,21 +190,35 @@ export const getAllDisputes = async (status?: DisputeStatus) => {
                     }
                 }
             },
+
             user: {
                 select: {
                     id: true,
                     firstName: true,
                     lastName: true,
                     email: true,
-                    phone: true,
-                    avatar: true
+                    role: true
                 }
             },
-
+            messages: {
+                include: {
+                    sender: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            avatar: true,
+                            role: true
+                        }
+                    }
+                },
+                orderBy: {
+                    createdAt: 'asc'
+                }
+            }
         },
-
         orderBy: { createdAt: 'desc' }
-    })
+    });
 }
 
 
@@ -201,6 +232,7 @@ export const updateDispute = async (disputeId: string) => {
             status: 'IN_REVIEW'
         }
     });
+    return getDisputeById(disputeId);
 }
 
 export const getDisputeById = async (disputeId: string) => await prisma.dispute.findUnique({
@@ -295,19 +327,109 @@ export const getTopProviders = async (startDate: Date) => {
 
 
 // Revenue by category
-export const getRevenueByCategory = async (startDate: Date) => await prisma.$queryRaw`
+export const getRevenueByCategory = async (startDate: Date) => {
+    const bookings = await prisma.booking.findMany({
+        where: {
+            status: 'COMPLETED',
+            createdAt: {
+                gte: startDate
+            }
+        },
+        include: {
+            provider: {
+                include: {
+                    profile: {
+                        include: {
+                            services: {
+                                include: {
+                                    category: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Group by category
+    const categoryMap = new Map<string, {
+        category: string;
+        categorySlug: string;
+        categoryIcon: string | null;
+        revenue: number;
+        providerPayout: number;
+        commission: number;
+        bookings: number;
+        providers: Set<string>;
+        totalAmount: number;
+    }>();
+
+    bookings.forEach(async (booking) => {
+        try {
+            const result = await prisma.$queryRaw`
       SELECT 
-        p.categories,
-        SUM(b.amount) as revenue,
-        COUNT(b.id) as bookings
-      FROM "Booking" b
-      JOIN "Provider" p ON b."providerId" = p.id
-      WHERE b.status = 'COMPLETED'
-        AND b."createdAt" >= ${startDate}
-      GROUP BY p.categories
-      ORDER BY revenue DESC
-      LIMIT 10
-    ` as any[];
+        COUNT(*) FILTER (WHERE status = 'PENDING')::int as pending,
+        COUNT(*) FILTER (WHERE status = 'CONFIRMED')::int as confirmed,
+        COUNT(*) FILTER (WHERE status = 'IN_PROGRESS')::int as "inProgress",
+        COUNT(*) FILTER (WHERE status = 'COMPLETED')::int as completed,
+        COUNT(*) FILTER (WHERE status = 'CANCELLED')::int as cancelled,
+        COALESCE(
+          ROUND(
+            COUNT(*) FILTER (WHERE status = 'COMPLETED')::numeric * 100.0 / 
+            NULLIF(COUNT(*) FILTER (WHERE status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED')), 0), 
+            2
+          ),
+          0
+        ) as "completionRate"
+      FROM "Booking"
+      WHERE "createdAt" >= ${startDate}
+    ` as Array<{
+                pending: number;
+                confirmed: number;
+                inProgress: number;
+                completed: number;
+                cancelled: number;
+                completionRate: number;
+            }>;
+
+            return result?.[0] || {
+                pending: 0,
+                confirmed: 0,
+                inProgress: 0,
+                completed: 0,
+                cancelled: 0,
+                completionRate: 0,
+            };
+        } catch (error) {
+            console.error('Error in getBookingConversionFunnel:', error);
+            return {
+                pending: 0,
+                confirmed: 0,
+                inProgress: 0,
+                completed: 0,
+                cancelled: 0,
+                completionRate: 0,
+            };
+        }
+    });
+
+    // Convert to array and calculate averages
+    return Array.from(categoryMap.values())
+        .map(item => ({
+            category: item.category,
+            categorySlug: item.categorySlug,
+            categoryIcon: item.categoryIcon,
+            revenue: item.revenue,
+            providerPayout: item.providerPayout,
+            commission: item.commission,
+            bookings: item.bookings,
+            providers: item.providers.size,
+            avgBookingValue: item.totalAmount / item.bookings
+        }))
+        ?.sort((a, b) => b.revenue - a.revenue)
+        ?.slice(0, 10);
+}
 
 export const getMonthData = async (monthDate: Date, nextMonth: Date) => await prisma.booking.aggregate({
     where: {

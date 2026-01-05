@@ -12,7 +12,7 @@ export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
 
 
         const { searchParams } = new URL(req.url);
-        const status = searchParams.get('status') || 'OPEN';
+        const status = searchParams.get('status') ;
 
         const disputes = await getAllDisputes(status as DisputeStatus)
 
@@ -21,13 +21,12 @@ export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
             disputes: disputes.map(dispute => ({
                 id: dispute.id,
                 booking: dispute.booking,
-                client: dispute.user,
-                provider: dispute.booking.provider,
+                user: dispute.user,
                 reason: dispute.reason,
                 status: dispute.status,
                 resolution: dispute.resolution,
                 createdAt: dispute.createdAt,
-
+                messages: dispute.messages
             }))
         });
 

@@ -27,7 +27,7 @@ export default function PaymentReconciliationPage() {
     try {
       const token = localStorage.getItem('accessToken');
       const response = await fetch(
-        `/api/admin/payments/reconciliation?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`,
+        `/api/admin/payments/reconciliations?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
       const result = await response.json();

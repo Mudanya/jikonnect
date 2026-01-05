@@ -1,6 +1,6 @@
 import { withRole } from '@/lib/api-auth';
 import logger from '@/lib/logger';
-import { getBookingsForExport } from '@/services/queries/admin.query';
+import { getBookingsForExport, getSettingsByKey } from '@/services/queries/admin.query';
 import { createAuditLog } from '@/services/queries/auth.query';
 import { AuthenticatedRequest } from '@/types/auth';
 import { NextResponse } from 'next/server';
@@ -36,7 +36,8 @@ export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
         ].join(','));
 
         // Data rows
-        const commissionRate = 0.10; //TODO: FETCH FROM configurations
+        const platformDetails = await getSettingsByKey('platform')
+        const commissionRate = platformDetails?.commissionRate || 0.10; 
         for (const booking of bookings) {
             const commission = +booking.amount * commissionRate;
             csvRows.push([

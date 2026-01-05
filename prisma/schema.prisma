@@ -39,6 +39,11 @@ model User {
   messagesSent        Message[]       @relation("MessagesSent")
   messagesReceived    Message[]       @relation("MessagesReceived")
 
+  payouts           Payout[]      @relation
+  processedPayouts  Payout[]      @relation("ProcessedPayouts")
+
+  disputeMessages DisputeMessage[] @relation
+
   
   @@index([email])
   @@index([phone])
@@ -148,6 +153,36 @@ model Portfolio {
   @@index([profileId])
 }
 
+model Payout {
+  id                String        @id @default(cuid())
+  providerId        String
+  amount            Decimal       @db.Decimal(10, 2)
+  commission        Decimal       @db.Decimal(10, 2)
+  phoneNumber       String
+  status            PayoutStatus  @default(PENDING)
+  mpesaCode         String?       @unique
+  conversationId    String?       @unique
+  originatorConversationId String?
+  resultCode        Int?
+  resultDesc        String?
+  processedBy       String        // Admin who initiated
+  processedAt       DateTime      @default(now())
+  completedAt       DateTime?
+  failureReason     String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  provider          User          @relation(fields: [providerId], references: [id])
+  processedByUser   User          @relation("ProcessedPayouts", fields: [processedBy], references: [id])
+  bookings          Booking[]     // All bookings in this payout
+
+  @@index([providerId])
+  @@index([status])
+  @@index([processedBy])
+  @@index([processedAt])
+}
+
+
 model Booking {
   id                 String        @id @default(cuid())
   bookingNumber      String        @unique
@@ -173,6 +208,12 @@ model Booking {
   dispute            Dispute?
   payment            Payment?
   review             Review?
+   payout             Payout?       @relation(fields: [payoutId], references: [id])
+
+
+  payoutStatus       PayoutStatus  @default(PENDING) 
+  paidOutAt          DateTime?                        
+  payoutId           String?   
 
   @@index([clientId])
   @@index([providerId])
@@ -233,9 +274,35 @@ model Dispute {
   updatedAt  DateTime      @updatedAt
   booking    Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   user       User          @relation(fields: [raisedBy], references: [id])
-
+  messages   DisputeMessage[] 
   @@index([status])
 }
+
+model DisputeMessage {
+  id         String              @id @default(cuid())
+  disputeId  String
+  senderId   String
+  senderType DisputeMessageSender // CLIENT, PROVIDER, or ADMIN
+  content    String              @db.Text
+  readAt     DateTime?
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  dispute    Dispute             @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  sender     User                @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([disputeId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@map("dispute_messages")
+}
+enum DisputeMessageSender {
+  CLIENT
+  PROVIDER
+  ADMIN
+}
+
+
 
 model Notification {
   id        String               @id @default(cuid())
@@ -452,4 +519,12 @@ enum NotificationPriority {
   MEDIUM
   HIGH
   URGENT
+}
+
+enum PayoutStatus {
+  PENDING      
+  PROCESSING   
+  COMPLETED     
+  FAILED       
+  REVERSED      
 }

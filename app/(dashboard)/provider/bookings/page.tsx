@@ -1,4 +1,3 @@
-// app/provider/bookings/page.tsx - UPDATED with Confirm/Reject
 "use client";
 
 import { useState, useEffect } from "react";
@@ -13,13 +12,16 @@ import {
   CheckCircle,
   XCircle,
   Loader,
-  MessageSquare,
   Star,
   Search,
   ThumbsUp,
   ThumbsDown,
+  Check,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
+import DisputeStatusBadge from "@/components/bookings/DisputeStatusBadge";
+import Link from "next/link";
 
 interface Booking {
   id: string;
@@ -144,7 +146,7 @@ export default function ProviderBookingsPage() {
 
       if (data.success) {
         toast.success(data.message);
-        loadBookings(); // Reload bookings
+        loadBookings();
       } else {
         toast.error(data.message);
       }
@@ -156,40 +158,40 @@ export default function ProviderBookingsPage() {
     }
   };
 
-  const getStatusConfig = (status: string) => {
-    const configs = {
-      PENDING: {
-        label: "Pending",
-        color: "bg-yellow-100 text-yellow-700",
-        icon: Clock,
-      },
-      CONFIRMED: {
-        label: "Confirmed",
-        color: "bg-blue-100 text-blue-700",
-        icon: CheckCircle,
-      },
-      IN_PROGRESS: {
-        label: "In Progress",
-        color: "bg-purple-100 text-purple-700",
-        icon: Clock,
-      },
-      COMPLETED: {
-        label: "Completed",
-        color: "bg-green-100 text-green-700",
-        icon: CheckCircle,
-      },
-      CANCELLED: {
-        label: "Cancelled",
-        color: "bg-gray-100 text-gray-700",
-        icon: XCircle,
-      },
-      FAILED: {
-        label: "Failed",
-        color: "bg-red-100 text-red-700",
-        icon: XCircle,
-      },
-    };
-    return configs[status as keyof typeof configs] || configs.PENDING;
+  // NEW: Handle completing booking
+  const handleCompleteBooking = async (bookingId: string) => {
+    if (!confirm("Are you sure you want to mark this booking as completed?"))
+      return;
+
+    try {
+      setConfirmingBooking(bookingId);
+      const token = localStorage.getItem("accessToken");
+
+      const response = await fetch(
+        `/api/provider/bookings/${bookingId}/complete`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(data.message);
+        loadBookings();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("Booking completion error:", error);
+      toast.error("Failed to complete booking");
+    } finally {
+      setConfirmingBooking(null);
+    }
   };
 
   const getStats = () => {
@@ -296,6 +298,7 @@ export default function ProviderBookingsPage() {
                 booking={booking}
                 onClick={() => setSelectedBooking(booking)}
                 onConfirm={handleConfirmBooking}
+                onComplete={handleCompleteBooking} // NEW
                 isConfirming={confirmingBooking === booking.id}
               />
             ))}
@@ -350,15 +353,18 @@ function BookingCard({
   booking,
   onClick,
   onConfirm,
+  onComplete, // NEW
   isConfirming,
 }: {
   booking: Booking;
   onClick: () => void;
   onConfirm: (bookingId: string, action: "confirm" | "reject") => void;
+  onComplete: (bookingId: string) => void; // NEW
   isConfirming: boolean;
 }) {
   const statusConfig = {
     PENDING: { label: "Pending", color: "bg-yellow-100 text-yellow-700" },
+    DISPUTED: { label: "Disputed", color: "bg-red-100 text-red-700" },
     CONFIRMED: { label: "Confirmed", color: "bg-blue-100 text-blue-700" },
     IN_PROGRESS: {
       label: "In Progress",
@@ -370,9 +376,11 @@ function BookingCard({
   };
 
   const config = statusConfig[booking.status];
-
+  const [showDisputeModal, setShowDisputeModal] = useState(false);
+  const [showResponseModal, setShowResponseModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+    <Link href={`/provider/bookings/${booking.id}`} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-4 flex-1">
           <img
@@ -427,6 +435,7 @@ function BookingCard({
           View Details
         </button>
 
+        {/* PENDING - Accept/Decline */}
         {booking.status === "PENDING" && (
           <div className="flex items-center space-x-2">
             <button
@@ -463,10 +472,30 @@ function BookingCard({
           </div>
         )}
 
+        {/* CONFIRMED - Awaiting payment */}
         {booking.status === "CONFIRMED" && (
           <span className="text-sm text-blue-600 font-medium">
             ⏳ Awaiting client payment
           </span>
+        )}
+
+        {/* IN_PROGRESS - Mark as Complete */}
+        {booking.status === "IN_PROGRESS" && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onComplete(booking.id);
+            }}
+            disabled={isConfirming}
+            className="flex items-center space-x-1 px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-lg hover:shadow-lg transition disabled:opacity-50"
+          >
+            {isConfirming ? (
+              <Loader size={16} className="animate-spin" />
+            ) : (
+              <Check size={16} />
+            )}
+            <span className="text-sm font-medium">Mark as Complete</span>
+          </button>
         )}
       </div>
 
@@ -492,7 +521,22 @@ function BookingCard({
           </div>
         </div>
       )}
-    </div>
+
+      {/* {booking.status === "COMPLETED" && !booking.dispute && (
+        <button
+          onClick={() => {
+            setSelectedBooking(booking);
+            setShowDisputeModal(true);
+          }}
+          className="flex items-center space-x-2 text-red-600 hover:text-red-700"
+        >
+          <AlertTriangle size={16} />
+          <span>Raise Dispute</span>
+        </button>
+      )} */}
+
+     
+    </Link>
   );
 }
 
@@ -508,6 +552,7 @@ function BookingDetailsModal({
   const statusConfig = {
     PENDING: { label: "Pending", color: "bg-yellow-100 text-yellow-700" },
     CONFIRMED: { label: "Confirmed", color: "bg-blue-100 text-blue-700" },
+    DISPUTED: { label: "Disputed", color: "bg-red-100 text-red-700" },
     IN_PROGRESS: {
       label: "In Progress",
       color: "bg-purple-100 text-purple-700",
@@ -557,16 +602,16 @@ function BookingDetailsModal({
                   {booking.client.firstName} {booking.client.lastName}
                 </p>
                 {booking.status === "IN_PROGRESS" && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
-                    <Mail size={14} />
-                    <span>{booking.client.email}</span>
-                  </div>
-                )}
-                {booking.status === "IN_PROGRESS" && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
-                    <Phone size={14} />
-                    <span>{booking.client.phone}</span>
-                  </div>
+                  <>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
+                      <Mail size={14} />
+                      <span>{booking.client.email}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
+                      <Phone size={14} />
+                      <span>{booking.client.phone}</span>
+                    </div>
+                  </>
                 )}
               </div>
             </div>

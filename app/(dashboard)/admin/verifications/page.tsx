@@ -7,7 +7,6 @@ import {
   XCircle,
   Eye,
   FileText,
- 
   Mail,
   Phone,
   Calendar,
@@ -35,13 +34,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-select";
 import { Textarea } from "@/components/ui/textarea";
 import { User } from "@/types/auth";
+
 const VerificationPage = () => {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [verifications, setVerifications] = useState([]);
-  const [selectedProfile, setSelectedProfile] = useState<{user:User,id:string} | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<{
+    user: User;
+    id: string;
+  } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
 
@@ -73,11 +76,19 @@ const VerificationPage = () => {
 
     setActionLoading(true);
     try {
-      const data = await submitVerification(action, profileId, rejectionReason);
+      const data = await submitVerification(
+        action,
+        profileId,
+        selectedProfile!.user.id,
+        rejectionReason
+      );
       if (data.success) {
         setSelectedProfile(null);
         setRejectionReason("");
-        await loadVerifications();
+        const verData = await loadVerifications();
+        if (verData?.success) {
+          setVerifications(verData.data);
+        }
         toast.success("Verification updated successfully");
       } else toast.error(data.message);
     } catch (err) {
@@ -168,14 +179,16 @@ const VerificationPage = () => {
                 <div className="mb-4">
                   <p className="text-sm text-gray-500 mb-2">Services</p>
                   <div className="flex flex-wrap gap-2">
-                    {profile?.services?.map((service: {name:string,id:string}) => (
-                      <span
-                        key={service.id}
-                        className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                      >
-                        {service.name}
-                      </span>
-                    ))}
+                    {profile?.services?.map(
+                      (service: { name: string; id: string }) => (
+                        <span
+                          key={service.id}
+                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                        >
+                          {service.name}
+                        </span>
+                      )
+                    )}
                   </div>
                 </div>
 
@@ -255,9 +268,9 @@ const VerificationPage = () => {
                           </Button>
                         </DialogClose>
                         <Button
-                          onClick={() =>
-                            handleAction(selectedProfile!.id, "reject")
-                          }
+                          onClick={() => {
+                            handleAction(selectedProfile!.id, "reject");
+                          }}
                           disabled={actionLoading || !rejectionReason}
                           className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 disabled:opacity-50"
                         >
@@ -268,7 +281,9 @@ const VerificationPage = () => {
                   </Dialog>
 
                   <Button
-                    onClick={() => handleAction(profile.id, "approve")}
+                    onClick={() => {
+                      handleAction(profile.id, "approve");
+                    }}
                     disabled={actionLoading}
                     className="flex-1 cursor-pointer flex items-center justify-center space-x-2 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition font-semibold disabled:opacity-50"
                   >

@@ -1,64 +1,98 @@
+// app/admin/disputes/page.tsx - UPDATED FOR NEW MESSAGE SYSTEM
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
 import { 
-  AlertTriangle, ArrowLeft, MessageSquare, User, 
-  CheckCircle, XCircle, Clock, Send, FileText 
+  AlertTriangle, MessageSquare, Send, 
+  CheckCircle, XCircle, Loader
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+interface DisputeMessage {
+  id: string;
+  senderType: 'CLIENT' | 'PROVIDER' | 'ADMIN';
+  content: string;
+  createdAt: string;
+  sender: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatar: string | null;
+    role: string;
+  };
+}
+
 interface Dispute {
   id: string;
+  reason: string;
+  resolution: string | null;
+  status: 'OPEN' | 'IN_REVIEW' | 'RESOLVED' | 'CLOSED';
+  createdAt: string;
   booking: {
     id: string;
-    scheduledFor: string;
-    price: number;
+    bookingNumber: string;
+    service: string;
+    amount: number;
+    scheduledDate: string;
+    client: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      avatar: string | null;
+    };
+    provider: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      avatar: string | null;
+    };
   };
-  client: {
+  user: {
     id: string;
-    name: string;
-    email: string;
-    phone: string;
-    avatarUrl: string;
+    firstName: string;
+    lastName: string;
+    role: string;
   };
-  provider: {
-    id: string;
-    name: string;
-    title: string;
-    avatarUrl: string;
-  };
-  reason: string;
-  description: string;
-  status: 'OPEN' | 'IN_REVIEW' | 'RESOLVED' | 'CLOSED';
-  resolution?: string;
-  createdAt: string;
-  messages: Array<{
-    id: string;
-    sender: 'CLIENT' | 'PROVIDER' | 'ADMIN';
-    senderName: string;
-    message: string;
-    createdAt: string;
-  }>;
+  messages: DisputeMessage[];
 }
 
 export default function DisputeResolutionPage() {
-  const router = useRouter();
   const [disputes, setDisputes] = useState<Dispute[]>([]);
+  const [disputesStats, setDisputesStats] = useState<Dispute[]>([]);
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('OPEN');
   const [newMessage, setNewMessage] = useState('');
   const [resolutionNote, setResolutionNote] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [sending, setSending] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadDisputes();
   }, [statusFilter]);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [selectedDispute?.messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const loadDisputes = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem('accessToken');
+      const responseStats = await fetch(`/api/admin/disputes`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (responseStats.ok) {
+        const dataStats = await responseStats.json();
+        setDisputesStats(dataStats.disputes);
+      }
       const response = await fetch(`/api/admin/disputes?status=${statusFilter}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -66,20 +100,28 @@ export default function DisputeResolutionPage() {
       if (response.ok) {
         const data = await response.json();
         setDisputes(data.disputes);
+        
+        // Update selected dispute if it's in the new data
+        if (selectedDispute) {
+          const updated = data.disputes.find((d: Dispute) => d.id === selectedDispute.id);
+          if (updated) setSelectedDispute(updated);
+        }
       }
     } catch (error) {
       console.error('Failed to load disputes:', error);
+      toast.error('Failed to load disputes');
     } finally {
       setLoading(false);
     }
   };
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !selectedDispute) return;
-
+    if (!newMessage.trim() || !selectedDispute || sending) return;
+    
+    setSending(true);
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`/api/admin/disputes/${selectedDispute.id}/message`, {
+      const response = await fetch(`/api/disputes/${selectedDispute.id}/message`, {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -87,18 +129,19 @@ export default function DisputeResolutionPage() {
         },
         body: JSON.stringify({ message: newMessage })
       });
-
+      
       if (response.ok) {
         setNewMessage('');
-        // Reload dispute to get updated messages
-        const updatedResponse = await fetch(`/api/admin/disputes/${selectedDispute.id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await updatedResponse.json();
-        setSelectedDispute(data.dispute);
+        await loadDisputes(); // Reload to get updated messages
+        toast.success('Message sent');
+      } else {
+        toast.error('Failed to send message');
       }
     } catch (error) {
       console.error('Failed to send message:', error);
+      toast.error('Failed to send message');
+    } finally {
+      setSending(false);
     }
   };
 
@@ -107,9 +150,9 @@ export default function DisputeResolutionPage() {
       toast.warning('Please provide resolution notes');
       return;
     }
-
+    
     if (!confirm('Are you sure you want to resolve this dispute?')) return;
-
+    
     setProcessing(true);
     try {
       const token = localStorage.getItem('accessToken');
@@ -124,43 +167,18 @@ export default function DisputeResolutionPage() {
           notes: resolutionNote 
         })
       });
-
+      
       if (response.ok) {
         await loadDisputes();
         setSelectedDispute(null);
         setResolutionNote('');
         toast.success('Dispute resolved successfully');
+      } else {
+        toast.error('Failed to resolve dispute');
       }
     } catch (error) {
       console.error('Failed to resolve dispute:', error);
       toast.error('Failed to resolve dispute');
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const handleCloseDispute = async () => {
-    if (!confirm('Are you sure you want to close this dispute without resolution?')) return;
-
-    setProcessing(true);
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`/api/admin/disputes/${selectedDispute?.id}/close`, {
-        method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        await loadDisputes();
-        setSelectedDispute(null);
-        toast.success('Dispute closed');
-      }
-    } catch (error) {
-      console.error('Failed to close dispute:', error);
-      toast.error('Failed to close dispute');
     } finally {
       setProcessing(false);
     }
@@ -176,30 +194,42 @@ export default function DisputeResolutionPage() {
     }
   };
 
+  const getSenderName = (message: DisputeMessage, dispute: Dispute) => {
+    return `${message.sender.firstName} ${message.sender.lastName}`;
+  };
+
+  const getSenderBadge = (senderType: 'CLIENT' | 'PROVIDER' | 'ADMIN') => {
+    const badges = {
+      CLIENT: 'bg-blue-100 text-blue-800',
+      PROVIDER: 'bg-purple-100 text-purple-800',
+      ADMIN: 'bg-green-100 text-green-800'
+    };
+    return badges[senderType];
+  };
+
   const stats = {
-    open: disputes.filter(d => d.status === 'OPEN').length,
-    inReview: disputes.filter(d => d.status === 'IN_REVIEW').length,
-    resolved: disputes.filter(d => d.status === 'RESOLVED').length,
+    open: disputesStats.filter(d => d.status === 'OPEN').length,
+    inReview: disputesStats.filter(d => d.status === 'IN_REVIEW').length,
+    resolved: disputesStats.filter(d => d.status === 'RESOLVED').length,
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <Loader className="animate-spin h-12 w-12 text-blue-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b mx-4 rounded-lg shadow-md">
-        <div className=" mx-auto px-4 py-4">
-          
+      <div className="bg-white border-b">
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Dispute Resolution</h1>
-              <p className="text-gray-600 mt-1">{disputes.length} disputes in this view</p>
+              <p className="text-gray-600 mt-1">{disputes.length} disputes</p>
             </div>
             <select
               value={statusFilter}
@@ -236,10 +266,10 @@ export default function DisputeResolutionPage() {
           {/* Disputes List */}
           <div className="space-y-4">
             {disputes.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-md  p-12 text-center">
+              <div className="bg-white rounded-xl shadow-md p-12 text-center">
                 <AlertTriangle className="mx-auto text-gray-400 mb-4" size={48} />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No disputes found</h3>
-                <p className="text-gray-600">There are no disputes with status: {statusFilter}</p>
+                <p className="text-gray-600">No disputes with status: {statusFilter}</p>
               </div>
             ) : (
               disputes.map((dispute) => (
@@ -257,9 +287,7 @@ export default function DisputeResolutionPage() {
                       <AlertTriangle className="text-red-600" size={24} />
                       <div>
                         <h3 className="font-bold text-lg text-gray-900">{dispute.reason}</h3>
-                        <p className="text-sm text-gray-600">
-                          Booking #{dispute.booking.id.substring(0, 8)}...
-                        </p>
+                        <p className="text-sm text-gray-600">#{dispute.booking.bookingNumber}</p>
                       </div>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(dispute.status)}`}>
@@ -267,32 +295,35 @@ export default function DisputeResolutionPage() {
                     </span>
                   </div>
 
+                  {/* Parties */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
                       <img
-                        src={dispute.client.avatarUrl || '/images/avatar-placeholder.png'}
-                        alt={dispute.client.name}
+                        src={dispute.booking.client.avatar || '/avatar-placeholder.png'}
+                        alt={dispute.booking.client.firstName}
                         className="w-8 h-8 rounded-full"
                       />
-                      <span className="text-sm font-medium">{dispute.client.name}</span>
+                      <span className="text-sm font-medium">
+                        {dispute.booking.client.firstName}
+                      </span>
                     </div>
                     <span className="text-xs text-gray-500">vs</span>
                     <div className="flex items-center space-x-2">
                       <img
-                        src={dispute.provider.avatarUrl || '/images/avatar-placeholder.png'}
-                        alt={dispute.provider.name}
+                        src={dispute.booking.provider.avatar || '/avatar-placeholder.png'}
+                        alt={dispute.booking.provider.firstName}
                         className="w-8 h-8 rounded-full"
                       />
-                      <span className="text-sm font-medium">{dispute.provider.name}</span>
+                      <span className="text-sm font-medium">
+                        {dispute.booking.provider.firstName}
+                      </span>
                     </div>
                   </div>
-
-                  <p className="text-sm text-gray-700 line-clamp-2 mb-3">{dispute.description}</p>
 
                   <div className="flex items-center justify-between text-xs text-gray-500">
                     <span className="flex items-center">
                       <MessageSquare size={14} className="mr-1" />
-                      {dispute.messages.length} messages
+                      {dispute?.messages?.length} messages
                     </span>
                     <span>{new Date(dispute.createdAt).toLocaleDateString()}</span>
                   </div>
@@ -302,29 +333,42 @@ export default function DisputeResolutionPage() {
           </div>
 
           {/* Dispute Details & Chat */}
-          <div className="lg:sticky lg:top-8 lg:h-fit">
+          <div className="lg:sticky lg:top-8">
             {selectedDispute ? (
               <div className="bg-white rounded-xl shadow-sm border">
                 {/* Header */}
                 <div className="p-6 border-b">
                   <div className="flex items-start justify-between mb-4">
-                    <h2 className="text-xl font-bold text-gray-900">{selectedDispute.reason}</h2>
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900">{selectedDispute.reason}</h2>
+                      <p className="text-sm text-gray-600">
+                        Booking #{selectedDispute.booking.bookingNumber}
+                      </p>
+                    </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedDispute.status)}`}>
                       {selectedDispute.status}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 mb-4">{selectedDispute.description}</p>
-                  
+
+                  {/* Raised By */}
+                  <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Raised by:</p>
+                    <p className="font-medium">
+                      {selectedDispute.user.firstName} {selectedDispute.user.lastName}
+                      <span className="ml-2 text-xs text-gray-500">
+                        ({selectedDispute.user.id === selectedDispute.booking.client.id ? 'Client' : 'Provider'})
+                      </span>
+                    </p>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-600 mb-1">Booking Date</p>
-                      <p className="font-medium">
-                        {new Date(selectedDispute.booking.scheduledFor).toLocaleDateString()}
-                      </p>
+                      <p className="text-gray-600 mb-1">Service</p>
+                      <p className="font-medium">{selectedDispute.booking.service}</p>
                     </div>
                     <div>
                       <p className="text-gray-600 mb-1">Amount</p>
-                      <p className="font-medium">KSH {selectedDispute.booking.price.toLocaleString()}</p>
+                      <p className="font-medium">KES {selectedDispute.booking.amount.toLocaleString()}</p>
                     </div>
                   </div>
                 </div>
@@ -333,25 +377,34 @@ export default function DisputeResolutionPage() {
                 <div className="p-6 border-b max-h-96 overflow-y-auto">
                   <h3 className="font-semibold text-gray-900 mb-4">Conversation</h3>
                   <div className="space-y-4">
-                    {selectedDispute.messages.map((msg) => (
-                      <div key={msg.id} className={`flex ${msg.sender === 'ADMIN' ? 'justify-end' : 'justify-start'}`}>
+                    {selectedDispute?.messages?.map((msg) => (
+                      <div 
+                        key={msg.id} 
+                        className={`flex ${msg.senderType === 'ADMIN' ? 'justify-end' : 'justify-start'}`}
+                      >
                         <div className={`max-w-[80%] ${
-                          msg.sender === 'ADMIN' 
-                            ? 'bg-blue-100' 
-                            : msg.sender === 'CLIENT'
-                            ? 'bg-gray-100'
-                            : 'bg-orange-100'
-                        } rounded-xl p-4`}>
-                          <div className="flex items-center space-x-2 mb-1">
-                            <span className="text-xs font-semibold text-gray-700">{msg.senderName}</span>
-                            <span className="text-xs text-gray-500">
-                              {new Date(msg.createdAt).toLocaleString()}
+                          msg.senderType === 'ADMIN' 
+                            ? 'bg-green-50 border-green-200' 
+                            : msg.senderType === 'CLIENT'
+                            ? 'bg-blue-50 border-blue-200'
+                            : 'bg-purple-50 border-purple-200'
+                        } border rounded-xl p-4`}>
+                          <div className="flex items-center space-x-2 mb-2">
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getSenderBadge(msg.senderType)}`}>
+                              {msg.senderType}
+                            </span>
+                            <span className="text-xs font-medium text-gray-700">
+                              {getSenderName(msg, selectedDispute)}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-900">{msg.message}</p>
+                          <p className="text-sm text-gray-900">{msg.content}</p>
+                          <p className="text-xs text-gray-500 mt-2">
+                            {new Date(msg.createdAt).toLocaleString()}
+                          </p>
                         </div>
                       </div>
                     ))}
+                    <div ref={messagesEndRef} />
                   </div>
                 </div>
 
@@ -363,16 +416,21 @@ export default function DisputeResolutionPage() {
                         type="text"
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                        placeholder="Type your message..."
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onKeyPress={(e) => e.key === 'Enter' && !sending && handleSendMessage()}
+                        placeholder="Type your message as admin..."
+                        disabled={sending}
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
                       />
                       <button
                         onClick={handleSendMessage}
-                        disabled={!newMessage.trim()}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+                        disabled={!newMessage.trim() || sending}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition flex items-center space-x-2"
                       >
-                        <Send size={20} />
+                        {sending ? (
+                          <Loader size={20} className="animate-spin" />
+                        ) : (
+                          <Send size={20} />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -410,18 +468,10 @@ export default function DisputeResolutionPage() {
                     <button
                       onClick={() => handleResolveDispute('MUTUAL')}
                       disabled={processing}
-                      className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 disabled:opacity-50 transition mb-2"
+                      className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 disabled:opacity-50 transition"
                     >
                       <CheckCircle size={18} />
                       <span>Mutual Agreement</span>
-                    </button>
-                    <button
-                      onClick={handleCloseDispute}
-                      disabled={processing}
-                      className="w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 disabled:opacity-50 transition"
-                    >
-                      <XCircle size={18} />
-                      <span>Close Without Resolution</span>
                     </button>
                   </div>
                 )}
@@ -443,7 +493,7 @@ export default function DisputeResolutionPage() {
               <div className="bg-white rounded-xl shadow-md p-12 text-center">
                 <AlertTriangle className="mx-auto text-gray-400 mb-4" size={48} />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Select a dispute</h3>
-                <p className="text-gray-600">Choose a dispute from the list to view details and take action</p>
+                <p className="text-gray-600">Choose a dispute to view details and messages</p>
               </div>
             )}
           </div>

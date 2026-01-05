@@ -18,7 +18,7 @@ export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
                     avatar: booking.provider.avatar
                 },
                 status: booking.status,
-                // scheduledFor: booking., //TODO : include sheduledFor
+                scheduledFor: booking.scheduledDate, 
                 amount: booking.amount,
                 createdAt: booking.createdAt,
                 mpesaReceipt: booking.status

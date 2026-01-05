@@ -119,9 +119,9 @@ export default function AdminDashboard() {
           
             <div className="flex items-center space-x-4">
              
-              <Button className="px-4 py-2 text-sm font-medium bg-jiko-primary text-white rounded-lg hover:bg-jiko-primary/80 transition">
+              {/* <Button className="px-4 py-2 text-sm font-medium bg-jiko-primary text-white rounded-lg hover:bg-jiko-primary/80 transition">
                 Generate Report
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
@@ -221,7 +221,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
+        {/* <div className="bg-white rounded-xl shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
             <Button variant={'link'} className="text-sm text-blue-600 hover:text-blue-700 font-medium cursor-pointer">
@@ -254,7 +254,7 @@ export default function AdminDashboard() {
               time="2 hours ago"
             />
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
