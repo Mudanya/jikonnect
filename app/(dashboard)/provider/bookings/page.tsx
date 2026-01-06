@@ -380,7 +380,8 @@ function BookingCard({
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   return (
-    <Link href={`/provider/bookings/${booking.id}`} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+      <Link href={`/provider/bookings/${booking.id}`}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-4 flex-1">
           <img
@@ -425,7 +426,7 @@ function BookingCard({
           <span>KSH {booking.providerPayout.toLocaleString()}</span>
         </div>
       </div>
-
+            </Link>
       {/* Action Buttons */}
       <div className="flex items-center justify-between pt-4 border-t">
         <button
@@ -480,7 +481,7 @@ function BookingCard({
         )}
 
         {/* IN_PROGRESS - Mark as Complete */}
-        {booking.status === "IN_PROGRESS" && (
+        {/* {booking.status === "IN_PROGRESS" && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -496,7 +497,7 @@ function BookingCard({
             )}
             <span className="text-sm font-medium">Mark as Complete</span>
           </button>
-        )}
+        )} */}
       </div>
 
       {booking.review && (
@@ -536,7 +537,7 @@ function BookingCard({
       )} */}
 
      
-    </Link>
+    </div>
   );
 }
 

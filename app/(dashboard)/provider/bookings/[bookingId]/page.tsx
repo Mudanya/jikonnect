@@ -223,7 +223,9 @@ export default function ProviderBookingDetailsPage() {
           <div className="mt-4 pt-4 border-t border-blue-500">
             <div className="flex justify-between text-sm">
               <span className="text-blue-100">Total Amount:</span>
-              <span className="font-medium">KES {booking.amount.toLocaleString()}</span>
+              <span className="font-medium">
+                KES {booking.amount.toLocaleString()}
+              </span>
             </div>
             <div className="flex justify-between text-sm mt-1">
               <span className="text-blue-100">Platform Fee:</span>
@@ -341,18 +343,22 @@ export default function ProviderBookingDetailsPage() {
               <h3 className="font-bold text-lg text-gray-900">
                 {booking.client.firstName} {booking.client.lastName}
               </h3>
-
-              <div className="mt-3 space-y-2">
-                <div className="flex items-center space-x-2 text-sm">
-                  <Phone size={16} className="text-gray-400" />
-                  <span className="text-gray-600">{booking.client.phone}</span>
+              {booking.status === "IN_PROGRESS" && (
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Phone size={16} className="text-gray-400" />
+                    <span className="text-gray-600">
+                      {booking.client.phone}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Mail size={16} className="text-gray-400" />
+                    <span className="text-gray-600">
+                      {booking.client.email}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <Mail size={16} className="text-gray-400" />
-                  <span className="text-gray-600">{booking.client.email}</span>
-                </div>
-              </div>
-
+              )}
               {booking.status === "CONFIRMED" && (
                 <button className="mt-4 flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                   <MessageSquare size={18} />

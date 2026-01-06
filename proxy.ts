@@ -13,6 +13,7 @@ export const proxy = (req: NextRequest) => {
         '/api/auth/reset-password',
         '/api/auth/verify-email',
         '/api/landing',
+        '/api/services/top',
         '/api/locations/zones',
         '/api/locations/search',
         '/api/services',

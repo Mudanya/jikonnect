@@ -218,6 +218,7 @@ const Register = () => {
                 </label>
                
                 <LocationDropdown
+                  
                   value={getValues("location")}
                   onChange={(locId) => {
                     setValue("location", locId, {

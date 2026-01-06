@@ -33,7 +33,8 @@ export const getBookingsById = async (clientId: string, status?: BookingStatus) 
                 }
             },
             payment: true,
-            review: true
+            review: true,
+            dispute: true
         },
         orderBy: { createdAt: 'desc' }
     })
@@ -99,7 +100,7 @@ export const getAllProviders = async () => {
             profile: {
                 include: {
                     location: true,
-                    services:true
+                    services: true
                 },
             },
             receivedReviews: {
@@ -156,30 +157,61 @@ export const getRecentReviews = async () => await prisma.review.findMany({
     take: 6
 });
 
-export const getProviderServices = async () =>
-    await prisma.user.findMany({
-        where: {
-            role: 'PROFESSIONAL',
-            profile: {
-                verifiedAt: { not: null }
-            }
+export const getProviderServices = async () => {
+    const providerRatings = await prisma.review.groupBy({
+        by: ['revieweeId'],
+        _avg: {
+            rating: true
         },
-        include: {
-            profile: {
-                select: {
-                    services: {
+        _count: {
+            id: true
+        },
+        orderBy: {
+            _avg: {
+                rating: 'desc'
+            }
+        }
+    });
+
+    return await Promise.all(
+        providerRatings.map(async (pr) => {
+            const provider = await prisma.user.findFirst({
+                where: {
+                    id: pr.revieweeId,
+                    role: 'PROFESSIONAL',
+                    profile: {
+                        verifiedAt: { not: null }
+                    }
+                },
+                include: {
+                    profile: {
                         select: {
-                            name: true,
-                            description: true,
-                            category: {
+                            services: {
                                 select: {
                                     name: true,
-                                    icon: true
+                                    description: true,
+                                    category: {
+                                        select: {
+                                            name: true,
+                                            icon: true
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-    });
+            });
+
+            if (!provider) return null;
+
+            return {
+                ...provider,
+                averageRating: pr._avg.rating || 0,
+                totalReviews: pr._count.id
+            };
+        })
+    );
+
+  
+}

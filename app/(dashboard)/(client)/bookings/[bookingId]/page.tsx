@@ -312,21 +312,26 @@ export default function BookingDetailsPage() {
                   {booking.provider.bio}
                 </p>
               )}
-
-              <div className="mt-3 space-y-2">
-                <div className="flex items-center space-x-2 text-sm">
-                  <Phone size={16} className="text-gray-400" />
-                  <span className="text-gray-600">{booking.provider.phone}</span>
+              {booking.status === "IN_PROGRESS" && (
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Phone size={16} className="text-gray-400" />
+                    <span className="text-gray-600">
+                      {booking.provider.phone}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Mail size={16} className="text-gray-400" />
+                    <span className="text-gray-600">
+                      {booking.provider.email}
+                    </span>
+                  </div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
                 </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <Mail size={16} className="text-gray-400" />
-                  <span className="text-gray-600">{booking.provider.email}</span>
-                </div>
-              </div>
+              )}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 
               {booking.status === "CONFIRMED" && (
                 <button className="mt-4 flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                  <MessageSquare size={18} />
+                  <MessageSquare size={18} />                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
                   <span>Chat with Provider</span>
                 </button>
               )}
@@ -383,7 +388,9 @@ export default function BookingDetailsPage() {
         {/* Review */}
         {booking.review && (
           <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Your Review</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              Your Review
+            </h2>
 
             <div className="flex items-center space-x-1 mb-3">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -404,7 +411,8 @@ export default function BookingDetailsPage() {
 
             <p className="text-gray-700">{booking.review.comment}</p>
             <p className="text-xs text-gray-500 mt-2">
-              Reviewed on {new Date(booking.review.createdAt).toLocaleDateString()}
+              Reviewed on{" "}
+              {new Date(booking.review.createdAt).toLocaleDateString()}
             </p>
           </div>
         )}
@@ -426,7 +434,8 @@ export default function BookingDetailsPage() {
               </p>
               <p className="text-sm text-red-800">{booking.dispute.reason}</p>
               <p className="text-xs text-gray-600 mt-1">
-                Raised on {new Date(booking.dispute.createdAt).toLocaleDateString()}
+                Raised on{" "}
+                {new Date(booking.dispute.createdAt).toLocaleDateString()}
               </p>
             </div>
 
@@ -457,27 +466,29 @@ export default function BookingDetailsPage() {
         )}
 
         {/* Actions */}
-        {booking.status === "COMPLETED" && !booking.dispute && !booking.review && (
-          <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Actions</h2>
-            <div className="flex flex-wrap gap-3">
-              <button
-                onClick={() => router.push(`/bookings/${booking.id}/review`)}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                <Star size={18} />
-                <span>Write Review</span>
-              </button>
-              <button
-                onClick={() => setShowDisputeModal(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-              >
-                <AlertTriangle size={18} />
-                <span>Raise Dispute</span>
-              </button>
+        {booking.status === "COMPLETED" &&
+          !booking.dispute &&
+          !booking.review && (
+            <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Actions</h2>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => router.push(`/bookings/${booking.id}/review`)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  <Star size={18} />
+                  <span>Write Review</span>
+                </button>
+                <button
+                  onClick={() => setShowDisputeModal(true)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  <AlertTriangle size={18} />
+                  <span>Raise Dispute</span>
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
 
       {/* Dispute Modal */}

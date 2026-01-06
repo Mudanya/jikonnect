@@ -5,6 +5,7 @@ export const searchService = async (queryParams: URLSearchParams,token:string) =
             'Content-Type': 'application/json'
         }
     });
+    
     return await response.json();
 }
 
