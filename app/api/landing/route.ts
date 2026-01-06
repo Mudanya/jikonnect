@@ -72,7 +72,7 @@ export const GET = async (request: NextRequest) => {
                     providerLocation: r.reviewee.profile?.location?.name,
                     serviceDate: r.booking.scheduledDate
                 })),
-                serviceCategories: allProviders.map(provider => provider.profile?.services || []).flat().slice(0, 12), // Top 12 categories,
+                serviceCategories: allProviders.map(provider => provider?.profile?.services || []).flat().slice(0, 4), // Top 4 categories,
                 platform: { name: platformDetails?.platformName, phone: platformDetails?.supportPhone, email: platformDetails?.supportEmail }
             }
         });
@@ -85,32 +85,4 @@ export const GET = async (request: NextRequest) => {
             { status: 500 }
         );
     }
-}
-
-// TODO pick from DB
-function getCategoryDescription(category: string): string {
-    const descriptions: Record<string, string> = {
-        'PLUMBING': 'Professional plumbing services',
-        'ELECTRICAL': 'Licensed electrical work',
-        'CARPENTRY': 'Expert carpentry & woodwork',
-        'PAINTING': 'Professional painting services',
-        'CLEANING': 'Home & office cleaning',
-        'GARDENING': 'Garden maintenance & landscaping',
-        'SECURITY': 'Security guard services',
-        'BABYSITTING': 'Trusted childcare services',
-        'NURSING': 'Professional nursing care',
-        'ELDERLY_CARE': 'Compassionate elderly care',
-        'HOME_CARE': 'Comprehensive home care',
-        'DECOR': 'Interior design & decoration',
-        'MOVING': 'Moving & relocation services',
-        'CATERING': 'Catering services',
-        'EVENT_PLANNING': 'Event planning & management',
-        'TUTORING': 'Educational tutoring',
-        'FITNESS': 'Personal training & fitness',
-        'BEAUTY': 'Beauty & wellness services',
-        'TAILORING': 'Tailoring & alterations',
-        'LAUNDRY': 'Laundry & dry cleaning'
-    };
-
-    return descriptions[category] || 'Professional services';
 }

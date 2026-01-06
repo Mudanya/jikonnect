@@ -15,7 +15,7 @@ export const getUserByUserId = async (userId: string) => {
 export const getUserProfileById = async (userId: string) => {
     return await prisma.profile.findUnique({
         where: { userId },
-        include:{services:true}
+        include: { services: true }
     })
 }
 
@@ -78,9 +78,9 @@ export const getUserProfiles = async ({ location, minRate, maxRate, minRating, c
     return await prisma.profile.findMany({
         where: {
             verificationStatus: 'VERIFIED',
-            // ...(category && {
-            //     services: {has:{contains:category}}
-            // }),
+            ...(category && {
+                services: { some: { category: { name: { equals: category, mode: 'insensitive' } } } }
+            }),
             ...(location && {
                 location: {
                     id: location
@@ -203,7 +203,7 @@ export const createBooking = async ({
     const hours = duration || 1;
     const amount = Number(hourlyRate) * hours;
     const platformDetails = await getSettingsByKey('platform')
-    const commission = amount * (platformDetails?.commissionRate || 0.10); 
+    const commission = amount * (platformDetails?.commissionRate || 0.10);
     const providerPayout = amount - commission;
     return await prisma.booking.create({
         data: {

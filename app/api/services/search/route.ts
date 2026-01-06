@@ -10,7 +10,7 @@ export const GET = async (req: NextRequest) => {
         const minRate = searchParams.get('minRate');
         const maxRate = searchParams.get('maxRate');
         const minRating = searchParams.get('minRating');
-
+        logger.info(`Search params - category: ${category}, location: ${location}, minRate: ${minRate}, maxRate: ${maxRate}, minRating: ${minRating}`);
         const profiles = await getUserProfiles({ category, location, minRate, maxRate, minRating })
         return NextResponse.json({ success: true, data: profiles })
     }

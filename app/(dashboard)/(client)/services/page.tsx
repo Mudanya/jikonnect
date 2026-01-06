@@ -1,20 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Search,
-  Filter,
-  MapPin,
-  Star,
-  DollarSign,
-  Award,
-  CheckCircle,
-  Briefcase,
-} from "lucide-react";
-import { toast } from "sonner";
-import { searchService } from "@/services/apis/booking.api";
+import { LocationDropdown } from "@/components/locations/LocationDropdown";
 import Loading from "@/components/shared/Loading";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,7 +12,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LocationDropdown } from "@/components/locations/LocationDropdown";
+import { searchService } from "@/services/apis/booking.api";
+import {
+  Briefcase,
+  CheckCircle,
+  DollarSign,
+  Filter,
+  MapPin,
+  Search,
+  Star
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Services = () => {
   const router = useRouter();
@@ -35,6 +33,7 @@ const Services = () => {
   const [providers, setProviders] = useState<any[]>([]);
   const [filteredProviders, setFilteredProviders] = useState<any[]>([]);
   const [locationId, setLocationId] = useState<string>("");
+  const [serviceCategories, setServiceCategories] = useState<any[]>([]);
   const [filters, setFilters] = useState({
     category: "",
     location: "",
@@ -42,16 +41,7 @@ const Services = () => {
     maxRate: "",
     minRating: "",
   });
-  const categories = [
-    { value: "CLEANING", label: "Cleaning", icon: "\u{1F9F9}" },
-    { value: "PLUMBING", label: "Plumbing", icon: "🔧" },
-    { value: "ELECTRICAL", label: "Electrical", icon: "⚡" },
-    { value: "CARPENTRY", label: "Carpentry", icon: "🔨" },
-    { value: "PAINTING", label: "Painting", icon: "🎨" },
-    { value: "GARDENING", label: "Gardening", icon: "🌱" },
-    { value: "HOME_CARE", label: "Home Care", icon: "🏠" },
-    { value: "SECURITY", label: "Security", icon: "🛡️" },
-  ];
+
 
   const loadProviders = async () => {
     try {
@@ -63,11 +53,12 @@ const Services = () => {
       if (filters.minRating) queryParams.append("minRating", filters.minRating);
       const token = localStorage.getItem("accessToken");
       const data = await searchService(queryParams, token!);
+      console.log("data", data.data);
       if (data.success) {
-        setProviders(data.data);
+        // setProviders(data.data);
         setFilteredProviders(data.data);
       }
-    } catch (err) {
+    } catch (err) { 
       toast.error((err as Error).message);
     } finally {
       setLoading(false);
@@ -112,6 +103,16 @@ const Services = () => {
       filterProviders();
     }, 0);
   }, [filters, providers]);
+
+  useEffect(() => {
+    setTimeout(async () => {
+      const res = await fetch("/api/services/top");
+      const data = await res.json();
+      if (data.success) {
+        setServiceCategories(data.data);
+      }
+    }, 0);
+  }, []);
 
   const handleCategoryClick = (category: string) => {
     setFilters({ ...filters, category });
@@ -164,19 +165,19 @@ const Services = () => {
       <div className="px-4 py-8">
         <h2 className="text-2xl font-bold mb-6">Popular Services</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-8">
-          {categories.map((cat) => (
+          {serviceCategories.map((cat) => (
             <button
-              key={cat.value}
-              onClick={() => handleCategoryClick(cat.value)}
+              key={cat.category.name}
+              onClick={() => handleCategoryClick(cat.category.name)}
               className={`p-4 rounded-xl border-2 transition text-center cursor-pointer ${
-                filters.category === cat.value
+                filters.category === cat.category.name
                   ? "border-jiko-primary bg-jiko-primary/5"
                   : "border-gray-200 bg-white hover:border-jiko-primary"
               }`}
             >
-              <div className="text-3xl mb-2">{cat.icon}</div>
+              <div className="text-3xl mb-2">{cat.category.icon}</div>
               <div className="text-sm font-medium text-gray-900">
-                {cat.label}
+                {cat.category.name}
               </div>
             </button>
           ))}

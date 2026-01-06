@@ -80,7 +80,7 @@ export const POST = async (
         }
 
         // Determine sender type
-        const senderType = isClient ? 'CLIENT' : isProvider ? 'PROVIDER' : 'ADMIN';
+        const senderType = isClient ? 'CLIENT' : isAdmin ? 'ADMIN' : 'PROVIDER';
 
         // Create message
         const disputeMessage = await prisma.disputeMessage.create({
@@ -116,7 +116,7 @@ export const POST = async (
             type: 'INFO',
             priority: 'HIGH',
             title: 'New Message in Dispute',
-            message: `${isClient ? 'Client' : 'Provider'} has sent a message in the dispute for booking #${dispute.booking.bookingNumber}`,
+            message: `${senderType} has sent a message in the dispute for booking #${dispute.booking.bookingNumber}`,
             actionUrl: isClient ? `/provider/bookings/${dispute.bookingId}` : `/bookings/${dispute.bookingId}`,
             data: { disputeId }
         });
