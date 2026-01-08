@@ -8,7 +8,7 @@ import { AuthenticatedRequest } from '@/types/auth';
 import { NextResponse } from 'next/server';
 
 // GET - Get pending payouts (ONLY bookings not yet paid out)
-export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
+export const GET = withRole('ADMIN', 'SUPER_ADMIN')(async (req: AuthenticatedRequest) => {
   try {
     // ONLY get bookings that are COMPLETED, PAID, and NOT YET PAID OUT
     const bookings = await prisma.booking.findMany({
@@ -66,7 +66,7 @@ export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
 });
 
 // POST - Process payout to provider (WITH DOUBLE-PAYMENT PREVENTION)
-export const POST = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
+export const POST = withRole('ADMIN', 'SUPER_ADMIN')(async (req: AuthenticatedRequest) => {
   try {
     const body = await req.json();
     const { providerId, bookingIds, phoneNumber } = body;
@@ -290,7 +290,7 @@ export const POST = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
 });
 
 // GET /api/admin/payouts/history - Get payout history
-export const GET_HISTORY = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
+export const GET_HISTORY = withRole('ADMIN', 'SUPER_ADMIN')(async (req: AuthenticatedRequest) => {
   try {
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');

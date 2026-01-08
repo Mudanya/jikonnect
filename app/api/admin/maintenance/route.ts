@@ -6,7 +6,7 @@ import { AuthenticatedRequest } from "@/types/auth";
 import { NextResponse } from "next/server";
 
 // TODO: use withRole:Admin
-export const POST = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
+export const POST = withRole("ADMIN", "SUPER_ADMIN")(async (req: AuthenticatedRequest) => {
     try {
         const { startTime, endTime, message } = await req.json();
 

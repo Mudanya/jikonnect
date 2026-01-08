@@ -328,30 +328,7 @@ const Register = () => {
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Hourly Rate (KES)
-                  </label>
-                  <div className="relative">
-                    <DollarSign
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
-                    <Input
-                      type="number"
-                      {...register("hourlyRate")}
-                      placeholder="800"
-                      className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        errors.hourlyRate && "border-red-300"
-                      }`}
-                    />
-                  </div>
-                  {errors.hourlyRate && (
-                    <small className="text-xs text-red-300">
-                      {errors.hourlyRate.message}
-                    </small>
-                  )}
-                </div>
+             
               </div>
 
               <div>

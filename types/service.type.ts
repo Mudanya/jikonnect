@@ -1,11 +1,20 @@
-export type serviceSearchParams = {
-    location?: string | null
-    category?: string | null
-    minRate?: string | null
-    maxRate?: string | null
-    minRating?: string | null
+export interface ServiceSearchParams {
+    location?: string | null;
+    minRate?: string | null;
+    maxRate?: string | null;
+    minRating?: string | null;
+    category?: string | null;
+    page?: number;
+    limit?: number;
 }
 
+export interface PaginatedResponse<T> {
+    providers: T[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
 export type BookingStatus =
     'PENDING' |
     'CONFIRMED' |

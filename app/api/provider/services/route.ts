@@ -6,12 +6,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 
 // GET - Get professional's services
-export const GET = withRole("PROFESSIONAL")(async(req: AuthenticatedRequest)=> {
+export const GET = withRole("PROFESSIONAL")(async (req: AuthenticatedRequest) => {
   try {
     const userId = req.headers.get("x-user-id");
-  
 
-     const professional = await prisma.profile.findUnique({
+
+    const professional = await prisma.profile.findUnique({
       where: { userId: userId! },
       include: {
         services: {
@@ -47,7 +47,7 @@ export const GET = withRole("PROFESSIONAL")(async(req: AuthenticatedRequest)=> {
 })
 
 // POST - Add service to professional profile
-export const POST = withRole("PROFESSIONAL")(async(req: AuthenticatedRequest)=> {
+export const POST = withRole("PROFESSIONAL")(async (req: AuthenticatedRequest) => {
   try {
     const userId = req.headers.get("x-user-id");
     const role = req.headers.get("x-user-role");
@@ -60,54 +60,94 @@ export const POST = withRole("PROFESSIONAL")(async(req: AuthenticatedRequest)=> 
     }
 
     const body = await req.json();
-    const { serviceIds } = body; // Can be single ID or array of IDs
+    const { serviceIds, services } = body;
 
-    if (!serviceIds || (Array.isArray(serviceIds) && serviceIds.length === 0)) {
-      return NextResponse.json({
-        success: false,
-        message: "Service ID(s) required"
-      }, { status: 400 });
-    }
-
-    const professional = await prisma.user.findUnique({
-      where: { id: userId! }
+    // Get provider profile
+    const profile = await prisma.profile.findUnique({
+      where: { userId: userId! },
+      select: { id: true },
     });
 
-    if (!professional) {
-      return NextResponse.json({
-        success: false,
-        message: "Professional profile not found"
-      }, { status: 404 });
+    if (!profile) {
+      return NextResponse.json(
+        { success: false, message: 'Profile not found' },
+        { status: 404 }
+      );
     }
 
-    // Connect services to professional
-    const ids = Array.isArray(serviceIds) ? serviceIds : [serviceIds];
-    
-    const updated = await prisma.profile.update({
-      where: { userId: professional.id },
-      data: {
-        services: {
-          connect: ids.map(id => ({ id }))
-        }
-      },
+    if (serviceIds && Array.isArray(serviceIds)) {
+      // Just connect services without pricing
+      await prisma.profile.update({
+        where: { id: profile.id },
+        data: {
+          services: {
+            connect: serviceIds.map((id: string) => ({ id })),
+          },
+        },
+      });
+    }
+    // Handle new format (with pricing)
+    else if (services && Array.isArray(services)) {
+      // Update each service with pricing information
+      for (const serviceData of services) {
+        const { serviceId, pricingType, ...pricingFields } = serviceData;
+
+        // Update the service with pricing
+        await prisma.service.update({
+          where: { id: serviceId },
+          data: {
+            pricingType: pricingType || 'HOURLY',
+            hourlyRate: pricingFields.hourlyRate,
+            fixedPrice: pricingFields.fixedPrice,
+            priceMin: pricingFields.priceMin,
+            priceMax: pricingFields.priceMax,
+            estimatedHours: pricingFields.estimatedHours,
+          },
+        });
+
+        // Connect service to profile
+        await prisma.profile.update({
+          where: { id: profile.id },
+          data: {
+            services: {
+              connect: { id: serviceId },
+            },
+          },
+        });
+      }
+    } else {
+      return NextResponse.json(
+        { success: false, message: 'Invalid request format' },
+        { status: 400 }
+      );
+    }
+
+    // Get updated services with pricing
+    const updatedProfile = await prisma.profile.findUnique({
+      where: { id: profile.id },
       include: {
         services: {
           include: {
-            category: true
-          }
-        }
-      }
+            category: {
+              select: {
+                name: true,
+                icon: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return NextResponse.json({
       success: true,
-      message: `${ids.length} service(s) added successfully`,
-      data: updated.services
+      data: updatedProfile?.services || [],
+      message: 'Services added successfully',
     });
 
   } catch (error: any) {
     console.error("Error adding services:", error);
-    
+
     if (error.code === 'P2025') {
       return NextResponse.json({
         success: false,
@@ -123,14 +163,14 @@ export const POST = withRole("PROFESSIONAL")(async(req: AuthenticatedRequest)=> 
 })
 
 // DELETE - Remove service from professional profile
-export const DELETE = withRole("PROFESSIONAL")(async(req: AuthenticatedRequest)=> {
+export const DELETE = withRole("PROFESSIONAL")(async (req: AuthenticatedRequest) => {
   try {
     const userId = req.headers.get("x-user-id");
-    
+
 
     const body = await req.json();
     const { serviceId } = body;
-    console.log('serviceId',serviceId)
+    console.log('serviceId', serviceId)
 
     if (!serviceId) {
       return NextResponse.json({

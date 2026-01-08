@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 
 interface DisputeMessage {
   id: string;
-  senderType: 'CLIENT' | 'PROVIDER' | 'ADMIN';
+  senderType: 'CLIENT' | 'PROVIDER' | 'ADMIN' | 'SUPER_ADMIN';
   content: string;
   createdAt: string;
   sender: {
@@ -198,11 +198,12 @@ export default function DisputeResolutionPage() {
     return `${message.sender.firstName} ${message.sender.lastName}`;
   };
 
-  const getSenderBadge = (senderType: 'CLIENT' | 'PROVIDER' | 'ADMIN') => {
+  const getSenderBadge = (senderType: 'CLIENT' | 'PROVIDER' | 'ADMIN' | 'SUPER_ADMIN') => {
     const badges = {
       CLIENT: 'bg-blue-100 text-blue-800',
       PROVIDER: 'bg-purple-100 text-purple-800',
-      ADMIN: 'bg-green-100 text-green-800'
+      ADMIN: 'bg-green-100 text-green-800',
+      SUPER_ADMIN: 'bg-yellow-100 text-yellow-800'
     };
     return badges[senderType];
   };
@@ -380,10 +381,10 @@ export default function DisputeResolutionPage() {
                     {selectedDispute?.messages?.map((msg) => (
                       <div 
                         key={msg.id} 
-                        className={`flex ${msg.senderType === 'ADMIN' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${msg.senderType === 'ADMIN' || msg.senderType === 'SUPER_ADMIN' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div className={`max-w-[80%] ${
-                          msg.senderType === 'ADMIN' 
+                          msg.senderType === 'ADMIN' || msg.senderType === 'SUPER_ADMIN'
                             ? 'bg-green-50 border-green-200' 
                             : msg.senderType === 'CLIENT'
                             ? 'bg-blue-50 border-blue-200'

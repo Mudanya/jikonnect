@@ -19,7 +19,6 @@ export const registerSchema = z.object({
     // lastName: z.string().min(2, 'Last name must be atleast 2 characters'),
 
     experience: z.string().optional(),
-    hourlyRate: z.string().optional(),
     location: z.string().optional(),
     bio: z.string().optional(),
     role: z.enum(['CLIENT', 'PROFESSIONAL']).optional(),
@@ -36,13 +35,7 @@ export const registerSchema = z.object({
                     message: 'Experience is required'
                 })
             }
-            if (!data.hourlyRate) {
-                ctx.addIssue({
-                    code: "custom",
-                    path: ["hourlyRate"],
-                    message: 'Hourly rate is required'
-                })
-            }
+          
             if (!data.location) {
                 ctx.addIssue({
                     code: "custom",

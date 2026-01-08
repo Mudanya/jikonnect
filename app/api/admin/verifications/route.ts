@@ -5,7 +5,7 @@ import { AuthenticatedRequest } from "@/types/auth";
 import { NextResponse } from "next/server";
 
 // TODO: use withRole:Admin
-export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
+export const GET = withRole("ADMIN", "SUPER_ADMIN")(async (req: AuthenticatedRequest) => {
     try {
         const profiles = await getAllPendingProfiles()
         return NextResponse.json({

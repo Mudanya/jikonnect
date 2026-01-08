@@ -15,7 +15,7 @@ const locationSchema = z.object({
     active: z.boolean(),
 });
 
-export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
+export const GET = withRole("ADMIN", "SUPER_ADMIN")(async (req: AuthenticatedRequest) => {
     try {
 
 
@@ -48,7 +48,7 @@ export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
     }
 })
 
-export const POST = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
+export const POST = withRole("ADMIN", "SUPER_ADMIN")(async (req: AuthenticatedRequest) => {
     try {
 
 

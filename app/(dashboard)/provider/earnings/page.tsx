@@ -377,7 +377,7 @@ export default function ProviderEarningsPage() {
                 <li>• <strong>PROCESSING</strong>: Payout initiated, money being sent to your M-Pesa</li>
                 <li>• <strong>COMPLETED</strong>: Money received in your M-Pesa account</li>
                 <li>• <strong>FAILED</strong>: Payout failed, will be retried by admin</li>
-                <li>• You earn 90% of booking amount, 10% platform commission</li>
+                {/* <li>• You earn 90% of booking amount, 10% platform commission</li> */}
               </ul>
             </div>
           </div>

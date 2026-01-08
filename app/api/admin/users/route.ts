@@ -6,7 +6,7 @@ import { AuthenticatedRequest } from '@/types/auth';
 import { NextResponse } from 'next/server';
 
 
-export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
+export const GET = withRole("ADMIN", "SUPER_ADMIN")(async (req: AuthenticatedRequest) => {
     try {
         // Get query parameters
         const searchParams = req.nextUrl.searchParams;
@@ -37,12 +37,12 @@ export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
         // Filter by status
         if (status && status !== 'all') {
             const theStatus = status as UserStatus
-            where.status = theStatus ;
-        } 
-            
+            where.status = theStatus;
+        }
+
         // Fetch users with counts
         const users = await prisma.user.findMany({
-            where,
+            where: { AND: [{ role: { not: 'SUPER_ADMIN' }, id: { not: req.user.userId } }], ...where },
             select: {
                 id: true,
                 firstName: true,
@@ -65,8 +65,8 @@ export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
             skip,
             take: limit,
         })
-        
-        const total = await prisma.user.count({where})
+        console.log('Fetched users:', users);
+        const total = await prisma.user.count({ where })
         return NextResponse.json({
             users,
             pagination: {
@@ -75,7 +75,7 @@ export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
                 total,
                 totalPages: Math.ceil(+total / limit),
             },
-           
+
         });
     } catch (error) {
         console.error('Error fetching users:', error);

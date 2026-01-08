@@ -17,7 +17,7 @@ export const GET = withAuth(async (req: AuthenticatedRequest) => {
         const steps = {
             profileCreated: !!user.profile,
             servicesAdded: (user.profile?.services?.length || 0) > 0,
-            ratesSet: !!user.profile?.hourlyRate,
+            ratesSet: !!user.profile?.services?.[0]?.hourlyRate || !!user.profile?.services?.[0]?.fixedPrice,
             bioAdded: !!user.profile?.bio,
             portfolioAdded: (user.profile?.portfolios?.length || 0) > 0,
             documentsUploaded: !!user.profile?.idDocument,

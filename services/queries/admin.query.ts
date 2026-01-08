@@ -635,8 +635,8 @@ export const initializeAdmin = async () => {
     await prisma.user.upsert({
         where: { email: 'soarex.ke@gmail.com' },
         update: {
-            firstName: 'Nelson',
-            lastName: 'Mudanya',
+            firstName: 'Admin',
+            lastName: 'One',
             phone: '254700263761',
             password: await hashPassword('@Bentola25'),
             role: 'ADMIN',
@@ -650,6 +650,29 @@ export const initializeAdmin = async () => {
             phone: '254700263761',
             password: await hashPassword('@Bentola25'),
             role: 'ADMIN',
+            status: 'ACTIVE',
+            createdAt: new Date(),
+            emailVerified: true
+        }
+    })
+    await prisma.user.upsert({
+        where: { email: 'jikonnect@gmail.com' },
+        update: {
+            firstName: 'Nelson',
+            lastName: 'Mudanya',
+            phone: '254700263762',
+            password: await hashPassword('@Konekt26'),
+            role: 'SUPER_ADMIN',
+            status: 'ACTIVE',
+            updatedAt: new Date(),
+        },
+        create: {
+            email: 'jikonnect@gmail.com',
+            firstName: 'Nelson',
+            lastName: 'Mudanya',
+            phone: '254700263762',
+            password: await hashPassword('@Konekt26'),
+            role: 'SUPER_ADMIN',
             status: 'ACTIVE',
             createdAt: new Date(),
             emailVerified: true

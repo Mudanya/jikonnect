@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (reUser.role === "PROFESSIONAL") {
         callback = "/provider/dashboard";
       }
-      if (reUser.role === "ADMIN") {
+      if (reUser.role === "ADMIN" || reUser.role === "SUPER_ADMIN") {
         callback = "/admin";
       }
       console.log("callback", callback);

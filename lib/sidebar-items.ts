@@ -1,4 +1,4 @@
-import { Home, Inbox, Calendar, Search, Settings, Briefcase, DollarSign, Star, User, UserRoundCheck, ListTodo, NotebookPen, HandFist, HandCoins, Logs, GalleryVerticalEnd, BookCheck, StepForward, Calendar1, BriefcaseBusiness, Users, Shield, Coins } from "lucide-react";
+import { Home, Inbox, Calendar, Search, Settings, Briefcase, DollarSign, Star, User, UserRoundCheck, ListTodo, NotebookPen, HandFist, HandCoins, Logs, GalleryVerticalEnd, BookCheck, StepForward, Calendar1, BriefcaseBusiness, Users, Shield, Coins, MessageSquare } from "lucide-react";
 
 export const SidebarClientItems = [
   {
@@ -17,6 +17,12 @@ export const SidebarClientItems = [
     title: "My Profile",
     url: "/profile",
     icon: User,
+    role: ''
+  },
+  {
+    title: "Chat Support",
+    url: "/chat/admin",
+    icon: MessageSquare,
     role: ''
   },
 
@@ -142,6 +148,12 @@ export const SidebarProviderItems = [
     title: "My Profile",
     url: "/profile",
     icon: User,
+    role: ''
+  },
+  {
+    title: "Chat Support",
+    url: "/chat/admin",
+    icon: MessageSquare,
     role: ''
   },
 

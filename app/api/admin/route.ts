@@ -4,10 +4,10 @@ import { getActiveBookings, getActiveClients, getActiveProviders, getCompletedBo
 import { AuthenticatedRequest } from "@/types/auth";
 import { NextResponse } from "next/server";
 
-export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
+export const GET = withRole('ADMIN' , 'SUPER_ADMIN')(async (req: AuthenticatedRequest) => {
     try {
 
-        // Get pending verifications
+        // Get pending verifications`
         const pendingVerifications = await getPendingVerifications()
 
         // Get active bookings (confirmed or pending)

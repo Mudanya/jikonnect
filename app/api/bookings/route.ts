@@ -43,12 +43,18 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
         const body = await req.json();
         const {
             providerId,
-            service,
+            serviceName:service,
             description,
             scheduledDate,
             scheduledTime,
             duration,
-            location
+            location,
+            unitType,
+            quantity,
+            unitPrice,
+            pricingType,
+            fixedPrice,
+            hourlyRate
         } = body;
 
         if (!providerId || !service || !scheduledDate || !scheduledTime || !location) {
@@ -58,7 +64,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
             );
         }
         const profile = await getUserProfileById(providerId)
-        if (!profile || !profile.hourlyRate) {
+        if (!profile) {
             return NextResponse.json(
                 { success: false, message: 'Provider not found or rates not set' },
                 { status: 404 }
@@ -74,7 +80,12 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
             scheduledTime,
             duration,
             location, userId: req.user.userId,
-            hourlyRate: profile.hourlyRate
+            hourlyRate,
+            unitType,
+            quantity,
+            unitPrice,
+            pricingType,
+            fixedPrice,
         })
         await NotificationService.create({
             userId: req.user.userId,
@@ -90,7 +101,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
             priority: 'HIGH',
             title: 'Booking Request Received',
             message: `Booking request for ${booking.service} on ${scheduledDate} at ${scheduledTime} has been received.`,
-            actionUrl: `/provider/my-jobs`
+            actionUrl: `/provider/bookings`
         });
         // log 
         await createAuditLog(req, req.user.userId, 'BOOKING_CREATED', 'Booking', { bookingNumber: booking.bookingNumber, providerId, service }, booking.id)

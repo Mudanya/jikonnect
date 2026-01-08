@@ -17,6 +17,7 @@ import { set } from "zod";
 import { User } from "@/types/auth";
 import { NotificationBell } from "../notifications/NotificationBell";
 import { ChatIcon } from "../chat/ChatIcon";
+import AdminChatButton from "../chat/admin/AdminChatButton";
 
 const AppNavBar = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -58,6 +59,7 @@ const AppNavBar = () => {
           </div>
           <div className="flex items-center md:space-x-4 space-x-1">
             <ChatIcon />
+            
             <NotificationBell />
             {/* <div className="relative p-2 rounded-lg">
               <DropdownMenu>

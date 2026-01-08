@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 interface DisputeMessage {
   id: string;
-  senderType: "CLIENT" | "PROVIDER" | "ADMIN";
+  senderType: "CLIENT" | "PROVIDER" | "ADMIN" | "SUPER_ADMIN";
   content: string;
   createdAt: string;
   sender: {
@@ -102,6 +102,7 @@ export default function DisputeChatBox({
       CLIENT: "Client",
       PROVIDER: "Provider",
       ADMIN: "Admin",
+      SUPER_ADMIN: "Super Admin",
     };
     return labels[senderType as keyof typeof labels];
   };
@@ -111,6 +112,7 @@ export default function DisputeChatBox({
       CLIENT: "bg-blue-100 text-blue-800",
       PROVIDER: "bg-purple-100 text-purple-800",
       ADMIN: "bg-green-100 text-green-800",
+      SUPER_ADMIN: "bg-yellow-100 text-yellow-800",
     };
     return colors[senderType as keyof typeof colors];
   };
@@ -119,7 +121,7 @@ export default function DisputeChatBox({
     if (isOwnMessage) {
       return "bg-blue-600 text-white ml-auto";
     }
-    if (senderType === "ADMIN") {
+    if (senderType === "ADMIN" || senderType === "SUPER_ADMIN") {
       return "bg-green-50 border-green-200";
     }
     return "bg-gray-100 border-gray-200";

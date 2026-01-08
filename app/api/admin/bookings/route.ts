@@ -4,7 +4,7 @@ import { getAllBokings } from "@/services/queries/admin.query";
 import { AuthenticatedRequest } from "@/types/auth";
 import { NextResponse } from "next/server";
 
-export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
+export const GET = withRole("ADMIN", "SUPER_ADMIN")(async (req: AuthenticatedRequest) => {
     try {
         const bookings = await getAllBokings()
         return NextResponse.json({

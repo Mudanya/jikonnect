@@ -1,7 +1,7 @@
 "use client";
 
 import { LocationDropdown } from "@/components/locations/LocationDropdown";
-import ServicesModal from "@/components/shared/ServicesModal";
+import ServicesModal from "@/components/services/ServicesModal";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -28,8 +28,7 @@ export default function ProviderOnboardingPage() {
 
   const [formData, setFormData] = useState({
     bio: "",
-    hourlyRate: 0,
-    yearsExperience: 0,
+    yearsOfExperience: 0,
     location: "",
     languages: ["English"],
     idNumber: "",
@@ -65,9 +64,8 @@ export default function ProviderOnboardingPage() {
           setFormData({
             bio: data.data.user.profile.bio || "",
 
-            hourlyRate: +data.data.user.profile.hourlyRate || 0,
-            yearsExperience:
-              +data.data.user.profile.yearsExperience || 0,
+            
+            yearsOfExperience: +data.data.user.profile.yearsOfExperience || 0,
             location: data.data.user.profile.location.id || "",
             languages: data.data.user.profile.languages || ["English"],
             idNumber: data.data.user.profile.idNumber || "",
@@ -94,8 +92,7 @@ export default function ProviderOnboardingPage() {
           },
           body: JSON.stringify({
             bio: formData.bio,
-            hourlyRate: formData.hourlyRate,
-            yearsExperience: formData.yearsExperience,
+            yearsOfExperience: formData.yearsOfExperience,
             location: formData.location,
             languages: formData.languages,
           }),
@@ -229,7 +226,6 @@ export default function ProviderOnboardingPage() {
               </div>
 
               <div className="grid md:grid-cols-3 gap-6">
-                
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Location
@@ -249,11 +245,11 @@ export default function ProviderOnboardingPage() {
                   </label>
                   <Input
                     type="number"
-                    value={formData.yearsExperience}
+                    value={formData.yearsOfExperience}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        yearsExperience: +e.target.value,
+                        yearsOfExperience: +e.target.value,
                       })
                     }
                     placeholder="5"
@@ -261,20 +257,7 @@ export default function ProviderOnboardingPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Hourly Rate (KES)
-                  </label>
-                  <Input
-                    type="number"
-                    value={formData.hourlyRate}
-                    onChange={(e) =>
-                      setFormData({ ...formData, hourlyRate: +e.target.value })
-                    }
-                    placeholder="800"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+              
               </div>
             </div>
           )}

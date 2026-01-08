@@ -58,11 +58,11 @@ export const POST = async (req: NextRequest) => {
                 ? 'Complete your profile to start receiving booking requests.'
                 : 'Start browsing service providers and book your first service.',
             actionUrl: createdUser.role === 'PROFESSIONAL'
-                ? '/dashboard/profile'
+                ? '/profile'
                 : '/services'
         });
         const admins = await prisma.user.findMany({
-            where: { role: 'ADMIN' },
+            where: { OR: [{ role: 'ADMIN' }, { role: 'SUPER_ADMIN' }] },
             select: { id: true }
         });
         await Promise.all(

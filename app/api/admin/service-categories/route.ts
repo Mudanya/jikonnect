@@ -3,7 +3,7 @@ import { prisma } from "@/prisma/prisma.init";
 import { AuthenticatedRequest } from "@/types/auth";
 import { NextResponse } from "next/server";
 
-export const GET = withRole('ADMIN')(async (eq: AuthenticatedRequest) => {
+export const GET = withRole('ADMIN', 'SUPER_ADMIN')(async (eq: AuthenticatedRequest) => {
     try {
 
         const categories = await prisma.serviceCategory.findMany({
@@ -28,7 +28,7 @@ export const GET = withRole('ADMIN')(async (eq: AuthenticatedRequest) => {
         }, { status: 500 });
     }
 })
-export const POST = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
+export const POST = withRole('ADMIN', 'SUPER_ADMIN')(async (req: AuthenticatedRequest) => {
     try {
         const body = await req.json();
         const { name, slug, icon, description, order } = body;

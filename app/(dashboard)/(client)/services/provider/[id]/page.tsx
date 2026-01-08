@@ -1,4 +1,5 @@
 "use client";
+import { LocationDropdown } from "@/components/locations/LocationDropdown";
 import Loading from "@/components/shared/Loading";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,10 +12,21 @@ import {
   Send,
   Star,
 } from "lucide-react";
-import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+interface Service {
+  id: string;
+  name: string;
+  pricingType: "HOURLY" | "FIXED" | "PER_UNIT" | "CUSTOM";
+  hourlyRate?: number;
+  fixedPrice?: number;
+  priceMin?: number;
+  priceMax?: number;
+  estimatedHours?: number;
+}
+
 const SvcProvider = () => {
   const router = useRouter();
   const params = useParams();
@@ -26,15 +38,21 @@ const SvcProvider = () => {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [providerData, setProviderData] = useState<any>(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   const [bookingForm, setBookingForm] = useState({
-    service: "",
+    serviceId: "",
+    serviceName: "",
     description: "",
     scheduledDate: "",
     scheduledTime: "",
     duration: "1",
+    quantity: "1",
+    unitType: "room",
     location: "",
   });
+
+  const [calculatedAmount, setCalculatedAmount] = useState(0);
 
   const loadProviderProfile = async () => {
     try {
@@ -45,6 +63,8 @@ const SvcProvider = () => {
       }
     } catch (err) {
       toast.error((err as Error).message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,6 +75,55 @@ const SvcProvider = () => {
     }, 0);
   }, [providerId]);
 
+  // Calculate amount when service or inputs change
+  useEffect(() => {
+    if (!selectedService) {
+      setCalculatedAmount(0);
+      return;
+    }
+
+    let amount = 0;
+    switch (selectedService.pricingType) {
+      case "HOURLY":
+        amount =
+          (selectedService.hourlyRate || 0) *
+          parseFloat(bookingForm.duration || "1");
+        break;
+      case "FIXED":
+        amount = selectedService.fixedPrice || 0;
+        break;
+      case "PER_UNIT":
+        amount =
+          (selectedService.fixedPrice || 0) *
+          parseInt(bookingForm.quantity || "1");
+        break;
+      case "CUSTOM":
+        amount = selectedService.priceMin || 0;
+        break;
+    }
+    setCalculatedAmount(amount);
+  }, [selectedService, bookingForm.duration, bookingForm.quantity]);
+
+  const handleServiceSelect = (serviceName: string) => {
+    // Find service by name from the services array
+    const service = providerData.profile.services.find(
+      (s: Service) => s.name === serviceName
+    );
+
+    console.log("Selected service:", service); // DEBUG
+    console.log("Pricing type:", service?.pricingType); // DEBUG
+
+    setSelectedService(service || null);
+    setBookingForm({
+      ...bookingForm,
+      serviceId: service?.id || "",
+      serviceName: service?.name || "",
+      duration: "1",
+      quantity: "1",
+      unitType: "room",
+    });
+  };
+
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -63,25 +132,63 @@ const SvcProvider = () => {
       return;
     }
 
-    setBookingLoading(true);
+    if (!selectedService) {
+      toast.error("Please select a service");
+      return;
+    }
 
+    // For CUSTOM pricing, redirect to quote request
+    if (selectedService.pricingType === "CUSTOM") {
+      router.push(
+        `/quotes/request?providerId=${providerId}&serviceId=${selectedService.id}`
+      );
+      return;
+    }
+
+    setBookingLoading(true);
     try {
       const token = localStorage.getItem("accessToken");
+
+      const bookingData: any = {
+        providerId,
+        serviceId: selectedService.id,
+        serviceName: selectedService.name,
+        scheduledDate: bookingForm.scheduledDate,
+        scheduledTime: bookingForm.scheduledTime,
+        location: bookingForm.location,
+        description: bookingForm.description,
+        pricingType: selectedService.pricingType,
+      };
+
+      // Add pricing-specific fields
+      switch (selectedService.pricingType) {
+        case "HOURLY":
+          bookingData.hourlyRate = selectedService.hourlyRate;
+          bookingData.duration = parseFloat(bookingForm.duration);
+          break;
+        case "FIXED":
+          bookingData.fixedPrice = selectedService.fixedPrice;
+          bookingData.estimatedHours = selectedService.estimatedHours;
+          break;
+        case "PER_UNIT":
+          bookingData.unitPrice = selectedService.fixedPrice;
+          bookingData.quantity = parseInt(bookingForm.quantity);
+          bookingData.unitType = bookingForm.unitType;
+          break;
+      }
+
+      console.log("Submitting booking data:", bookingData); // DEBUG
+
       const response = await fetch("/api/bookings", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          providerId,
-          ...bookingForm,
-          duration: parseInt(bookingForm.duration),
-        }),
+        body: JSON.stringify(bookingData),
       });
 
       const data = await response.json();
-
       if (data.success) {
         toast.success("Booking request sent successfully!");
         router.push("/bookings");
@@ -95,7 +202,8 @@ const SvcProvider = () => {
       setBookingLoading(false);
     }
   };
-  if (!mounted) return <Loading />;
+
+  if (!mounted || loading) return <Loading />;
 
   if (!providerData) {
     return (
@@ -114,7 +222,28 @@ const SvcProvider = () => {
       </div>
     );
   }
+
   const { profile, reviews, completedJobs } = providerData;
+
+  // Format price display
+  const formatServicePrice = (service: Service) => {
+    switch (service.pricingType) {
+      case "HOURLY":
+        return `KES ${service.hourlyRate?.toLocaleString() || 0}/hour`;
+      case "FIXED":
+        return `KES ${service.fixedPrice?.toLocaleString() || 0} (Fixed)`;
+      case "PER_UNIT":
+        return `KES ${service.fixedPrice?.toLocaleString() || 0}/unit`;
+      case "CUSTOM":
+        if (service.priceMin && service.priceMax) {
+          return `KES ${service.priceMin.toLocaleString()}-${service.priceMax.toLocaleString()}`;
+        }
+        return "Custom Quote";
+      default:
+        return "Price not set";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-cyan-50">
       {/* Header */}
@@ -129,7 +258,6 @@ const SvcProvider = () => {
           </button>
         </div>
       </div>
-
       <div className=" px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Provider Info */}
@@ -157,7 +285,7 @@ const SvcProvider = () => {
                     </span>
                     <span className="flex items-center">
                       <Award size={18} className="mr-1" />
-                      {profile.yearsExperience || 0} years experience
+                      {profile.yearsOfExperience || 0} years experience
                     </span>
                   </div>
                   <div className="flex flex-col md:items-center space-x-4">
@@ -188,7 +316,6 @@ const SvcProvider = () => {
                 </div>
               </div>
             </div>
-
             {/* About */}
             <div className="bg-white rounded-2xl shadow-sm border p-6">
               <h2 className="text-xl font-bold mb-4">About</h2>
@@ -196,22 +323,30 @@ const SvcProvider = () => {
                 {profile.bio || "No bio provided"}
               </p>
             </div>
-
             {/* Services */}
             <div className="bg-white rounded-2xl shadow-sm border p-6">
               <h2 className="text-xl font-bold mb-4">Services Offered</h2>
-              <div className="flex flex-wrap gap-3">
-                {profile.services.map((service: { name: string }) => (
-                  <span
-                    key={service.name}
-                    className="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl font-medium"
+              <div className="space-y-3">
+                {profile.services.map((service: Service) => (
+                  <div
+                    key={service.id}
+                    className="flex items-center justify-between p-4 bg-blue-50 rounded-xl"
                   >
-                    {service.name}
-                  </span>
+                    <div>
+                      <span className="font-medium text-blue-900">
+                        {service.name}
+                      </span>
+                      <span className="ml-2 text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                        {service.pricingType}
+                      </span>
+                    </div>
+                    <div className="text-sm font-semibold text-blue-700">
+                      {formatServicePrice(service)}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
-
             {/* Portfolio */}
             {profile.portfolios.length > 0 && (
               <div className="bg-white rounded-2xl shadow-sm border p-6">
@@ -238,7 +373,6 @@ const SvcProvider = () => {
                 </div>
               </div>
             )}
-
             {/* Reviews */}
             <div className="bg-white rounded-2xl shadow-sm border p-6">
               <h2 className="text-xl font-bold mb-6">
@@ -293,17 +427,9 @@ const SvcProvider = () => {
               )}
             </div>
           </div>
-
           {/* Right Column - Booking Form */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-xl border p-6 sticky top-28">
-              <div className="text-center mb-6 pb-6 border-b">
-                <div className="text-3xl font-bold text-gray-900 mb-1">
-                  KES {profile.hourlyRate?.toLocaleString() || 0}
-                </div>
-                <div className="text-gray-600">per hour</div>
-              </div>
-
               {!showBookingForm ? (
                 <button
                   onClick={() => {
@@ -320,37 +446,31 @@ const SvcProvider = () => {
                   Book Now
                 </button>
               ) : (
-                <form
-                  onSubmit={handleBookingSubmit} //TODO
-                  className="space-y-4"
-                >
+                <form onSubmit={handleBookingSubmit} className="space-y-4">
+                  {/* Service Selection */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Select Service
+                      Select Service *
                     </label>
                     <select
                       required
-                      value={bookingForm.service}
-                      onChange={(e) =>
-                        setBookingForm({
-                          ...bookingForm,
-                          service: e.target.value,
-                        })
-                      }
+                      value={bookingForm.serviceName}
+                      onChange={(e) => handleServiceSelect(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Choose a service</option>
-                      {profile.services.map((service:{name: string}) => (
-                        <option key={service.name} value={service.name}>
-                          {service.name}
+                      {profile.services.map((service: Service) => (
+                        <option key={service.id} value={service.name}>
+                          {service.name} - {formatServicePrice(service)}
                         </option>
                       ))}
                     </select>
                   </div>
 
+                  {/* Date */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Date
+                      Date *
                     </label>
                     <Input
                       type="date"
@@ -367,9 +487,10 @@ const SvcProvider = () => {
                     />
                   </div>
 
+                  {/* Time */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Time
+                      Time *
                     </label>
                     <Input
                       type="time"
@@ -385,44 +506,119 @@ const SvcProvider = () => {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Duration (hours)
-                    </label>
-                    <Input
-                      type="number"
-                      required
-                      min="1"
-                      value={bookingForm.duration}
-                      onChange={(e) =>
-                        setBookingForm({
-                          ...bookingForm,
-                          duration: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
+                  {/* HOURLY - Duration Input */}
+                  {selectedService &&
+                    selectedService.pricingType === "HOURLY" && (
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Duration (hours) *
+                        </label>
+                        <Input
+                          type="number"
+                          required
+                          min="0.5"
+                          step="0.5"
+                          value={bookingForm.duration}
+                          onChange={(e) =>
+                            setBookingForm({
+                              ...bookingForm,
+                              duration: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Rate: KES{" "}
+                          {selectedService.hourlyRate?.toLocaleString()}/hour
+                        </p>
+                      </div>
+                    )}
 
+                  {/* PER_UNIT - Unit Type and Quantity */}
+                  {selectedService &&
+                    selectedService.pricingType === "PER_UNIT" && (
+                      <>
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Unit Type *
+                          </label>
+                          <select
+                            value={bookingForm.unitType}
+                            onChange={(e) =>
+                              setBookingForm({
+                                ...bookingForm,
+                                unitType: e.target.value,
+                              })
+                            }
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="room">Room</option>
+                            <option value="item">Item</option>
+                            <option value="square meter">Square Meter</option>
+                            <option value="hour">Hour</option>
+                            <option value="unit">Unit</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Quantity *
+                          </label>
+                          <Input
+                            type="number"
+                            required
+                            min="1"
+                            value={bookingForm.quantity}
+                            onChange={(e) =>
+                              setBookingForm({
+                                ...bookingForm,
+                                quantity: e.target.value,
+                              })
+                            }
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Price per {bookingForm.unitType}: KES{" "}
+                            {selectedService.fixedPrice?.toLocaleString()}
+                          </p>
+                        </div>
+                      </>
+                    )}
+
+                  {/* FIXED - Show info */}
+                  {selectedService &&
+                    selectedService.pricingType === "FIXED" && (
+                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <p className="text-sm text-green-900 font-medium">
+                          ✓ Fixed price: KES{" "}
+                          {selectedService.fixedPrice?.toLocaleString()}
+                        </p>
+                        {selectedService.estimatedHours && (
+                          <p className="text-xs text-green-700 mt-1">
+                            Estimated: {selectedService.estimatedHours} hours
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                  {/* Location */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Location
+                      Location *
                     </label>
-                    <Input
-                      type="text"
-                      required
+                    <LocationDropdown
                       value={bookingForm.location}
-                      onChange={(e) =>
+                      onChange={(locId) => {
                         setBookingForm({
                           ...bookingForm,
-                          location: e.target.value,
-                        })
-                      }
-                      placeholder="Your address"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          location: locId,
+                        });
+                      }}
+                      className="w-full"
                     />
                   </div>
 
+                  {/* Description */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Additional Details (Optional)
@@ -441,53 +637,56 @@ const SvcProvider = () => {
                     />
                   </div>
 
-                  <div className="pt-4 border-t">
-                    <div className="flex justify-between text-sm text-gray-600 mb-2">
-                      <span>
-                        Rate (KES {profile.hourlyRate}/hr ×{" "}
-                        {bookingForm.duration || 1}hr)
-                      </span>
-                      <span>
-                        KES{" "}
-                        {(
-                          profile.hourlyRate *
-                          parseInt(bookingForm.duration || "1")
-                        ).toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between font-bold text-lg">
-                      <span>Total</span>
-                      <span>
-                        KES{" "}
-                        {(
-                          profile.hourlyRate *
-                          parseInt(bookingForm.duration || "1")
-                        ).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
+                  {/* Price Summary */}
+                  {selectedService &&
+                    selectedService.pricingType !== "CUSTOM" && (
+                      <div className="pt-4 border-t">
+                        <div className="flex justify-between text-sm text-gray-600 mb-2">
+                          <span>
+                            {selectedService.pricingType === "HOURLY" &&
+                              `${selectedService.hourlyRate} × ${bookingForm.duration}hr`}
+                            {selectedService.pricingType === "FIXED" &&
+                              "Fixed Price"}
+                            {selectedService.pricingType === "PER_UNIT" &&
+                              `${selectedService.fixedPrice} × ${bookingForm.quantity} ${bookingForm.unitType}(s)`}
+                          </span>
+                          <span>KES {calculatedAmount.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between font-bold text-lg">
+                          <span>Total</span>
+                          <span>KES {calculatedAmount.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    )}
 
+                  {/* Submit */}
                   <button
                     type="submit"
-                    disabled={bookingLoading}
+                    disabled={bookingLoading || !selectedService}
                     className="w-full py-3 bg-jiko-primary hover:bg-jiko-primary/90 cursor-pointer text-jiko-secondary rounded-xl font-bold hover:shadow-lg transition disabled:opacity-50 flex items-center justify-center space-x-2"
                   >
                     <Send size={20} />
                     <span>
-                      {bookingLoading ? "Sending..." : "Confirm Booking"}
+                      {bookingLoading
+                        ? "Sending..."
+                        : selectedService?.pricingType === "CUSTOM"
+                        ? "Request Quote"
+                        : "Confirm Booking"}
                     </span>
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => setShowBookingForm(false)}
+                    onClick={() => {
+                      setShowBookingForm(false);
+                      setSelectedService(null);
+                    }}
                     className="w-full cursor-pointer py-2 text-red-400 hover:text-red-600"
                   >
                     Cancel
                   </button>
                 </form>
               )}
-
               <div className="mt-6 pt-6 border-t text-center text-sm text-gray-600">
                 <p>✓ Verified professional</p>
                 <p>✓ Secure payment</p>

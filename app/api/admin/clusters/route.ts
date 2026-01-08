@@ -13,11 +13,11 @@ const clusterSchema = z.object({
     active: z.boolean(),
 });
 
-export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
+export const GET = withRole('ADMIN', 'SUPER_ADMIN')(async (req: AuthenticatedRequest) => {
     try {
         const role = req.headers.get("x-user-role");
 
-        if (role !== "ADMIN") {
+        if (role !== "ADMIN" && role !== "SUPER_ADMIN") {
             return NextResponse.json({
                 success: false,
                 message: "Unauthorized"
@@ -46,7 +46,7 @@ export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
     }
 })
 
-export const POST = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
+export const POST = withRole('ADMIN', 'SUPER_ADMIN')(async (req: AuthenticatedRequest) => {
     try {
 
 

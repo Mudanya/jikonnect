@@ -34,13 +34,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-select";
 import { Textarea } from "@/components/ui/textarea";
 import { User } from "@/types/auth";
+import { set } from "zod";
 
 const VerificationPage = () => {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [verifications, setVerifications] = useState([]);
+  const [verifications, setVerifications] = useState<any>([]);
   const [selectedProfile, setSelectedProfile] = useState<{
     user: User;
     id: string;
@@ -51,7 +52,8 @@ const VerificationPage = () => {
   useEffect(() => {
     setTimeout(async () => {
       setMounted(true);
-      if (user?.role !== "ADMIN") {
+      console.log("User ", JSON.stringify(user));
+      if (user?.role !== "ADMIN" && user?.role !== "SUPER_ADMIN") {
         router.push("/services");
       } else {
         const res = await loadVerifications();
@@ -62,7 +64,7 @@ const VerificationPage = () => {
         } else toast.error(res?.message);
       }
     }, 0);
-  }, [user]);
+  }, []);
 
   const handleAction = async (
     profileId: string,
@@ -168,24 +170,19 @@ const VerificationPage = () => {
                       {profile.yearsOfExperience || 0} years
                     </p>
                   </div>
-                  <div className="p-4 bg-gray-50 rounded-xl">
-                    <p className="text-sm text-gray-500 mb-1">Hourly Rate</p>
-                    <p className="font-semibold text-gray-900">
-                      KES {profile.hourlyRate?.toLocaleString() || 0}
-                    </p>
-                  </div>
+                
                 </div>
 
                 <div className="mb-4">
                   <p className="text-sm text-gray-500 mb-2">Services</p>
                   <div className="flex flex-wrap gap-2">
                     {profile?.services?.map(
-                      (service: { name: string; id: string }) => (
+                      (service: { name: string; id: string,pricingType:string,fixedPrice?:number, hourlyRate?:number}) => (
                         <span
                           key={service.id}
                           className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
                         >
-                          {service.name}
+                          {service.name} PricingType: {service.pricingType} Price: {service.fixedPrice ? service.fixedPrice : service.hourlyRate}
                         </span>
                       )
                     )}
@@ -282,6 +279,7 @@ const VerificationPage = () => {
 
                   <Button
                     onClick={() => {
+                      setSelectedProfile(profile);  
                       handleAction(profile.id, "approve");
                     }}
                     disabled={actionLoading}
