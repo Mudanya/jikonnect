@@ -1,9 +1,10 @@
-import { BookingStatus } from "@/lib/generated/prisma/enums"
+import { Prisma } from "@/lib/generated/prisma/client"
+import { BookingStatus, PricingType, VerificationStatus } from "@/lib/generated/prisma/enums"
+import { calculateBookingPrice, calculateCommission } from "@/lib/pricing/pricingUtils"
 import { prisma } from "@/prisma/prisma.init"
-import { serviceSearchParams } from "@/types/service.type"
+import { ServiceSearchParams } from "@/types/service.type"
 import { ProfileFormData } from "@/validators/profile.validator"
 import { Decimal, InputJsonValue } from "@prisma/client/runtime/client"
-import { getSettingsByKey } from "./admin.query"
 
 
 export const getUserByUserId = async (userId: string) => {
@@ -26,7 +27,6 @@ export const updateUserProfile = async (userId: string, data: Partial<ProfileFor
             profile: {
                 update: {
                     bio: data.bio,
-                    hourlyRate: data.hourlyRate,
                     yearsOfExperience: data.yearsOfExperience,
                     locationId: data.location,
                     languages: data.languages,
@@ -74,28 +74,58 @@ export const updateIdNumber = async (userId: string, idNumber: string) => {
     })
 }
 
-export const getUserProfiles = async ({ location, minRate, maxRate, minRating, category }: serviceSearchParams) => {
+
+// Helper function to build where clause
+const buildWhereClause = ({ location, minRate, maxRate, minRating, category }: Omit<ServiceSearchParams, 'page' | 'limit'>) => {
+    return {
+        verificationStatus: VerificationStatus.VERIFIED,
+        ...(category && {
+            services: { 
+                some: { 
+                    category: { 
+                        name: { equals: category, mode: Prisma.QueryMode.insensitive } 
+                    } 
+                } 
+            }
+        }),
+        ...(location && {
+            location: {
+                id: location
+            }
+        }),
+        ...(minRate && maxRate && {
+            hourlyRate: {
+                gte: parseFloat(minRate),
+                lte: parseFloat(maxRate)
+            }
+        }),
+        ...(minRating && {
+            averageRating: { gte: parseFloat(minRating) }
+        })
+    };
+};
+
+// Get count of providers matching filters
+export const getProviderCount = async (filters: Omit<ServiceSearchParams, 'page' | 'limit'>) => {
+    return await prisma.profile.count({
+        where: buildWhereClause(filters)
+    });
+};
+
+// Get paginated provider profiles
+export const getUserProfiles = async ({ 
+    location, 
+    minRate, 
+    maxRate, 
+    minRating, 
+    category,
+    page = 1,
+    limit = 12
+}: ServiceSearchParams) => {
+    const skip = (page - 1) * limit;
+    
     return await prisma.profile.findMany({
-        where: {
-            verificationStatus: 'VERIFIED',
-            ...(category && {
-                services: { some: { category: { name: { equals: category, mode: 'insensitive' } } } }
-            }),
-            ...(location && {
-                location: {
-                    id: location
-                }
-            }),
-            ...(minRate && maxRate && {
-                hourlyRate: {
-                    gte: parseFloat(minRate),
-                    lte: parseFloat(maxRate)
-                }
-            }),
-            ...(minRating && {
-                averageRating: { gte: parseFloat(minRating) }
-            })
-        },
+        where: buildWhereClause({ location, minRate, maxRate, minRating, category }),
         include: {
             user: {
                 select: {
@@ -111,14 +141,29 @@ export const getUserProfiles = async ({ location, minRate, maxRate, minRating, c
                 take: 3,
                 orderBy: { createdAt: 'desc' }
             },
-            location: { select: { name: true, id: true } },
-            services: { select: { name: true } }
+            location: { 
+                select: { 
+                    name: true, 
+                    id: true 
+                } 
+            },
+            services: { 
+                select: { 
+                    name: true,
+                    fixedPrice:true,
+                    pricingType:true,
+                    hourlyRate:true
+                } 
+            }
         },
-        orderBy: {
-            averageRating: 'desc'
-        }
-    })
-}
+        orderBy: [
+            { averageRating: 'desc' },
+            { totalJobs: 'desc' }
+        ],
+        skip,
+        take: limit
+    });
+};
 
 export const getProviderbyId = async (id: string) => {
     return await prisma.profile.findFirst({
@@ -139,7 +184,7 @@ export const getProviderbyId = async (id: string) => {
             portfolios: {
                 orderBy: { createdAt: 'desc' }
             },
-            services: { select: { name: true } }
+            services: { select: { name: true, id: true, pricingType: true, hourlyRate: true, estimatedHours: true, fixedPrice: true } }
 
         }
     });
@@ -187,7 +232,12 @@ export const createBooking = async ({
     hourlyRate,
     location,
     scheduledDate,
-    description
+    description,
+    unitType,
+    quantity,
+    pricingType,
+    fixedPrice,
+    unitPrice
 }: {
     userId: string,
     providerId: string,
@@ -198,13 +248,20 @@ export const createBooking = async ({
     location: string,
     scheduledDate: string,
     description: string,
+    unitType?: string,
+    quantity?: number,
+    unitPrice?: number,
+    pricingType: PricingType,
+    fixedPrice?: number,
 }) => {
     const bookingNumber = `BK${Date.now()}${Math.random().toString(36).substring(7).toUpperCase()}`;
     const hours = duration || 1;
-    const amount = Number(hourlyRate) * hours;
-    const platformDetails = await getSettingsByKey('platform')
-    const commission = amount * (platformDetails?.commissionRate || 0.10);
-    const providerPayout = amount - commission;
+    // const amount = Number(hourlyRate) * hours;
+    const amount = calculateBookingPrice({ pricingType, hourlyRate: Number(hourlyRate), estimatedHours: hours, fixedPrice }, { pricingType, quantity,unitPrice, unitType, estimatedHours: hours, hourlyRate: Number(hourlyRate) });
+    const loc = await prisma.location.findUnique({
+        where: { id: location }
+    });
+    const { commission, providerPayout } = await calculateCommission(amount);
     return await prisma.booking.create({
         data: {
             bookingNumber,
@@ -215,11 +272,16 @@ export const createBooking = async ({
             scheduledDate: new Date(scheduledDate),
             scheduledTime,
             duration: hours,
-            location,
+            location: loc ? loc.name : 'N/A',
             amount,
             commission,
             providerPayout,
-            status: 'PENDING'
+            status: 'PENDING',
+            unitType: unitType || null,
+            quantity: quantity || null,
+            // unitPrice: unitPrice || null,
+            pricingType: pricingType,
+            // fixedPrice: fixedPrice || null
         },
         include: {
             provider: {

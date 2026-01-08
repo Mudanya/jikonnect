@@ -16,10 +16,12 @@ import {
   CheckCircle,
   Ban,
   Trash2,
+  ShieldPlus,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { UserStatus } from "@/lib/generated/prisma/enums";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 type User = {
   id: string;
@@ -27,13 +29,13 @@ type User = {
   lastName: string | null;
   email: string;
   avatar: string | null;
-  role: "CLIENT" | "PROFESSIONAL" | "ADMIN";
+  role: "CLIENT" | "PROFESSIONAL" | "ADMIN" | "SUPER_ADMIN";
   status: UserStatus;
   createdAt: Date;
 };
 
 export default function AdminUsersPage() {
-  const router = useRouter();
+  const {user:adminUser}= useAuth()
   const searchParams = useSearchParams();
   const roleParam = searchParams?.get("role") || "CLIENT";
 
@@ -56,7 +58,7 @@ export default function AdminUsersPage() {
   const [actionModal, setActionModal] = useState<{
     isOpen: boolean;
     user: User | null;
-    action: "suspend" | "unsuspend" | "delete" | null;
+    action: "suspend" | "unsuspend" | "delete" | "makeAdmin" | null;
   }>({
     isOpen: false,
     user: null,
@@ -351,6 +353,21 @@ export default function AdminUsersPage() {
                       {/* Actions */}
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end gap-2">
+                          {adminUser?.role === "SUPER_ADMIN" && user.role !== "ADMIN" && (
+                            <button
+                              onClick={() =>
+                                setActionModal({
+                                  isOpen: true,
+                                  user,
+                                  action: "makeAdmin",
+                                })
+                              }
+                              className="text-green-600 hover:text-green-900"
+                              title="Make Admin"
+                            >
+                              <ShieldPlus className="w-5 h-5" />
+                            </button>
+                          ) }
                           {user.status === "SUSPENDED" ? (
                             <button
                               onClick={() =>
@@ -456,6 +473,8 @@ export default function AdminUsersPage() {
                 `Suspend ${actionModal.user.firstName}?`}
               {actionModal.action === "unsuspend" &&
                 `Restore access for ${actionModal.user.firstName}?`}
+              {actionModal.action === "makeAdmin" &&
+                `Make ${actionModal.user.firstName} an Admin?`}
               {actionModal.action === "delete" &&
                 `Permanently delete ${actionModal.user.firstName}? This action cannot be undone.`}
             </p>

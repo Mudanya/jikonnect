@@ -21,14 +21,14 @@ import {
   Phone,
   Save,
   Upload,
-  User
+  User,
 } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { LocationDropdown } from "../locations/LocationDropdown";
 import Loading from "../shared/Loading";
-import ServicesModal from "../shared/ServicesModal";
+import ServicesModal from "../services/ServicesModal";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
@@ -42,10 +42,10 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
     register,
     handleSubmit,
     formState: { errors, isValid, isSubmitting },
- 
+
     getValues,
     reset,
- 
+
     control,
   } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
@@ -56,8 +56,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
       phone: "",
       avatar: "",
       bio: "",
-      
-      hourlyRate: undefined,
+
       yearsOfExperience: undefined,
       location: "",
       languages: [],
@@ -71,8 +70,6 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
     certificates: [] as string[],
   });
 
-
-
   const onSubmit = async (data: EditProfileFormData) => {
     try {
       await submitProfile(data);
@@ -82,7 +79,6 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
       toast.error((err as Error).message);
     }
   };
-
 
   useEffect(() => {
     setTimeout(async () => {
@@ -101,12 +97,15 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
                 phone: data.data.phone || "",
                 avatar: data.data?.avatar || "",
                 bio: data.data?.profile?.bio || "",
-              
-                hourlyRate: data.data?.profile?.hourlyRate || 0,
+
                 yearsOfExperience: data.data?.profile?.yearsOfExperience || 0,
                 languages: data.data?.profile?.languages || [],
                 idNumber: data.data?.profile?.idNumber || "",
-                role: user.role as "CLIENT" | "PROFESSIONAL" | "ADMIN",
+                role: user.role as
+                  | "CLIENT"
+                  | "PROFESSIONAL"
+                  | "ADMIN"
+                  | "SUPER_ADMIN",
                 location: data.data?.profile?.locationId,
               },
               {
@@ -340,30 +339,16 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Hourly Rate (KES)
-                  </label>
-                  <div className="relative">
-                    <DollarSign
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
-                    <Input
-                      defaultValue={getValues("hourlyRate")}
-                      type="number"
-                      {...register("hourlyRate", { valueAsNumber: true })}
-                      placeholder="800"
-                      className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
+                
               </div>
             </div>
           </div>
 
           {/* ID & Document Upload */}
-          <div id="verification" className="bg-white rounded-2xl shadow-md p-6 mt-4">
+          <div
+            id="verification"
+            className="bg-white rounded-2xl shadow-md p-6 mt-4"
+          >
             <h2 className="text-xl font-bold mb-6">
               ID & Document Verification
             </h2>

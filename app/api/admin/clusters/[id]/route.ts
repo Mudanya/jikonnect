@@ -18,7 +18,7 @@ export async function PATCH(
     try {
         const role = req.headers.get("x-user-role");
         const { id } = await params
-        if (role !== "ADMIN") {
+        if (role !== "ADMIN" && role !== "SUPER_ADMIN") {
             return NextResponse.json({
                 success: false,
                 message: "Unauthorized"
@@ -62,7 +62,7 @@ export async function DELETE(
     try {
         const role = req.headers.get("x-user-role");
         const { id } = await params
-        if (role !== "ADMIN") {
+        if (role !== "ADMIN" && role !== "SUPER_ADMIN") {
             return NextResponse.json({
                 success: false,
                 message: "Unauthorized"

@@ -21,7 +21,7 @@ const AppSidebar = () => {
   const [sidebarItems, setSidebarItems] = useState<{title:string,url:string,icon:LucideIcon}[]>([])
   useEffect(() =>{
     setTimeout(()=>{
-      if(user?.role === 'ADMIN') setSidebarItems(SidebarAdminItems)
+      if(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') setSidebarItems(SidebarAdminItems)
         else if(user?.role === 'PROFESSIONAL') setSidebarItems(SidebarProviderItems)
       else setSidebarItems(SidebarClientItems)
     },0)

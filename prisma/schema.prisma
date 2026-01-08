@@ -42,6 +42,11 @@ model User {
   payouts           Payout[]      @relation
   processedPayouts  Payout[]      @relation("ProcessedPayouts")
 
+  adminConversations       AdminConversation[]  @relation("AdminConversations")
+  userAdminConversations   AdminConversation[]  @relation("UserAdminConversations")
+  adminMessagesSent        AdminMessage[]       @relation("AdminMessageSender")
+
+
   disputeMessages DisputeMessage[] @relation
 
   
@@ -116,7 +121,6 @@ model Profile {
   userId             String             @unique
   bio                String?
   services           Service []
-  hourlyRate         Decimal            @db.Decimal(10, 2)
   yearsOfExperience  Int?
   languages          String[]
   availability       Json?
@@ -136,6 +140,12 @@ model Profile {
   user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   locationId       String? 
   location         Location? @relation(fields: [locationId], references: [id])
+  defaultPricingType  PricingType   @default(HOURLY)
+  defaultHourlyRate   Float?
+  acceptsFixedPrice   Boolean       @default(true)
+  acceptsCustomQuotes Boolean       @default(true)
+  minimumJobPrice     Float?        // Minimum they'll accept
+
   @@index([verificationStatus])
 }
 
@@ -208,9 +218,13 @@ model Booking {
   dispute            Dispute?
   payment            Payment?
   review             Review?
-   payout             Payout?       @relation(fields: [payoutId], references: [id])
+  payout             Payout?       @relation(fields: [payoutId], references: [id])
 
-
+  pricingType       PricingType   @default(HOURLY)
+  hourlyRate        Float?
+  estimatedHours    Float?
+  quantity          Int?          @default(1) // For PER_UNIT pricing
+  unitType          String?       // e.g., "rooms", "items", "sqft
   payoutStatus       PayoutStatus  @default(PENDING) 
   paidOutAt          DateTime?                        
   payoutId           String?   
@@ -403,6 +417,14 @@ model Service {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  pricingType    PricingType      @default(HOURLY)
+  hourlyRate     Float?           // For HOURLY pricing
+  fixedPrice     Float?           // For FIXED/PER_TASK pricing
+  priceMin       Float?           // For CUSTOM range
+  priceMax       Float?           // For CUSTOM range
+  estimatedHours Float?           // Estimated hours for FIXED tasks
+
+
   @@map("services")
 }
 
@@ -449,6 +471,60 @@ model Message {
   @@index([recipientId])
   @@index([createdAt])
 }
+
+model AdminConversation {
+  id           String           @id @default(cuid())
+  adminId      String
+  userId       String           
+  userType     ConversationType 
+  subject      String?          
+  status       String           @default("ACTIVE") 
+  lastMessageAt DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  admin        User             @relation("AdminConversations", fields: [adminId], references: [id], onDelete: Cascade)
+  user         User             @relation("UserAdminConversations", fields: [userId], references: [id], onDelete: Cascade)
+  messages     AdminMessage[]
+
+  @@unique([adminId, userId, userType])
+  @@index([adminId])
+  @@index([userId])
+  @@index([lastMessageAt])
+  @@map("admin_conversations")
+}
+
+model AdminMessage {
+  id             String             @id @default(cuid())
+  conversationId String
+  senderId       String
+  senderType     ConversationType   // ADMIN, CLIENT, PROVIDER
+  content        String             @db.Text
+  attachments    String[]           @default([]) // URLs to attachments
+  readAt         DateTime?
+  createdAt      DateTime           @default(now())
+
+  conversation   AdminConversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User               @relation("AdminMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@map("admin_messages")
+}
+
+enum ConversationType {
+  ADMIN
+  CLIENT
+  PROVIDER
+}
+
+enum PricingType {
+  HOURLY      
+  FIXED       // Fixed price per task
+  PER_UNIT    // Per unit (e.g., per room, per item)
+}
+
     
 enum MessageStatus {
   SENT

@@ -134,7 +134,7 @@ export const POST = async (
                 priority: 'MEDIUM',
                 title: 'New Dispute Message',
                 message: `${senderType} sent a message in dispute for booking #${dispute.booking.bookingNumber}`,
-                actionUrl: `/admin/disputes/${dispute.id}`,
+                actionUrl: `/admin/disputes`,
                 data: { disputeId }
             });
         }

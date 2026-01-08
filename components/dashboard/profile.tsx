@@ -48,7 +48,7 @@ const GenProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
           ...storedUser,
           ...profile!.profile,
           role: storedUser.role as "CLIENT" | "PROFESSIONAL" | undefined,
-          hourlyRate: +(profile?.profile.hourlyRate || 0),
+         
         });
         if (res.success) toast.success("Profile updated successfully");
         setUploading(false);

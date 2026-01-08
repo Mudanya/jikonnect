@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 
 
 
-export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
+export const GET = withRole("ADMIN", "SUPER_ADMIN")(async (req: AuthenticatedRequest) => {
     try {
 
 

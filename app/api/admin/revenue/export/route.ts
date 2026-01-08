@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 
 
 // GET /api/admin/revenue/export
-export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
+export const GET = withRole("ADMIN", "SUPER_ADMIN")(async (req: AuthenticatedRequest) => {
     try {
         const { searchParams } = new URL(req.url);
         const days = parseInt(searchParams.get('days') || '30');

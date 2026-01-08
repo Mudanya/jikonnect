@@ -113,7 +113,7 @@ export class NotificationService {
                 jobId,
                 currency: 'KES',
             },
-            actionUrl: `/provider/my-jobs`,
+            actionUrl: `/provider/bookings`,
         });
     }
 

@@ -20,7 +20,13 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     // Count unread messages where user is NOT the sender
-    const unreadCount = await prisma.message.count({
+    const fullUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { role: true }
+    });
+
+    // Count unread booking messages where user is NOT the sender
+    const bookingUnreadCount = await prisma.message.count({
       where: {
         senderId: {
           not: user.id,
@@ -37,9 +43,44 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
       },
     });
 
+    // Count unread admin messages
+    const userType = fullUser?.role === 'PROFESSIONAL' ? 'PROVIDER' : 
+                     fullUser?.role === 'ADMIN' ? 'ADMIN' : 'CLIENT';
+
+    let adminUnreadCount = 0;
+
+    if (fullUser?.role === 'ADMIN') {
+      // Admin: count unread from clients and providers
+      adminUnreadCount = await prisma.adminMessage.count({
+        where: {
+          conversation: {
+            adminId: user.id
+          },
+          senderType: { not: 'ADMIN' },
+          readAt: null
+        }
+      });
+    } else {
+      // Client/Provider: count unread from admin
+      adminUnreadCount = await prisma.adminMessage.count({
+        where: {
+          conversation: {
+            userId: user.id,
+            userType
+          },
+          senderType: 'ADMIN',
+          readAt: null
+        }
+      });
+    }
+
+    const totalUnreadCount = bookingUnreadCount + adminUnreadCount;
+
     return NextResponse.json({
       success: true,
-      count: unreadCount,
+      count: totalUnreadCount,
+      bookingUnread: bookingUnreadCount,
+      adminUnread: adminUnreadCount,
     });
   } catch (error) {
     console.error('Error fetching unread count:', error);

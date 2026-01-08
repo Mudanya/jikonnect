@@ -13,7 +13,7 @@ interface ImportLocation {
     matchingRadius?: number;
 }
 
-export const POST = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
+export const POST = withRole("ADMIN", "SUPER_ADMIN")(async (req: AuthenticatedRequest) => {
     try {
 
 

@@ -30,7 +30,6 @@ export const createUser = async (data: RegisterFormData) => {
         location,
        
         experience,
-        hourlyRate,
         bio, acceptTerms } = data
     const fName = fullName.split(' ');
     const firstName = fName[0]
@@ -49,7 +48,7 @@ export const createUser = async (data: RegisterFormData) => {
                 profile: {
                     create: {
                         bio: bio || null,
-                        hourlyRate: parseFloat(hourlyRate!),
+                       
                         yearsOfExperience: experience ? parseInt(experience) : null,
                         ...(location && { locationId: location }),
                         languages: ['English'], // Default
@@ -144,7 +143,7 @@ export const getUserWithProfileById = async (id: string) => {
 export const deleteUser = async (id: string) => {
     return await prisma.user.delete({ where: { id } })
 }
-export const suspendUser = async (id: string, action: 'suspend' | 'unsuspend') => {
+export const suspendUser = async (id: string, action: 'suspend' | 'unsuspend' | 'makeAdmin') => {
     const status = action === 'suspend' ? 'SUSPENDED' : 'ACTIVE';
     return await prisma.user.update({ where: { id }, data: { status } })
 }

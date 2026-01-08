@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 
 // GET /api/admin/config
-export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
+export const GET = withRole("ADMIN", "SUPER_ADMIN")(async (req: AuthenticatedRequest) => {
     try {
 
         const config = await getAllSettings();
@@ -36,7 +36,7 @@ export const GET = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
 })
 
 
-export const PUT = withRole("ADMIN")(async (req: AuthenticatedRequest) => {
+export const PUT = withRole("ADMIN", "SUPER_ADMIN")(async (req: AuthenticatedRequest) => {
     try {
 
         const configData: Configs = await req.json();

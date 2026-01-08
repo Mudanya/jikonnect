@@ -23,7 +23,7 @@ export const POST = async (
         if (!user) {
             return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 401 });
         }
-        if (!user || user.role !== 'ADMIN') {
+        if (!user || user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') {
             return NextResponse.json(
                 { success: false, error: 'Unauthorized' },
                 { status: 401 }

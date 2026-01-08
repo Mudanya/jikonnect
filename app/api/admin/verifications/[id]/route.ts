@@ -32,7 +32,7 @@ export const PUT = (async (
         }
 
         
-        if (payload.role !== 'ADMIN') {
+        if (payload.role !== 'ADMIN' && payload.role !== 'SUPER_ADMIN') {
             return NextResponse.json(
                 { success: false, message: 'Insufficient permissions' },
                 { status: 403 }

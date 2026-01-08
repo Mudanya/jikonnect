@@ -16,7 +16,7 @@ export default function PaymentReconciliationPage() {
   });
 
   useEffect(() => {
-    if (user?.role !== 'ADMIN') {
+    if (user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN') {
       router.push('/dashboard');
     } else {
       loadReconciliationData();
