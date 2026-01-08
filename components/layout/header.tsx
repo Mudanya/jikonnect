@@ -98,7 +98,7 @@ const Header = () => {
             <Link href="#join" className="block text-jiko-black hover:text-jiko-primary">
               Join as Pro
             </Link>
-            <Link href={'/register'}  className="w-full inline-block text-left text-jiko-primary hover:underline font-medium">
+            <Link href={'/login'}  className="w-full inline-block text-left text-jiko-primary hover:underline font-medium">
               Login
             </Link>
             <Link href={'/register'} className="w-full inline-block shadow-md hover:shadow-lg bg-jiko-secondary text-center hover:bg-jiko-secondary/90 text-jiko-black hover:text-jiko-primary px-6 py-2 rounded-lg">
