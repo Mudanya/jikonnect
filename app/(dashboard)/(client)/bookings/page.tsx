@@ -382,8 +382,8 @@ const Bookings = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex flex-col md:flex-row items-center justify-between pt-4 border-t">
-                  <div className="flex items-center space-x-3">
+                <div className="flex flex-col md:flex-row items-center justify-between pt-4 border-t w-full md:w-fit">
+                  <div className="flex items-center space-x-3 w-full md:w-fit">
                     {booking.provider.phone &&
                       booking.status === "IN_PROGRESS" && (
                         <a
@@ -397,7 +397,7 @@ const Bookings = () => {
                     <button
                       onClick={() => handleMessageProvider(booking)}
                       disabled={messagingProvider === booking.id}
-                      className="flex items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center w-full md:w-fit space-x-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <MessageCircle
                         size={16}
@@ -415,12 +415,12 @@ const Bookings = () => {
                     </button>
                   </div>
 
-                  <div className="flex flex-col md:flex-row items-center gap-3">
+                  <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-fit">
                     {/* Pay Now Button - Show when CONFIRMED */}
                     {booking.status === "CONFIRMED" && (
                       <button
                         onClick={() => handlePayNow(booking)}
-                        className="flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-green-600 to-green-500 text-white rounded-lg hover:shadow-lg transition"
+                        className="flex items-center w-full md:w-fit max-md:y-1  space-x-2 px-4 py-2 bg-linear-to-r from-green-600 to-green-500 text-white rounded-lg hover:shadow-lg transition"
                       >
                         <CreditCard size={16} />
                         <span className="text-sm font-medium">Pay Now</span>
@@ -501,7 +501,7 @@ const Bookings = () => {
                     {["PENDING", "CONFIRMED"].includes(booking.status) && (
                       <button
                         onClick={() => handleCancelBooking(booking.id)}
-                        className="flex items-center space-x-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition"
+                        className="flex items-center space-x-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition w-full md:w-fit"
                       >
                         <X size={16} />
                         <span className="text-sm font-medium">Cancel</span>

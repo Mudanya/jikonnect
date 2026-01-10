@@ -8,11 +8,12 @@ interface STKPushRequest {
 }
 
 interface STKPushResponse {
-    MerchantRequestID: string;
-    CheckoutRequestID: string;
-    ResponseCode: string;
-    ResponseDescription: string;
-    CustomerMessage: string;
+    MerchantRequestID?: string;
+    CheckoutRequestID?: string;
+    ResponseCode?: string;
+    ResponseDescriptio?: string;
+    CustomerMessage?: string;
+    errorMessage?: string
 }
 
 export class MpesaService {
@@ -28,17 +29,16 @@ export class MpesaService {
         this.consumerSecret = process.env.MPESA_CONSUMER_SECRET || '';
         this.passkey = process.env.MPESA_PASSKEY || '';
         this.shortcode = process.env.MPESA_SHORTCODE || '';
-        this.callbackUrl = process.env.MPESA_CALLBACK_URL || '';
-        this.baseUrl = process.env.NODE_ENV === 'production'
-            ? 'https://api.safaricom.co.ke'
-            : 'https://sandbox.safaricom.co.ke';
+        this.callbackUrl = process.env.PUBLIC_APP_URL + "/api/payments/mpesa/callback" || '';
+        this.baseUrl = 'https://api.safaricom.co.ke'
+
     }
 
     // Generate OAuth token
     async getAccessToken(): Promise<string> {
         try {
             const auth = Buffer.from(`${this.consumerKey}:${this.consumerSecret}`).toString('base64');
-
+            console.log('url::::', this.baseUrl)
             const response = await fetch(
                 `${this.baseUrl}/oauth/v1/generate?grant_type=client_credentials`,
                 {
@@ -47,8 +47,9 @@ export class MpesaService {
                     }
                 }
             );
-            const res = await response.json()
-            return res.data.access_token;
+            const res = await response.json();
+            console.log("res token:::", res.access_token);
+            return res.access_token;
         } catch (error) {
             if (error instanceof Error)
                 logger.error('M-Pesa access token error: ' + error.message)
@@ -97,6 +98,7 @@ export class MpesaService {
             const accessToken = await this.getAccessToken();
             const timestamp = this.getTimestamp();
             const password = this.generatePassword();
+            // const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjEwNjI4MDkyNDA4"
             const phoneNumber = this.formatPhoneNumber(request.phoneNumber);
 
             const payload = {
@@ -104,7 +106,8 @@ export class MpesaService {
                 Password: password,
                 Timestamp: timestamp,
                 TransactionType: 'CustomerPayBillOnline',
-                Amount: Math.round(request.amount), // Must be integer
+                // Amount: Math.round(request.amount), 
+                Amount: 1,
                 PartyA: phoneNumber,
                 PartyB: this.shortcode,
                 PhoneNumber: phoneNumber,
@@ -112,7 +115,7 @@ export class MpesaService {
                 AccountReference: request.accountReference,
                 TransactionDesc: request.transactionDesc
             };
-
+            console.log('payload', payload)
             const response = await fetch(
                 `${this.baseUrl}/mpesa/stkpush/v1/processrequest`,
                 {
@@ -128,7 +131,8 @@ export class MpesaService {
 
             );
             const data = await response.json()
-            return data.data;
+            console.log('data', data)
+            return data;
         } catch (error) {
             if (error instanceof Error)
                 logger.error('initiate M-Pesa payment ' + error.message)

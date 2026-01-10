@@ -1,0 +1,47 @@
+# local
+DATABASE_URL="postgresql://jikonnect:Konekt724@localhost:5432/jikonnect?schema=public"
+
+# neon
+# DATABASE_URL="postgresql://neondb_owner:npg_9XJmMQsBG6Ub@ep-lingering-thunder-ah6xw9si-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+
+# #prod::
+# DATABASE_URL="postgres://e43cf597fb1dbf2987cad678a2cccda8aa45172b299d028b551b445a53b9bc26:sk_Mp9b1DLEm9DM2fKflO_yf@db.prisma.io:5432/postgres?sslmode=require"
+
+# DATABASE_URL_ACCELERATE="prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqd3RfaWQiOjEsInNlY3VyZV9rZXkiOiJza19NcDliMURMRW05RE0yZktmbE9feWYiLCJhcGlfa2V5IjoiMDFLRDYwNllESEI3RjQxWldQNlYxV1gzRzMiLCJ0ZW5hbnRfaWQiOiJlNDNjZjU5N2ZiMWRiZjI5ODdjYWQ2NzhhMmNjY2RhOGFhNDUxNzJiMjk5ZDAyOGI1NTFiNDQ1YTUzYjliYzI2IiwiaW50ZXJuYWxfc2VjcmV0IjoiZTBkNDczY2YtYTFkMi00OTZhLWEzOTAtNjAyZDVmZDUzZGQ3In0.ofZdrOiqBcub2sH0J47maaKVeRClMum3hWQYrVXT5m4"
+
+JWT_ACCESS_SECRET="S29uZWt0azIzNDU="
+JWT_REFRESH_KEY="S29uZWt0azQ1NzY="
+JWT_ACCESS_EXPIRY='1h'
+JWT_REFRESH_EXPIRY='7d'
+
+SMTP_HOST=mail.jikonnect.co.ke
+SMTP_PORT=587
+SMTP_USER=info@jikonnect.co.ke   
+SMTP_PASS=@Konekt724!
+SMTP_FROM=info@jikonnect.co.ke
+EMAIL_SECURE=false  # false for TLS, true for SSL
+EMAIL_TLS=true  # Enable TLS
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USER=soarex.ke@gmail.com   
+# SMTP_PASS=iswg uayn gwrg tepo
+# SMTP_FROM=soarex.ke@gmail.com
+PUBLIC_APP_URL='https://jikonnect.co.ke'
+
+# M-Pesa Credentials
+MPESA_CONSUMER_KEY=7PZDXZOAN4hcQYmuCvS4xuj4gx09uVzzNM2c5WbPSIn4t4jw
+MPESA_CONSUMER_SECRET=g3kuH0RDFua2N5CbwzOwGXlepDJB6YNUekoJwzZqJZuzbr9NPD1GX3EcAgjzl1Hi
+MPESA_PASSKEY= 40e5fe70efd57175a21e7b23551d9215e69db4872ff8153c8dc3f4924c25146f
+MPESA_SHORTCODE=9512952
+MPESA_CALLBACK_URL=https://jikonnect.co.ke/api/payments/mpesa/callback
+
+# B2C (Provider Payouts)
+MPESA_INITIATOR_NAME=Prod-LINKORA DIGITAL LTD-1767983454722
+MPESA_SECURITY_CREDENTIAL=KimdEF5Qzo1/X7h/cTcsNFHjan69u/DZmS+PAn1HJIyDiPQvwbtyVuuR0E3v9uqVS94a1fY9vf0Fbs8FRN9RSp+Mg7nPF6iROQ6osOQlM9Czl4kqDsKh0Jhdrhu8EdNUy97SPoqn4zTpgqonjJlF0M39uKJ7UcJTxpWCSK0HZvo6hNL0kgij104FatB37AlegwRaSRkLh4secv2Fpm7WWtQ1IcVZFNgJATdAQ0R2ds9snaqkqxLLwNzTA08+vGr2Yi1fPxcxqeJ4dTT9TKcNlt0nSaWr2Bjf+zYAwHtAXXgBbI7rOJn3o/15b3W8G4z5NAgVhL3Ky/ZXLBEmdZnPdw==
+
+# Environment
+NODE_ENV=production # or development for sandbox
+
+CLOUDINARY_CLOUD_NAME='dqytn9mos'
+CLOUDINARY_API_KEY='864712836229925'
+CLOUDINARY_API_SECRET='ehEyf0ETjmijb1YknMkm7__fIhg'
