@@ -1,23 +1,26 @@
 import nodemailer from 'nodemailer'
 
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT!),
-    secure: false,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-    }
+export const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: process.env.EMAIL_SECURE === 'true',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  },
+  tls: {
+    rejectUnauthorized: false,
+  }
 })
 
 export const sendVerificationEmail = async (email: string, token: string) => {
-    const verificationUrl = `${process.env.PUBLIC_APP_URL}/verify-email/${token}`
-    
-    await transporter.sendMail({
-        from: `${process.env.SMTP_FROM}`,
-        to: email,
-        subject: 'Verify Email',
-        html: `
+  const verificationUrl = `${process.env.PUBLIC_APP_URL}/verify-email/${token}`
+
+  await transporter.sendMail({
+    from: `${process.env.SMTP_FROM}`,
+    to: email,
+    subject: 'Verify Email',
+    html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #333;">Email Verification</h1>
         <p>Please click the button below to verify your email address:</p>
@@ -35,18 +38,18 @@ export const sendVerificationEmail = async (email: string, token: string) => {
         </p>
       </div>
     `
-    })
+  })
 
 }
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-    const resetUrl = `${process.env.PUBLIC_APP_URL}/reset-password/${token}`;
+  const resetUrl = `${process.env.PUBLIC_APP_URL}/reset-password/${token}`;
 
-    await transporter.sendMail({
-        from: process.env.SMTP_FROM,
-        to: email,
-        subject: 'Reset Your Password',
-        html: `
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM,
+    to: email,
+    subject: 'Reset Your Password',
+    html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #333;">Password Reset</h1>
         <p>You requested to reset your password. Click the button below:</p>
@@ -67,5 +70,5 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
         </p>
       </div>
     `
-    });
+  });
 }

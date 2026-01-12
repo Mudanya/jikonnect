@@ -100,8 +100,8 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 pt-8 text-center text-sm">
           <p>
-            &copy; 2025 JiKonnect. All rights reserved. Made with ❤️ by{" "}
-            <Link target="_blank" href="https://nelson-mudanya.me/">
+            &copy; {new Date().getFullYear()} JiKonnect. All rights reserved. Made with ❤️ by{" "}
+            <Link target="_blank" href="https://nelson-mudanya.com/">
               Nelson Mudanya
             </Link>
             .

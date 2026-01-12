@@ -54,9 +54,13 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
         accountReference: booking.bookingNumber,
         transactionDesc: `Payment for ${booking.service}`
       });
+      if (stkPushResponse?.errorMessage) return NextResponse.json(
+        { success: false, message: stkPushResponse?.errorMessage },
+        { status: 500 }
+      );
       checkoutRequestId = stkPushResponse.CheckoutRequestID;
       merchantRequestId = stkPushResponse.MerchantRequestID;
-      customerMessage = stkPushResponse.CustomerMessage
+      customerMessage = stkPushResponse.CustomerMessage!
     }
 
     // Save payment record
