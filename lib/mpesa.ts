@@ -105,7 +105,7 @@ export class MpesaService {
                 BusinessShortCode: this.shortcode,
                 Password: password,
                 Timestamp: timestamp,
-                TransactionType: 'CustomerPayBillOnline',
+                TransactionType: 'CustomerBuyGoodsOnline',
                 // Amount: Math.round(request.amount), 
                 Amount: 1,
                 PartyA: phoneNumber,
