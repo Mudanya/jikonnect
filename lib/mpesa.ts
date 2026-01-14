@@ -23,14 +23,18 @@ export class MpesaService {
     private shortcode: string;
     private callbackUrl: string;
     private baseUrl: string;
+    private till: string;
+    private useMpesaLow?: boolean
 
     constructor() {
         this.consumerKey = process.env.MPESA_CONSUMER_KEY || '';
         this.consumerSecret = process.env.MPESA_CONSUMER_SECRET || '';
         this.passkey = process.env.MPESA_PASSKEY || '';
         this.shortcode = process.env.MPESA_SHORTCODE || '';
+        this.till = process.env.MPESA_TILL || '';
         this.callbackUrl = process.env.PUBLIC_APP_URL + "/api/payments/mpesa/callback" || '';
         this.baseUrl = 'https://api.safaricom.co.ke'
+        this.useMpesaLow = JSON.parse(process.env.USE_MPESA_LOW_AMT || "")
 
     }
 
@@ -106,10 +110,9 @@ export class MpesaService {
                 Password: password,
                 Timestamp: timestamp,
                 TransactionType: 'CustomerBuyGoodsOnline',
-                // Amount: Math.round(request.amount), 
-                Amount: 1,
+                Amount: this.useMpesaLow ? 1 :Math.round(request.amount), 
                 PartyA: phoneNumber,
-                PartyB: this.shortcode,
+                PartyB: this.till,
                 PhoneNumber: phoneNumber,
                 CallBackURL: this.callbackUrl,
                 AccountReference: request.accountReference,
@@ -167,12 +170,12 @@ export class MpesaService {
                 }
             );
             const data = await response.json()
-
-            return data.data;
+            logger.info('data:: ', JSON.stringify(data))
+            return data;
         } catch (error) {
             if (error instanceof Error)
                 logger.error('STK Push query error: ' + error.message)
-            console.error('STK Push query error:', error);
+           
             throw new Error('Failed to query payment status');
         }
     }
@@ -187,12 +190,13 @@ export class MpesaService {
                 InitiatorName: process.env.MPESA_INITIATOR_NAME,
                 SecurityCredential: process.env.MPESA_SECURITY_CREDENTIAL,
                 CommandID: 'BusinessPayment',
-                Amount: Math.round(amount),
+                // Amount: Math.round(amount),
+                Amount: 1,
                 PartyA: this.shortcode,
                 PartyB: formattedPhone,
                 Remarks: remarks,
-                QueueTimeOutURL: `${process.env.MPESA_CALLBACK_URL}/b2c/timeout`,
-                ResultURL: `${process.env.MPESA_CALLBACK_URL}/b2c/result`,
+                QueueTimeOutURL: `${process.env.PUBLIC_APP_URL}/payments/mpesa/b2c/timeout`,
+                ResultURL: `${process.env.PUBLIC_APP_URL}/payments/mpesa/b2c/callback`,
                 Occasion: remarks
             };
 

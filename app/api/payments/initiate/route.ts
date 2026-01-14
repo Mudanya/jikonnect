@@ -83,16 +83,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
       }
     });
 
-    await prisma.booking.update({
-      where: { id: booking.id },
-      data: {
-        status: 'IN_PROGRESS',
-      },
-      include: {
-        client: true,
-        provider: true
-      }
-    });
+   
 
     // Log transaction
     await prisma.auditLogs.create({

@@ -118,7 +118,7 @@ export function PaymentModal({
       attempts++;
 
       try {
-        const response = await fetch(`/api/payments/${paymentId}/status`, {
+        const response = await fetch(`/api/payments/status/${paymentId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
