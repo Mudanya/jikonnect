@@ -1,12 +1,13 @@
 // app/api/payments/mpesa/callback/route.ts
 import { NotificationService } from '@/lib/notifications/notificationService';
 import { prisma } from '@/prisma/prisma.init';
+import { getSettingsByKey } from '@/services/queries/admin.query';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    
+
     console.log('M-Pesa Callback received:', JSON.stringify(body, null, 2));
 
     const { Body } = body;
@@ -35,9 +36,9 @@ export async function POST(req: NextRequest) {
 
     if (!payment) {
       console.error('Payment not found for checkout request:', CheckoutRequestID);
-      return NextResponse.json({ 
-        ResultCode: 1, 
-        ResultDesc: 'Payment record not found' 
+      return NextResponse.json({
+        ResultCode: 1,
+        ResultDesc: 'Payment record not found'
       });
     }
 
@@ -60,11 +61,11 @@ export async function POST(req: NextRequest) {
         where: { id: payment.id },
         data: {
           status: 'PAID',
-        //   mpesaCode,
-        //   createdAt: transactionDate ? new Date(String(transactionDate)) : null,
+          //   mpesaCode,
+          //   createdAt: transactionDate ? new Date(String(transactionDate)) : null,
           phoneNumber: phoneNumber || payment.phoneNumber,
-        //   resultCode: ResultCode,
-        //   resultDesc: ResultDesc,
+          //   resultCode: ResultCode,
+          //   resultDesc: ResultDesc,
           paidAt: new Date()
         }
       });
@@ -74,12 +75,14 @@ export async function POST(req: NextRequest) {
         where: { id: payment.bookingId },
         data: {
           status: 'IN_PROGRESS',
-        //   paymentStatus: 'PAID'
+          //   paymentStatus: 'PAID'
         }
       });
 
       // Calculate commission and provider payout
-      const commission = Number(payment.amount) * 0.10; // 10% commission
+      const platformDetails = await getSettingsByKey('platform')
+      const commissionRate = platformDetails?.commissionRate || 0.10;
+      const commission = Number(payment.amount) * commissionRate;
       const providerPayout = Number(payment.amount) - commission;
 
       // Update booking with payment breakdown
@@ -130,9 +133,9 @@ export async function POST(req: NextRequest) {
         where: { id: payment.id },
         data: {
           status: 'FAILED',
-        //   resultCode: ResultCode,
-         failureReason: ResultDesc,
-        //   failedAt: new Date()
+          //   resultCode: ResultCode,
+          failureReason: ResultDesc,
+          //   failedAt: new Date()
         }
       });
 
@@ -162,8 +165,8 @@ export async function POST(req: NextRequest) {
         entityId: payment.id,
         details: {
           checkoutRequestId: CheckoutRequestID,
-        //   resultCode: ResultCode,
-        //   resultDesc: ResultDesc,
+          //   resultCode: ResultCode,
+          //   resultDesc: ResultDesc,
           amount: payment.amount
         },
         ipAddress: req.headers.get('x-forwarded-for') || 'unknown',

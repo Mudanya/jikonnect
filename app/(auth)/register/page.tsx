@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { AuthLayoutContext } from "@/contexts/auth-context.provider";
 import { useAuth } from "@/contexts/AuthContext";
 import { RegisterFormData, registerSchema } from "@/validators/auth.validator";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,7 +31,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { AuthLayoutContext } from "../layout";
 
 const Register = () => {
   const {

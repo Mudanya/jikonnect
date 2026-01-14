@@ -158,60 +158,61 @@ export const getRecentReviews = async () => await prisma.review.findMany({
 });
 
 export const getProviderServices = async () => {
-    const providerRatings = await prisma.review.groupBy({
-        by: ['revieweeId'],
-        _avg: {
-            rating: true
-        },
-        _count: {
-            id: true
-        },
-        orderBy: {
-            _avg: {
-                rating: 'desc'
+    const providers = await prisma.user.findMany({
+        where: {
+            role: 'PROFESSIONAL',
+            profile: {
+                verifiedAt: { not: null }
             }
-        }
-    });
-
-    return await Promise.all(
-        providerRatings.map(async (pr) => {
-            const provider = await prisma.user.findFirst({
-                where: {
-                    id: pr.revieweeId,
-                    role: 'PROFESSIONAL',
-                    profile: {
-                        verifiedAt: { not: null }
-                    }
-                },
-                include: {
-                    profile: {
+        },
+        include: {
+            profile: {
+                select: {
+                    services: {
                         select: {
-                            services: {
+                            name: true,
+                            description: true,
+                            category: {
                                 select: {
                                     name: true,
-                                    description: true,
-                                    category: {
-                                        select: {
-                                            name: true,
-                                            icon: true
-                                        }
-                                    }
+                                    icon: true
                                 }
                             }
                         }
                     }
                 }
-            });
+            },
+            reviews: {
+                select: {
+                    rating: true
+                }
+            }
+        }
+    });
 
-            if (!provider) return null;
+    // Calculate ratings and sort
+    const providersWithRatings = providers.map(provider => {
+        const reviews = provider.reviews;
+        const totalReviews = reviews.length;
+        const averageRating = totalReviews > 0
+            ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+            : 0;
 
-            return {
-                ...provider,
-                averageRating: pr._avg.rating || 0,
-                totalReviews: pr._count.id
-            };
-        })
-    );
+        // Remove reviewsReceived from response
+        const { ...providerData } = provider;
 
-  
-}
+        return {
+            ...providerData,
+            averageRating,
+            totalReviews
+        };
+    });
+
+    // Sort by rating (highest first), then by review count
+    return providersWithRatings.sort((a, b) => {
+        if (b.averageRating !== a.averageRating) {
+            return b.averageRating - a.averageRating;
+        }
+        return b.totalReviews - a.totalReviews;
+    });
+};

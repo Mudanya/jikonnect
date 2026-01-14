@@ -118,15 +118,15 @@ export const POST = withRole('ADMIN', 'SUPER_ADMIN')(async (req: AuthenticatedRe
       });
 
       // 2. Mark all bookings as PROCESSING (prevents double-processing)
-      await tx.booking.updateMany({
-        where: {
-          id: { in: bookingIds }
-        },
-        data: {
-          payoutStatus: 'PROCESSING',
-          payoutId: payout.id
-        }
-      });
+      // await tx.booking.updateMany({
+      //   where: {
+      //     id: { in: bookingIds }
+      //   },
+      //   data: {
+      //     payoutStatus: 'PROCESSING',
+      //     payoutId: payout.id
+      //   }
+      // });
 
       return payout;
     });
@@ -150,13 +150,13 @@ export const POST = withRole('ADMIN', 'SUPER_ADMIN')(async (req: AuthenticatedRe
         );
 
         // Update payout with M-Pesa conversation IDs
-        await prisma.payout.update({
-          where: { id: result.id },
-          data: {
-            conversationId: payoutResponse.ConversationID,
-            originatorConversationId: payoutResponse.OriginatorConversationID
-          }
-        });
+        // await prisma.payout.update({
+        //   where: { id: result.id },
+        //   data: {
+        //     conversationId: payoutResponse.ConversationID,
+        //     originatorConversationId: payoutResponse.OriginatorConversationID
+        //   }
+        // });
 
         // Notify provider (processing)
         await NotificationService.create({
@@ -289,64 +289,3 @@ export const POST = withRole('ADMIN', 'SUPER_ADMIN')(async (req: AuthenticatedRe
   }
 });
 
-// GET /api/admin/payouts/history - Get payout history
-export const GET_HISTORY = withRole('ADMIN', 'SUPER_ADMIN')(async (req: AuthenticatedRequest) => {
-  try {
-    const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const status = searchParams.get('status');
-
-    const where: any = {};
-    if (status) where.status = status;
-
-    const [payouts, total] = await Promise.all([
-      prisma.payout.findMany({
-        where,
-        include: {
-          provider: {
-            select: {
-              firstName: true,
-              lastName: true,
-              phone: true
-            }
-          },
-          processedByUser: {
-            select: {
-              firstName: true,
-              lastName: true
-            }
-          },
-          bookings: {
-            select: {
-              id: true,
-              service: true,
-              amount: true
-            }
-          }
-        },
-        orderBy: { processedAt: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit
-      }),
-      prisma.payout.count({ where })
-    ]);
-
-    return NextResponse.json({
-      success: true,
-      data: payouts,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      }
-    });
-  } catch (error: any) {
-    console.error('Get payout history error:', error);
-    return NextResponse.json(
-      { success: false, message: error.message },
-      { status: 500 }
-    );
-  }
-});

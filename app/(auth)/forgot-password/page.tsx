@@ -2,7 +2,6 @@
 
 import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
-import { AuthLayoutContext } from "../layout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
@@ -12,6 +11,7 @@ import {
 } from "@/validators/auth.validator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
+import { AuthLayoutContext } from "@/contexts/auth-context.provider";
 
 export default function ForgotPasswordPage() {
   

@@ -81,6 +81,10 @@ export class MpesaService {
         return `${year}${month}${day}${hours}${minutes}${seconds}`;
     }
 
+    private generateOriginatorConversationID() {
+        const random = Math.random().toString(36).substring(2, 14);
+        return `${this.shortcode}_Payout_${random}`;
+    }
     // Format phone number to 254XXXXXXXXX
     private formatPhoneNumber(phone: string): string {
         let formatted = phone.replace(/\s+/g, '');
@@ -110,7 +114,7 @@ export class MpesaService {
                 Password: password,
                 Timestamp: timestamp,
                 TransactionType: 'CustomerBuyGoodsOnline',
-                Amount: this.useMpesaLow ? 1 :Math.round(request.amount), 
+                Amount: this.useMpesaLow ? 1 : Math.round(request.amount),
                 PartyA: phoneNumber,
                 PartyB: this.till,
                 PhoneNumber: phoneNumber,
@@ -175,7 +179,7 @@ export class MpesaService {
         } catch (error) {
             if (error instanceof Error)
                 logger.error('STK Push query error: ' + error.message)
-           
+
             throw new Error('Failed to query payment status');
         }
     }
@@ -187,21 +191,23 @@ export class MpesaService {
             const formattedPhone = this.formatPhoneNumber(phoneNumber);
 
             const payload = {
+                OriginatorConversationID: this.generateOriginatorConversationID(),
                 InitiatorName: process.env.MPESA_INITIATOR_NAME,
                 SecurityCredential: process.env.MPESA_SECURITY_CREDENTIAL,
                 CommandID: 'BusinessPayment',
                 // Amount: Math.round(amount),
                 Amount: 1,
                 PartyA: this.shortcode,
-                PartyB: formattedPhone,
+                // PartyB: formattedPhone,
+                PartyB: '254700263761',
                 Remarks: remarks,
-                QueueTimeOutURL: `${process.env.PUBLIC_APP_URL}/payments/mpesa/b2c/timeout`,
+                QueueTimeOutURL: `${process.env.PUBLIC_APP_URL}/payments/mpesa/b2c/callback`,
                 ResultURL: `${process.env.PUBLIC_APP_URL}/payments/mpesa/b2c/callback`,
                 Occasion: remarks
             };
-
+            
             const response = await fetch(
-                `${this.baseUrl}/mpesa/b2c/v1/paymentrequest`,
+                `${this.baseUrl}/mpesa/b2c/v3/paymentrequest`,
                 {
                     body: JSON.stringify(payload),
                     method: 'POST',
@@ -212,7 +218,9 @@ export class MpesaService {
                 }
             );
             const data = await response.json()
-            return data.data;
+            console.log("payload::", payload)
+            console.log("payout::", data)
+            return data;
         } catch (error) {
             if (error instanceof Error)
                 logger.error('B2C error: ' + error.message)
