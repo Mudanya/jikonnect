@@ -1,4 +1,5 @@
 import { withAuth } from '@/lib/api-auth';
+import logger from '@/lib/logger';
 import { MpesaService } from '@/lib/mpesa';
 import { prisma } from '@/prisma/prisma.init';
 import { getSettingsByKey } from '@/services/queries/admin.query';
@@ -112,7 +113,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
       }
     });
   } catch (error: any) {
-    console.error('Payment initiation error:', error);
+    logger.error(`Payment initiation error: ${(error as Error).message}`);
     return NextResponse.json(
       { success: false, message: error.message || 'Failed to initiate payment' },
       { status: 500 }
