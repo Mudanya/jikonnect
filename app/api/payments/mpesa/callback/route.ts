@@ -1,4 +1,5 @@
 // app/api/payments/mpesa/callback/route.ts
+import { transporter } from '@/lib/email';
 import { NotificationService } from '@/lib/notifications/notificationService';
 import { prisma } from '@/prisma/prisma.init';
 import { getSettingsByKey } from '@/services/queries/admin.query';
@@ -108,6 +109,19 @@ export async function POST(req: NextRequest) {
           bookingId: payment.bookingId
         }
       });
+      
+      await transporter.sendMail({
+        from: `${process.env.SMTP_FROM}`,
+        to: `${payment.booking.client.email}`,
+        subject: 'Payment Successful',
+        html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #333;">Payment </h1>
+        <p>Your payment of KES ${Number(payment.amount).toLocaleString()} was successful. Receipt: ${mpesaReceiptNumber}</p>
+              
+      </div>
+    `})
+
 
       // Notify provider
       await NotificationService.create({

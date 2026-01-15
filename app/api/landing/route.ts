@@ -1,4 +1,3 @@
-import { transporter } from '@/lib/email';
 import logger from '@/lib/logger';
 import { getSettingsByKey } from '@/services/queries/admin.query';
 import { completedBookings, getAllProviders, getAvgRatingResult, getProviderServices, getRecentReviews, totalBookings, totalProviders, totalReviews, verifiedProviders } from '@/services/queries/client.query';
@@ -88,29 +87,3 @@ export const GET = async (request: NextRequest) => {
     }
 }
 
-export const POST = async (req: NextRequest) => {
-
-    try {
-        const res = await transporter.sendMail({
-            from: `${process.env.SMTP_FROM}`,
-            to: 'nmudanya9@gmail.com',
-            subject: 'Verify Email',
-            html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #333;">Email Verification</h1>
-        <p>Test email</p>
-       
-        <p style="color: #666; font-size: 14px;">
-          This link will expire in 24 hours.
-        </p>
-      </div>
-    `
-        })
-        console.log('email res', res)
-        return NextResponse.json({ success: true, message: 'sent' })
-    }
-    catch (err) {
-        logger.error((err as Error).message)
-        return NextResponse.json({ success: false, message: 'error' }, { status: 500 })
-    }
-}
