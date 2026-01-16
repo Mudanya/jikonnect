@@ -589,13 +589,13 @@ export function getDefaultSettings(): Configs {
             minBookingAmount: 500,
             maxBookingAmount: 100000,
             platformName: 'JiKonnect',
-            supportEmail: 'support@jikonnect.com',
-            supportPhone: '+254700000000'
+            supportEmail: 'support@jikonnect.co.ke',
+            supportPhone: '+254792423398'
         },
         payments: {
             mpesaEnabled: true,
-            mpesaShortcode: '174379',
-            mpesaEnvironment: 'sandbox',
+            mpesaShortcode: '9512952',
+            mpesaEnvironment: 'production',
             autoPayoutEnabled: false,
             payoutThreshold: 5000
         },
@@ -633,22 +633,22 @@ export async function initializeDefaultSettings(): Promise<void> {
 
 export const initializeAdmin = async () => {
     await prisma.user.upsert({
-        where: { email: 'soarex.ke@gmail.com' },
+        where: { email: 'support@jikonnect.co.ke' },
         update: {
-            firstName: 'Admin',
-            lastName: 'One',
-            phone: '254700263761',
-            password: await hashPassword('@Bentola25'),
+            firstName: 'Support',
+            lastName: 'Admin',
+            phone: '254792423398',
+            password: await hashPassword('@Jiko72426'),
             role: 'ADMIN',
             status: 'ACTIVE',
             updatedAt: new Date(),
         },
         create: {
-            email: 'soarex.ke@gmail.com',
-            firstName: 'Nelson',
-            lastName: 'Mudanya',
-            phone: '254700263761',
-            password: await hashPassword('@Bentola25'),
+            email: 'support@jikonnect.co.ke',
+            firstName: 'Support',
+            lastName: 'Admin',
+            phone: '254792423398',
+            password: await hashPassword('@Jiko72426'),
             role: 'ADMIN',
             status: 'ACTIVE',
             createdAt: new Date(),
@@ -656,22 +656,22 @@ export const initializeAdmin = async () => {
         }
     })
     await prisma.user.upsert({
-        where: { email: 'jikonnect@gmail.com' },
+        where: { email: 'admin@jikonnect.co.ke' },
         update: {
-            firstName: 'Nelson',
-            lastName: 'Mudanya',
-            phone: '254700263762',
-            password: await hashPassword('@Konekt26'),
+            firstName: 'Super',
+            lastName: 'Admin',
+            phone: '254792480522',
+            password: await hashPassword('@Konekt26!'),
             role: 'SUPER_ADMIN',
             status: 'ACTIVE',
             updatedAt: new Date(),
         },
         create: {
-            email: 'jikonnect@gmail.com',
-            firstName: 'Nelson',
-            lastName: 'Mudanya',
-            phone: '254700263762',
-            password: await hashPassword('@Konekt26'),
+            email: 'admin@jikonnect.co.ke',
+            firstName: 'Supper',
+            lastName: 'Admin',
+            phone: '254792480522',
+            password: await hashPassword('@Konekt26!'),
             role: 'SUPER_ADMIN',
             status: 'ACTIVE',
             createdAt: new Date(),

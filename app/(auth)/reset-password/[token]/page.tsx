@@ -3,7 +3,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
-import { AuthLayoutContext } from "../../layout";
 import { useForm } from "react-hook-form";
 import {
   ResetPasswordFormData,
@@ -14,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { AuthLayoutContext } from "@/contexts/auth-context.provider";
 
 export default function ResetPasswordPage() {
   const router = useRouter();

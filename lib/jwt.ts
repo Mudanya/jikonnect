@@ -1,11 +1,12 @@
 import { AuthUser } from "@/types/auth"
 import jwt from 'jsonwebtoken'
-import * as ms from 'ms'
 import logger from "./logger"
+type Expiry = `${number}${'s' | 'm' | 'h' | 'd'}` | `${number} ${'seconds' | 'minutes' | 'hours' | 'days'}`
+
 const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET as string
 const REFRESH_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET || ""
-const ACCESS_TOKEN_EXPIRY = process.env.JWT_ACCESS_EXPIRY as ms.StringValue
-const REFRESH_TOKEN_EXPIRY = process.env.JWT_ACCESS_EXPIRY as ms.StringValue
+const ACCESS_TOKEN_EXPIRY:Expiry = process.env.JWT_ACCESS_EXPIRY as Expiry
+const REFRESH_TOKEN_EXPIRY:Expiry = process.env.JWT_ACCESS_EXPIRY as Expiry
 
 export const generateTokens = (payload: AuthUser, rememberMe: boolean) => {
     logger.info('secret: ' + ACCESS_TOKEN_SECRET + " tokens" + ACCESS_TOKEN_SECRET + " remember me: " + rememberMe)
