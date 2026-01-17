@@ -5,7 +5,7 @@ import { AuthenticatedRequest } from '@/types/auth';
 import { NextResponse } from 'next/server';
 
 // GET - Get all admin conversations
-export const GET = withRole('ADMIN', 'SUPER_ADMIN')(async (req: AuthenticatedRequest) => {
+export const GET = withRole('ADMIN')(async (req: AuthenticatedRequest) => {
   try {
     const { searchParams } = new URL(req.url);
     const userType = searchParams.get('userType'); // Filter by CLIENT or PROVIDER
