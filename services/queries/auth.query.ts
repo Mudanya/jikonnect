@@ -141,6 +141,12 @@ export const getUserWithProfileById = async (id: string) => {
 }
 
 export const deleteUser = async (id: string) => {
+    const terms = await prisma.terms.findMany({ where: { userId: id } })
+    if (terms.length > 0) {
+        for (const term of terms) {
+            await prisma.terms.delete({ where: { id: term.id } })
+        }
+    }
     return await prisma.user.delete({ where: { id } })
 }
 export const suspendUser = async (id: string, action: 'suspend' | 'unsuspend' | 'makeAdmin') => {

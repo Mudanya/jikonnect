@@ -47,6 +47,7 @@ export const DELETE = async (req: NextRequest, { params }: { params: Promise<{ i
         );
 
     } catch (err) {
+        console.log(err)
         return NextResponse.json(
             { success: false, message: (err as Error).message || 'Something went wrong!' },
             { status: 500 })
