@@ -61,29 +61,7 @@ const AppNavBar = () => {
             <ChatIcon />
             
             <NotificationBell />
-            {/* <div className="relative p-2 rounded-lg">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="link"
-                    className="p-0! m-0! flex items-center cursor-pointer hover:bg-transparent w-fit h-fit"
-                  >
-                    <Bell size={20} />
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-56 mt-2 bg-gray-100 p-4 rounded me-2"
-                  align="start"
-                >
-                  <DropdownMenuLabel>Notification</DropdownMenuLabel>
-                  <DropdownMenuSeparator className="border border-gray-200" />
-                  <DropdownMenuItem className="cursor-pointer mt-2">
-                    All
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div> */}
+          
             <Link
               href="/profile"
               className="w-10 h-10 bg-linear-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-2xl cursor-pointer"

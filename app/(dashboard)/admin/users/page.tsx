@@ -17,6 +17,7 @@ import {
   Ban,
   Trash2,
   ShieldPlus,
+  Eye,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { UserStatus } from "@/lib/generated/prisma/enums";
@@ -38,7 +39,7 @@ export default function AdminUsersPage() {
   const {user:adminUser}= useAuth()
   const searchParams = useSearchParams();
   const roleParam = searchParams?.get("role") || "CLIENT";
-
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -362,7 +363,7 @@ export default function AdminUsersPage() {
                                   action: "makeAdmin",
                                 })
                               }
-                              className="text-green-600 hover:text-green-900"
+                              className="text-green-600 hover:text-green-900 cursor-pointer"
                               title="Make Admin"
                             >
                               <ShieldPlus className="w-5 h-5" />
@@ -377,7 +378,7 @@ export default function AdminUsersPage() {
                                   action: "unsuspend",
                                 })
                               }
-                              className="text-green-600 hover:text-green-900"
+                              className="text-green-600 hover:text-green-900 cursor-pointer"
                               title="Unsuspend user"
                             >
                               <CheckCircle className="w-5 h-5" />
@@ -391,7 +392,7 @@ export default function AdminUsersPage() {
                                   action: "suspend",
                                 })
                               }
-                              className="text-red-600 hover:text-red-900"
+                              className="text-red-600 hover:text-red-900 cursor-pointer"
                               title="Suspend user"
                             >
                               <Ban className="w-5 h-5" />
@@ -405,10 +406,21 @@ export default function AdminUsersPage() {
                                 action: "delete",
                               })
                             }
-                            className="text-red-600 hover:text-red-900"
+                            className="text-red-600 hover:text-red-900 cursor-pointer"
                             title="Delete user"
                           >
                             <Trash2 className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() =>
+                            {
+                              router.push(`/admin/users/${user.id}`)
+                            }
+                            }
+                            className="text-blue-600 hover:text-blue-900 cursor-pointer"
+                            title="View User Details"
+                          >
+                            <Eye className="w-5 h-5" />
                           </button>
                         </div>
                       </td>

@@ -9,8 +9,6 @@ export const getAllPendingProfiles = async () => {
     return await prisma.profile.findMany({
         where: {
             verificationStatus: 'PENDING',
-            idDocument: { not: null },
-            idNumber: { not: null }
         },
         include: {
             user: {
@@ -20,7 +18,8 @@ export const getAllPendingProfiles = async () => {
                     firstName: true,
                     lastName: true,
                     phone: true,
-                    createdAt: true
+                    createdAt: true,
+                    
                 }
             }
             ,
