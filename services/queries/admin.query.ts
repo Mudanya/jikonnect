@@ -589,7 +589,8 @@ export function getDefaultSettings(): Configs {
             maxBookingAmount: 100000,
             platformName: 'JiKonnect',
             supportEmail: 'support@jikonnect.co.ke',
-            supportPhone: '+254792423398'
+            supportPhone: '+254792423398',
+            maxFileUploadSizeMB:2
         },
         payments: {
             mpesaEnabled: true,

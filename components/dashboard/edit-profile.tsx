@@ -134,6 +134,9 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
     setUploading(true);
     try {
       const result = await uploadDocument(e, documentType);
+      if(result?.success === false){
+        toast.error(result.message || "Failed to upload document");
+      }
       if (result?.success) {
         if (documentType === "idDocument") {
           setDocuments((prev) => ({
@@ -149,6 +152,7 @@ const EditProfile = ({ onClickEdit }: { onClickEdit: () => void }) => {
         setUploading(false);
       }
     } catch (err) {
+      toast.error((err as Error).message);
     } finally {
       setUploading(false);
     }
