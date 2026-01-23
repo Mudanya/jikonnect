@@ -9,8 +9,6 @@ export const getAllPendingProfiles = async () => {
     return await prisma.profile.findMany({
         where: {
             verificationStatus: 'PENDING',
-            idDocument: { not: null },
-            idNumber: { not: null }
         },
         include: {
             user: {
@@ -20,7 +18,8 @@ export const getAllPendingProfiles = async () => {
                     firstName: true,
                     lastName: true,
                     phone: true,
-                    createdAt: true
+                    createdAt: true,
+                    
                 }
             }
             ,
@@ -590,7 +589,8 @@ export function getDefaultSettings(): Configs {
             maxBookingAmount: 100000,
             platformName: 'JiKonnect',
             supportEmail: 'support@jikonnect.co.ke',
-            supportPhone: '+254792423398'
+            supportPhone: '+254792423398',
+            maxFileUploadSizeMB:2
         },
         payments: {
             mpesaEnabled: true,

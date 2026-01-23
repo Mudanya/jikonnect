@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 export const GET = withAuth(async (req: AuthenticatedRequest) => {
   try {
     const userId = req.user.userId;
-    
+
     // Get user info
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -59,7 +59,7 @@ export const GET = withAuth(async (req: AuthenticatedRequest) => {
     if (!conversation) {
       // Get first admin user
       const admin = await prisma.user.findFirst({
-        where: { OR: [{ role: 'ADMIN' }, { role: 'SUPER_ADMIN' }] }
+        where: { role: 'ADMIN' }
       });
 
       if (!admin) {
@@ -143,7 +143,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
     // Get user info
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { 
+      select: {
         role: true,
         firstName: true,
         lastName: true
@@ -218,7 +218,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
       where: { id: conversation.id },
       data: { lastMessageAt: new Date() }
     });
- 
+
 
     return NextResponse.json({
       success: true,

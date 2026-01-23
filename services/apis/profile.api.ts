@@ -98,12 +98,14 @@ export const uploadDocument = async (e: React.ChangeEvent<HTMLInputElement>, doc
         });
         const data = await res.json();
         if (!data.success) {
-            throw new Error(data.message || "Failed to upload document");
+            return { success: false, message: data.message || "Failed to upload document" };
+            // throw new Error(data.message || "Failed to upload document");
         }
         return { success: true, fileUrl: data.data.fileUrl, documentType };
     }
     catch (err) {
-        throw new Error("Failed to upload document : " + (err as Error).message);
+        return { success: false, message: (err as Error).message };
+        // throw new Error("Failed to upload document : " + (err as Error).message);
     }
 }
 

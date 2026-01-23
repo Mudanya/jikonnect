@@ -1,6 +1,7 @@
 import { withAuth } from "@/lib/api-auth";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import logger from "@/lib/logger";
+import { getSettingsByKey } from "@/services/queries/admin.query";
 import { createAuditLog } from "@/services/queries/auth.query";
 import { getUserByUserId, getUserProfileById, updateDocument } from "@/services/queries/provider.query";
 import { AuthenticatedRequest } from "@/types/auth";
@@ -33,6 +34,7 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
         const documentType = formData.get('documentType') as string;
         const file = formData.get('file') as File;
         if (!file) {
+            logger.error("POST /api/profile/documents - No file uploaded");
             return NextResponse.json({
                 success: false,
                 message: 'No file uploaded'
@@ -47,17 +49,20 @@ export const POST = withAuth(async (req: AuthenticatedRequest) => {
             allowedTypeMsg = "JPEG, PNG, and PDF"
         }
         if (!allowedTypes.includes(file.type)) {
+            logger.error(`POST /api/profile/documents - Invalid file type. Only ${allowedTypeMsg} fileType: ${file.type} files are allowed.`);
             return NextResponse.json({
                 success: false,
                 message: `Invalid file type. Only ${allowedTypeMsg} files are allowed.`
             }, { status: 400 });
         }
-
-        const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
+        const platformDetails = await getSettingsByKey('platform')
+        const maxFileSizeMB = platformDetails?.maxFileUploadSizeMB || 1;
+        const MAX_FILE_SIZE = maxFileSizeMB * 1024 * 1024; // in bytes
         if (file.size > MAX_FILE_SIZE) {
+            logger.error("POST /api/profile/documents - File size exceeds the " + maxFileSizeMB + "MB limit. fileSize: " + file.size/1024/1024 + "MB");
             return NextResponse.json({
                 success: false,
-                message: 'File size exceeds the 1MB limit.'
+                message: 'File size exceeds the ' + maxFileSizeMB + 'MB limit.'
             }, { status: 400 });
         }
 

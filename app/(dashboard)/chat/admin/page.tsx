@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 interface Message {
   id: string;
   content: string;
-  senderType: "ADMIN" | "CLIENT" | "PROVIDER" | "SUPER_ADMIN";
+  senderType: "ADMIN" | "CLIENT" | "PROVIDER";
   sender: {
     firstName: string;
     lastName: string;
@@ -140,7 +140,7 @@ export default function ChatWithAdminPage() {
         ) : (
           <div className="space-y-4">
             {messages.map((message) => {
-              const isAdmin = message.senderType === "ADMIN" || message.senderType === "SUPER_ADMIN";
+              const isAdmin = message.senderType === "ADMIN";
               const isOwnMessage = !isAdmin;
 
               return (

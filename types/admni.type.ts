@@ -6,6 +6,7 @@ export type Configs = {
         platformName: string,
         supportEmail: string,
         supportPhone: string
+        maxFileUploadSizeMB: number
     },
     payments?: {
         mpesaEnabled: boolean,
