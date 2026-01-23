@@ -71,7 +71,7 @@ const VerificationPage = () => {
 
   const handleAction = async (
     profileId: string,
-    action: "approve" | "reject"
+    action: "approve" | "reject",
   ) => {
     if (action === "reject" && !rejectionReason) {
       toast.warning("Please provide a rejection reason");
@@ -84,7 +84,7 @@ const VerificationPage = () => {
         action,
         profileId,
         selectedProfile!.user.id,
-        rejectionReason
+        rejectionReason,
       );
       if (data.success) {
         setSelectedProfile(null);
@@ -118,7 +118,7 @@ const VerificationPage = () => {
 This is a reminder from JiKonnect regarding your provider verification.
 
 We noticed that your verification is incomplete. The following items are missing:
-${missing.map((item, i) => `${i + 1}. ${item}`).join('\n')}
+${missing.map((item, i) => `${i + 1}. ${item}`).join("\n")}
 
 Please update your profile with the missing information to complete your verification process.
 
@@ -134,9 +134,17 @@ Best regards,
 JiKonnect Verification Team`;
 
     // Format phone number for WhatsApp (remove + and spaces)
-    const phoneNumber = profile.user.phone.replace(/[\s+]/g, '');
-    
-    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    const phoneNumber = profile.user.phone.replace(/[\s+]/g, "");
+    let formatted;
+    if (phoneNumber.startsWith("0")) {
+      formatted = "254" + phoneNumber.substring(1);
+    } else if (phoneNumber.startsWith("+")) {
+      formatted = phoneNumber.substring(1);
+    } else if (!phoneNumber.startsWith("254")) {
+      formatted = "254" + phoneNumber;
+    }
+
+    return `https://wa.me/${formatted}?text=${encodeURIComponent(message)}`;
   };
 
   // Generate Email link
@@ -149,7 +157,7 @@ We hope this email finds you well.
 
 We noticed that your provider verification on JiKonnect is incomplete. To complete your verification and start receiving service requests, please provide the following missing information:
 
-${missing.map((item, i) => `${i + 1}. ${item}`).join('\n')}
+${missing.map((item, i) => `${i + 1}. ${item}`).join("\n")}
 
 HOW TO COMPLETE YOUR VERIFICATION:
 
@@ -205,7 +213,7 @@ Support: support@jikonnect.co.ke`;
               // Check if verification can be processed
               const canProcess = profile.idNumber && profile.idDocument;
               const missingItems = getMissingItemsMessage(profile);
-              
+
               return (
                 <div
                   key={profile.id}
@@ -282,11 +290,11 @@ Support: support@jikonnect.co.ke`;
                             className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
                           >
                             {service.name} • {service.pricingType} •{" "}
-                            {service.fixedPrice
-                              ? `KES ${service.fixedPrice}`
-                              : `KES ${service.hourlyRate}/hr`}
+                            {service.pricingType === "FIXED"
+                              ? `KES ${service.fixedPrice}` : service.pricingType === "HOURLY"
+                              ? `KES ${service.hourlyRate}/hr` : `${service.fixedPrice}/unit`}
                           </span>
-                        )
+                        ),
                       )}
                     </div>
                   </div>
@@ -319,7 +327,9 @@ Support: support@jikonnect.co.ke`;
                     {profile.certificates.length > 0 && (
                       <Button className="flex items-center space-x-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition">
                         <FileText size={18} />
-                        <span>{profile.certificates.length} Certificate(s)</span>
+                        <span>
+                          {profile.certificates.length} Certificate(s)
+                        </span>
                       </Button>
                     )}
                   </div>
@@ -328,18 +338,25 @@ Support: support@jikonnect.co.ke`;
                   {!canProcess && (
                     <div className="mt-4 space-y-3">
                       <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start space-x-2">
-                        <AlertCircle className="text-amber-600 mt-0.5 flex-shrink-0" size={18} />
+                        <AlertCircle
+                          className="text-amber-600 mt-0.5 flex-shrink-0"
+                          size={18}
+                        />
                         <div className="text-sm text-amber-800 flex-1">
-                          <p className="font-semibold mb-1">Incomplete Verification</p>
+                          <p className="font-semibold mb-1">
+                            Incomplete Verification
+                          </p>
                           <p className="mb-2">
-                            Missing: {missingItems.join(", ")}. Cannot process verification until all required information is provided.
+                            Missing: {missingItems.join(", ")}. Cannot process
+                            verification until all required information is
+                            provided.
                           </p>
                           <p className="text-xs text-amber-700">
                             Send a reminder to the provider:
                           </p>
                         </div>
                       </div>
-                      
+
                       {/* Reminder Action Buttons */}
                       <div className="flex flex-col md:flex-row items-center gap-3">
                         <a
@@ -352,11 +369,13 @@ Support: support@jikonnect.co.ke`;
                           <MessageCircle size={18} />
                           <span>Send WhatsApp Reminder</span>
                         </a>
-                        
+
                         <a
                           href={getEmailLink(profile)}
                           className="md:flex-1 flex w-full md:w-fit items-center justify-center space-x-2 px-4 py-2.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 transition font-medium"
-                          onClick={() => toast.success("Opening email client...")}
+                          onClick={() =>
+                            toast.success("Opening email client...")
+                          }
                         >
                           <Send size={18} />
                           <span>Send Email Reminder</span>

@@ -23,7 +23,7 @@ export const getAllPendingProfiles = async () => {
                 }
             }
             ,
-            services: { select: { name: true, id: true } }
+            services: { select: { name: true, id: true,fixedPrice:true,pricingType:true,hourlyRate:true } }
         },
         orderBy: {
             updatedAt: 'desc'

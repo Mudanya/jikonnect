@@ -193,7 +193,7 @@ const HeroSection = ({ data }: { data: LandingPageData | null }) => {
                       ))}
                     </div>
                     <span className="text-gray-600 font-medium">
-                      {data?.stats.verifiedProviders || 10}+ Verified Pros
+                      {Math.max(data?.stats.verifiedProviders || 0, 400)}+ Verified Pros
                     </span>
                   </div>
                   <div className="flex items-center space-x-1">

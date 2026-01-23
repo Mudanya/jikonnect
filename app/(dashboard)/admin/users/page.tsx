@@ -18,6 +18,8 @@ import {
   Trash2,
   ShieldPlus,
   Eye,
+  BanIcon,
+  MousePointerBan,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { UserStatus } from "@/lib/generated/prisma/enums";
@@ -381,7 +383,7 @@ export default function AdminUsersPage() {
                               className="text-green-600 hover:text-green-900 cursor-pointer"
                               title="Unsuspend user"
                             >
-                              <CheckCircle className="w-5 h-5" />
+                              <MousePointerBan className="w-5 h-5" />
                             </button>
                           ) : (
                             <button
